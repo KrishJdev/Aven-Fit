@@ -19,6 +19,8 @@
 9. [Competitive Positioning Matrix](#9-competitive-positioning-matrix)
 10. [Go-To-Market Strategy](#10-go-to-market-strategy)
 11. [MVP Feature Roadmap](#11-mvp-feature-roadmap)
+12. [Updated Technology Stack](#updated-technology-stack)
+13. [Architectural Principles](#architectural-principles)
 
 ---
 
@@ -105,8 +107,8 @@
 
 ### 🔗 Integrations
 
-- [ ] **Apple HealthKit** (mandatory for iOS)
-- [ ] **Google Health Connect** (mandatory for Android, replaces deprecated Google Fit APIs)
+- [ ] **Google Health Connect** (primary — mandatory for Android, replaces deprecated Google Fit APIs)
+- [ ] **Apple HealthKit** (future — required when iOS support is added)
 - [ ] **Wearable sync** — Garmin, Fitbit, Whoop, Oura, Noise, boAt (Indian wearables!)
 - [ ] **Smart scales** — Withings, Renpho (auto-import weight & body composition)
 - [ ] **Spotify / YouTube Music** — In-app playback controls during workouts
@@ -282,7 +284,7 @@ The Problem:
 |:---|:---|
 | Require internet to log a workout | Indian gyms (especially basement gyms) have zero signal |
 | Ignore battery optimization on Chinese OEM phones | MIUI, ColorOS, FuntouchOS aggressively kill background apps → broken step tracking |
-| Use CPU-polling for step counting | Drains battery; use hardware step sensor (`Sensor.TYPE_STEP_COUNTER`) instead |
+| Use CPU-polling for step counting | Drains battery; use hardware step sensor via native module (`Sensor.TYPE_STEP_COUNTER`) instead |
 | Allow unmoderated crowd-sourced food entries | Creates thousands of duplicates with wrong macros (MyFitnessPal's problem) |
 | Skip data export functionality | Users want to own their data; lock-in strategies cause backlash |
 
@@ -301,18 +303,21 @@ The Problem:
 ### Platform Strategy
 
 > [!IMPORTANT]
-> **Android first.** Android holds **>92-95% market share** in India. iOS can follow in Phase 2.
+> **Android-first.** Android holds **>92-95% market share** in India. The current architecture targets Android exclusively. iOS is a future expansion that should not influence current architectural decisions.
 
 | Decision | Recommendation | Rationale |
 |:---|:---|:---|
-| **Framework** | **Flutter** (Dart) | Single codebase; near-native performance; excellent for rapid iteration; growing Indian developer talent pool |
-| **Local DB** | **SQLite + Drift (Dart)** or **Isar** | Offline-first architecture; local is the source of truth |
-| **Backend** | **Supabase** (PostgreSQL + Auth + Edge Functions) | Open-source Firebase alternative; generous free tier; real-time sync; row-level security |
-| **Cloud Sync** | **Background sync via WorkManager (Android) / BGTasks (iOS)** | Batch sync when connectivity available; never block UI |
-| **Auth** | **Phone OTP (primary)** + Google Sign-In | Indians trust phone-based auth; email is secondary |
-| **Payments** | **Razorpay / Cashfree** with UPI AutoPay | UPI mandates for recurring subscriptions; handles RBI compliance |
+| **Platform** | **Android** | >92-95% market share in India; budget Android devices are the primary target |
+| **Framework** | **React Native** (TypeScript) | Cross-platform foundation with Android-first focus; strong ecosystem; TypeScript for type safety and maintainability |
+| **Language** | **TypeScript** (frontend), **Java** (backend) | TypeScript for mobile; Java + Spring Boot for robust, maintainable server-side logic |
+| **Local DB** | **SQLite** | Offline-first architecture; local is the source of truth for workout data; mature and well-supported on Android |
+| **Backend** | **Spring Boot / Java** (modular monolith) | Production-grade framework; Spring Security, Spring Data JPA, Hibernate; appropriate for initial scale |
+| **Server DB** | **PostgreSQL** | Authoritative server database; relational modelling, constraints, indexing, transactions, migrations |
+| **API** | **REST** | Simple, well-understood, sufficient for current requirements; GraphQL only if a demonstrated future need arises |
+| **Auth** | **Spring Security** + Phone OTP (primary) + Google Sign-In | Spring Security handles authentication/authorization; exact OTP provider selected during implementation |
+| **Cloud Sync** | **Background sync via Android WorkManager** | Network-aware, battery-friendly batch sync when connectivity available; never block UI |
 | **APK Size** | **Target <30MB** using AAB, WebP, dynamic feature delivery | Budget phone compatibility |
-| **CI/CD** | **GitHub Actions + Fastlane + Firebase App Distribution** | Automated builds, testing, and distribution |
+| **CI/CD** | **GitHub Actions** | Automated builds, testing, and Android APK/AAB generation |
 
 ### Architecture Diagram
 
@@ -321,32 +326,192 @@ The Problem:
 │                    Local-First Architecture                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  [ Flutter UI Layer ]                                            │
+│  [ React Native / TypeScript UI Layer ]                          │
 │       │                                                          │
 │       ▼                                                          │
-│  [ Local SQLite / Isar DB ]  ◄── Source of Truth                 │
+│  [ Local SQLite DB ]  ◄── Source of Truth (offline)              │
 │       │                                                          │
 │       ▼                                                          │
-│  [ Sync Engine + Conflict Resolver (LWW / CRDT) ]                │
+│  [ Sync Engine + Conflict Resolver ]                             │
 │       │                                                          │
-│  ┌────┼──────────────────────┬───────────────────────────┐       │
-│  ▼    ▼                      ▼                           ▼       │
-│ [Background     [Health       [Supabase        [Push     │       │
-│  Worker]         Connect/      Cloud API]       Notif     │       │
-│                  HealthKit]                     (FCM)]    │       │
-│                                                           │       │
+│  ┌────┼────────────────────┬────────────────────────────┐       │
+│  ▼    ▼                    ▼                            ▼       │
+│ [Android       [Google       [Spring Boot       [Push    │       │
+│  WorkManager]   Health        REST API]          Notif   │       │
+│                 Connect]           │             (FCM)]  │       │
+│                 (future)           ▼              (future)│       │
+│                            [Spring Security]             │       │
+│                                    │                     │       │
+│                                    ▼                     │       │
+│                            [PostgreSQL]                  │       │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+### Offline-First Architecture (Critical for India)
+
+> [!IMPORTANT]
+> Core workout logging must **never** require an internet connection. Indian gyms — especially basement gyms in Tier 2/3 cities — frequently have zero cellular signal.
+
+The architecture follows a local-first pattern:
+
+```
+React Native UI
+      ↓
+Local SQLite (source of truth)
+      ↓
+Synchronization Layer
+      ↓
+Spring Boot REST API
+      ↓
+PostgreSQL (authoritative server store)
+```
+
+**Offline capabilities (no internet required):**
+- Start a workout
+- Log sets (weight × reps)
+- Modify sets mid-workout
+- Complete a workout
+- View locally available workout history
+- Log meals from cached food database
+- Access previously loaded exercise library
+
+**Online capabilities (when connectivity is available):**
+- Background sync of pending operations to server
+- Fetch updated exercise library and food database
+- Social features (feed, kudos, sharing)
+- Cloud backup and cross-device restore
+
+### Synchronization & Conflict Handling
+
+Synchronization is a core architectural concern. The sync layer sits between the local SQLite database and the Spring Boot REST API.
+
+**Design considerations:**
+- Each locally created record should carry a client-generated UUID and a `last_modified` timestamp
+- Pending sync operations are queued in SQLite and processed when connectivity is detected
+- The sync engine should be idempotent — re-sending the same operation produces the same result
+- Network failures should result in automatic retry with exponential backoff
+
+**Conflict resolution strategy:**
+- For the MVP, a **last-write-wins (LWW)** strategy based on timestamps is a reasonable starting point for most data types
+- Workout logs are primarily append-only (new sets, new sessions), which significantly reduces conflict likelihood
+- The server should be the final arbiter for conflicts it detects
+- More sophisticated strategies (operational transforms, CRDTs) can be evaluated as multi-device usage patterns emerge
+
+> [!NOTE]
+> The conflict resolution strategy should not be prematurely locked in. Start with LWW for simplicity, instrument sync conflicts to understand real-world patterns, and evolve the approach based on data.
+
+### Backend Architecture — Modular Monolith
+
+The backend is a single Spring Boot application organized into logical modules:
+
+```
+┌────────────────────────────────────────────────┐
+│            Spring Boot Application              │
+├────────────────────────────────────────────────┤
+│                                                  │
+│  ┌──────────────┐  ┌──────────────┐              │
+│  │     Auth     │  │    Users     │              │
+│  └──────────────┘  └──────────────┘              │
+│  ┌──────────────┐  ┌──────────────┐              │
+│  │  Exercises   │  │   Workouts   │              │
+│  └──────────────┘  └──────────────┘              │
+│  ┌──────────────┐  ┌──────────────┐              │
+│  │   Routines   │  │  Nutrition   │              │
+│  └──────────────┘  └──────────────┘              │
+│  ┌──────────────┐  ┌──────────────┐              │
+│  │  Analytics   │  │     Sync     │              │
+│  └──────────────┘  └──────────────┘              │
+│                                                  │
+│  [ Spring Security ]  [ Spring Data JPA ]        │
+│  [ Hibernate ]        [ Bean Validation ]        │
+│                                                  │
+│  ──────────── PostgreSQL ────────────            │
+└────────────────────────────────────────────────┘
+```
+
+**Why a modular monolith (not microservices):**
+- Simpler to develop, test, deploy, and debug for a small team
+- No distributed system overhead (no service discovery, no inter-service communication complexity)
+- Clean module boundaries can be extracted into services later if scale demands it
+- Appropriate for early-stage product finding product-market fit
+
+**Each module should have:**
+- Its own package structure (`com.avenfit.auth`, `com.avenfit.workouts`, etc.)
+- Clear interfaces/boundaries between modules
+- Its own JPA entities, repositories, services, and controllers
+- Shared cross-cutting concerns (security, validation, error handling) via Spring infrastructure
+
+> [!NOTE]
+> Infrastructure such as Kubernetes, Kafka, Redis, and Elasticsearch are **not required for the MVP**. These can be evaluated as future scaling technologies if and when usage patterns justify them.
+
+### Database Architecture
+
+#### Mobile Database — SQLite
+
+**Purpose:** Offline persistence, fast workout logging, cached data, pending sync operations.
+
+**Key tables/entities:**
+- `workouts` — Workout sessions with start/end time, status
+- `exercises` — Local exercise library (cached from server)
+- `routines` — User-created workout templates
+- `sets` — Individual sets within a workout (weight, reps, RPE, set type)
+- `nutrition_entries` — Logged meals and food items
+- `food_cache` — Cached food database for offline search
+- `sync_queue` — Pending operations awaiting sync to server
+
+**Design principles:**
+- Client-generated UUIDs for all records (enables offline creation)
+- `created_at` and `updated_at` timestamps on all records
+- `sync_status` flag (pending / synced / conflict) on syncable records
+- Foreign key relationships maintained locally
+
+> [!NOTE]
+> The specific React Native SQLite library (e.g., `react-native-quick-sqlite`, `expo-sqlite`, `op-sqlite`) should be evaluated during implementation based on performance benchmarks, maintenance status, and synchronous API support. No library is pre-selected at this stage.
+
+#### Server Database — PostgreSQL
+
+**Purpose:** Authoritative server data, user accounts, workout history, nutrition data, analytics source, future social features.
+
+**Design requirements:**
+- Proper relational modelling with foreign keys and constraints
+- Indexes on frequently queried columns (user_id, exercise_id, created_at)
+- Transactions for data integrity during sync operations
+- Database migrations managed via Flyway or Liquibase
+- Auditing timestamps (`created_at`, `updated_at`) on all tables
+- Soft deletes where appropriate (`deleted_at` timestamp)
+
+### Authentication Architecture
+
+```
+React Native App
+      ↓
+Spring Boot REST API
+      ↓
+Spring Security (authentication + authorization)
+      ↓
+PostgreSQL (user accounts, credentials, sessions)
+```
+
+**Product requirements (preserved):**
+- **Phone OTP** — Primary authentication method; Indians trust phone-based auth
+- **Google Sign-In** — Secondary authentication method
+
+**Architecture:**
+- Spring Security handles authentication filters, session/token management, and endpoint authorization
+- JWT-based stateless authentication is a natural fit for mobile API clients
+- The exact OTP/SMS provider (e.g., Twilio, MSG91, or similar Indian providers) will be selected during implementation based on cost, reliability, and India coverage
+- Google Sign-In integrates via standard OAuth2/OpenID Connect flow through Spring Security
 
 ### Battery & Background Process Strategy (Critical for India)
 
 ```
-Indian Budget Phone Survival Guide:
+Android Budget Phone Survival Guide:
 ┌────────────────────────────────────────────────────────────────┐
 │ Problem: MIUI, ColorOS, FuntouchOS kill background apps       │
 │                                                                │
 │ Solutions:                                                     │
 │ 1. Use Hardware Step Sensor (TYPE_STEP_COUNTER)                │
+│    → Access via React Native native module                     │
 │    → Zero CPU cost, survives battery optimization              │
 │ 2. Foreground Service with persistent notification             │
 │    → For active workout tracking only                          │
@@ -354,10 +519,40 @@ Indian Budget Phone Survival Guide:
 │    → "Set app to Unrestricted Battery / Auto-Launch Allowed"   │
 │ 4. Google Health Connect for step sync                         │
 │    → Standardized OS-level data; survives app kills            │
-│ 5. WorkManager for background sync                             │
-│    → Batched, battery-friendly data upload                     │
+│ 5. Android WorkManager for background sync                    │
+│    → Network-aware, battery-friendly batch sync                │
+│    → Respects Doze mode and battery saver                      │
+│    → Automatic retry with backoff on failure                   │
+│    → Constraints: require unmetered network for large syncs    │
 └────────────────────────────────────────────────────────────────┘
 ```
+
+**Android WorkManager specifics:**
+- Use `PeriodicWorkRequest` for regular background sync intervals
+- Use `OneTimeWorkRequest` with network constraints for immediate sync when connectivity returns
+- Chain work requests for dependent operations (authenticate → sync workouts → sync nutrition)
+- Implement `ExistingPeriodicWorkPolicy.KEEP` to avoid duplicate sync workers
+
+> [!NOTE]
+> iOS background processing (BGTasks, Background App Refresh) will be addressed when iOS support is added as a future expansion. Current architecture focuses exclusively on Android mechanisms.
+
+### CI/CD Pipeline
+
+| Stage | Tool | Purpose |
+|:---|:---|:---|
+| **Source Control** | GitHub | Repository hosting, pull requests, code review |
+| **Frontend CI** | GitHub Actions | Lint, TypeScript type-check, unit tests (Jest), integration tests |
+| **Backend CI** | GitHub Actions | Build, unit tests (JUnit), integration tests, Spring Boot test context |
+| **Android Build** | GitHub Actions + Gradle | APK/AAB generation, signing |
+| **Code Quality** | ESLint + Prettier (frontend), Checkstyle/SpotBugs (backend) | Consistent code style and static analysis |
+| **Distribution** | Firebase App Distribution or internal testing track | Pre-release builds for testing |
+| **Production** | Google Play Console | Release to Play Store |
+
+**MVP CI/CD priorities:**
+- Automated lint and type-checking on every PR
+- Automated unit test execution for both frontend and backend
+- Automated Android build to catch build failures early
+- Keep deployment and hosting choices flexible — do not commit to a specific cloud provider unless explicitly required
 
 ---
 
@@ -577,7 +772,7 @@ STRONG TAILWINDS:
 
 | Priority | Feature |
 |:---:|:---|
-| P0 | Cloud sync (Supabase) across devices |
+| P0 | Cloud sync (Spring Boot + PostgreSQL) across devices |
 | P0 | Social feed — share workouts, kudos, follow friends |
 | P0 | Vrat/Fasting mode with festival calendar |
 | P1 | Advanced analytics — 1RM tracking, muscle heatmap, custom date ranges |
@@ -622,6 +817,43 @@ STRONG TAILWINDS:
 3. **Generous free tier is non-negotiable** — This is how you beat Strong/Hevy in India
 4. **Budget phone performance is non-negotiable** — Test on ₹8,000 Xiaomi phones, not ₹80,000 iPhones
 5. **Community-driven growth** — Routine sharing, transformation challenges, and Instagram-native content will outperform paid acquisition in India
+
+---
+
+## Updated Technology Stack
+
+| Layer | Technology | Status |
+|:---|:---|:---|
+| **Platform** | Android | Current |
+| **Mobile** | React Native | Current |
+| **Language** | TypeScript (frontend), Java (backend) | Current |
+| **Local DB** | SQLite | Current |
+| **Backend** | Spring Boot / Java (modular monolith) | Current |
+| **API** | REST | Current |
+| **Server DB** | PostgreSQL | Current |
+| **Security** | Spring Security | Current |
+| **Background Sync** | Android WorkManager | Current direction |
+| **Health** | Google Health Connect | Future |
+| **iOS** | React Native iOS support | Future |
+| **Payments** | Razorpay / Cashfree with UPI AutoPay | Future |
+| **AI** | To be determined | Future |
+| **Wearables** | Google Health Connect + Indian brands (Noise, boAt) | Future |
+| **Advanced Sync** | CRDTs / operational transforms (if needed) | Future |
+
+---
+
+## Architectural Principles
+
+1. **Android-first** — Target Android exclusively for the current release. iOS is a future expansion.
+2. **Offline-first** — Core workout logging, set tracking, and local history must work without any internet connection.
+3. **Local-first workout logging** — SQLite is the source of truth on the device. The user's workout experience never depends on server availability.
+4. **Spring Boot modular monolith** — A single, well-structured Spring Boot application with logical domain modules. No microservices overhead for the MVP.
+5. **PostgreSQL server persistence** — The authoritative server database for user data, workout history, nutrition, analytics, and future social features.
+6. **REST API** — Simple, well-understood REST endpoints between React Native and Spring Boot. No GraphQL unless a demonstrated need arises.
+7. **Clear separation between mobile and server persistence** — SQLite handles offline/local concerns; PostgreSQL handles authoritative server concerns. The sync layer bridges the two.
+8. **Background synchronization** — Android WorkManager provides network-aware, battery-conscious sync. Data is synced opportunistically without blocking the user experience.
+9. **Security** — Spring Security handles authentication (Phone OTP, Google Sign-In) and authorization. JWT-based stateless auth for mobile API clients.
+10. **Incremental development** — Ship the MVP fast, validate with users, and expand incrementally. Do not over-engineer infrastructure for hypothetical scale.
 
 ---
 
