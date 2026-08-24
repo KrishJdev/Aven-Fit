@@ -9,14 +9,18 @@ import { theme } from '@/theme';
 import { useAuthStore } from '@/store/authStore';
 import { format } from 'date-fns';
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '@/navigation/types';
+
 export const TodayScreen = () => {
   const { user } = useAuthStore();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const todayDate = format(new Date(), 'EEEE, MMMM do').toUpperCase();
   
-  // Example "start workout" handler
+  // Navigate to the Active Workout flow
   const handleStartWorkout = () => {
-    // In future phases, this will navigate to the Active Workout flow
-    console.log('Start Workout');
+    navigation.navigate('ActiveWorkout', {});
   };
 
   return (
