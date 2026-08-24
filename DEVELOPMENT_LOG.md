@@ -494,3 +494,21 @@ Significant architectural and product decisions are recorded here for reference.
 
 **Next Steps:**
 - Move to Phase 3: The "Today/Home" experience.
+
+---
+
+### 2026-08-25 — Antigravity (Phase 3 Frontend)
+
+**Task:** Phase 3 Today/Home Experience
+**Status:** Complete
+
+**Changes:**
+- Built the TodayScreen avoiding generic dashboard paradigms. Implemented an editorial layout utilizing substantial whitespace and clean typographic hierarchy.
+- **ActionCard**: A high-contrast call-to-action for the upcoming workout with haptic integration.
+- **FuelSummary**: A dense, tabular macro tracker. Avoided Apple-style circular rings in favor of minimalist horizontal linear tracking that fits the "Technical" ethos.
+- **MomentumChart**: A bespoke week-view consistency grid.
+- Leveraged date-fns for formatted date injection (EEEE, MMMM do).
+- Zero typescript errors.
+
+**Next Steps:**
+- Move to Phase 4: The Workout Experience (Task 4.2). This is the core of the app.
