@@ -19,6 +19,15 @@ public interface WorkoutExerciseRepository extends JpaRepository<WorkoutExercise
     int findNextPosition(@Param("workoutId") UUID workoutId);
 
     /**
+     * Pessimistic write lock used to serialize set-position assignment when
+     * sets are logged into the same exercise concurrently.
+     */
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query(
+            "select we from WorkoutExercise we where we.id = :id")
+    Optional<WorkoutExercise> findByIdForUpdate(@Param("id") UUID id);
+
+    /**
      * Detail fetch: exercise + sets in one query (single bag per query —
      * fetching Workout.exercises and sets together is a MultipleBagFetch).
      */

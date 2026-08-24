@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -192,8 +193,17 @@ public class SyncOperationProcessor {
                 if (existing == null || !existing.getUser().getId().equals(user.getId())) {
                     return new Result(id, id, IGNORED_DUPLICATE);
                 }
+                // Capture affected exercises before the cascade so personal
+                // records can be re-synced afterwards (rows whose source sets
+                // vanished must not linger as unmoored PRs).
+                List<UUID> affectedExerciseIds = existing.getExercises().stream()
+                        .map(we -> we.getExercise().getId())
+                        .toList();
                 workoutRepository.delete(existing);
                 workoutRepository.flush();
+                for (UUID exerciseId : affectedExerciseIds) {
+                    personalRecordService.synchronize(user.getId(), exerciseId);
+                }
                 return new Result(id, id, DELETED);
             }
             default -> {

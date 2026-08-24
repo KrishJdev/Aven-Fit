@@ -72,7 +72,12 @@ public class AuthService {
             throw badRefreshToken();
         }
         User user = stored.getUser();
-        refreshTokenRepository.delete(stored);
+        // Consume the token atomically: a concurrent rotation of the same
+        // token deletes it first and this call must fail instead of also
+        // minting a second pair from one refresh.
+        if (refreshTokenRepository.deleteByTokenReturningCount(refreshToken) == 0) {
+            throw badRefreshToken();
+        }
         return issueTokens(user);
     }
 

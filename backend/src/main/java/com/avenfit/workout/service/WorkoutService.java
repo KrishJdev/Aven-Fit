@@ -133,12 +133,15 @@ public class WorkoutService {
         Workout workout = ownedInProgress(userId, workoutId);
         Exercise exercise = visibleExercise(userId, exerciseId);
 
+        // Serialize per-workout so concurrent adds cannot race on positions.
+        workoutRepository.findByIdForUpdate(workout.getId());
+
         WorkoutExercise we = new WorkoutExercise();
         we.setWorkout(workout);
         we.setExercise(exercise);
         we.setPosition(workoutExerciseRepository.findNextPosition(workoutId) + 1);
         we.setRestSeconds(restSeconds != null ? restSeconds : DEFAULT_REST_SECONDS);
-        we = workoutExerciseRepository.save(we);
+        we = workoutExerciseRepository.saveAndFlush(we);
         return WorkoutExerciseDto.emptySets(we);
     }
 
@@ -168,8 +171,10 @@ public class WorkoutService {
     @Transactional
     public SetLogResponse logSet(UUID userId, UUID workoutId, UUID workoutExerciseId, LogSetRequest request) {
         Workout workout = ownedInProgress(userId, workoutId);
-        WorkoutExercise we = workoutExerciseRepository
-                .findByIdAndWorkoutId(workoutExerciseId, workoutId)
+        // Serialize per-exercise so concurrent set logging cannot race on
+        // positions (MAX+1 is only safe under the parent row lock).
+        WorkoutExercise we = workoutExerciseRepository.findByIdForUpdate(workoutExerciseId)
+                .filter(candidate -> candidate.getWorkout().getId().equals(workout.getId()))
                 .orElseThrow(() -> ResourceNotFoundException.of("Workout exercise", workoutExerciseId));
 
         WorkoutSet set = new WorkoutSet();

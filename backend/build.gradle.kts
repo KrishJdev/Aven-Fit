@@ -13,6 +13,12 @@ java {
     }
 }
 
+// Windows dev machines default to windows-1252 — non-ASCII literals
+// (Hindi food names etc.) must survive compilation and test runs.
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+}
+
 repositories {
     mavenCentral()
 }
@@ -51,4 +57,5 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs("-Dfile.encoding=UTF-8")
 }

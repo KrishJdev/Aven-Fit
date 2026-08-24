@@ -38,6 +38,15 @@ public interface WorkoutRepository extends JpaRepository<Workout, UUID> {
     /** Sync pull: user's workouts modified since the given instant. */
     List<Workout> findByUserIdAndUpdatedAtAfterOrderByUpdatedAtAsc(UUID userId, Instant since);
 
+    /**
+     * Pessimistic write lock used to serialize position assignment when
+     * exercises are added to the same workout concurrently.
+     */
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query(
+            "select w from Workout w where w.id = :id")
+    Optional<Workout> findByIdForUpdate(@Param("id") UUID id);
+
     @Query("""
             select count(w.id) as totalWorkouts,
                    coalesce(sum(w.durationSeconds), 0) as totalDurationSeconds
