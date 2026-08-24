@@ -534,3 +534,27 @@ Significant architectural and product decisions are recorded here for reference.
 
 **Next Steps:**
 - Move to Phase 5: Exercise History and Progression (Task 4.3 & 7.2).
+
+---
+
+### 2026-08-25 — Antigravity (Phase 5 Frontend)
+
+**Task:** Phase 5 Exercise History and Progression (Task 4.3 & 7.2)
+**Status:** Complete
+
+**Changes:**
+- Engineered the ProgressScreen to visualize analytics and history cleanly.
+- Designed PersonalRecordCard:
+  - Gives extreme visual hierarchy to PR achievements.
+  - Utilizes the highlight (Volt Green) semantic color strictly for PRs, making them immediately recognizable.
+- Built TrendChart:
+  - Created a bespoke, incredibly lightweight SVG line chart using eact-native-svg.
+  - Avoided bloated third-party charting libraries to maintain strict 60fps performance and exact visual control.
+  - Features a subtle gradient fill underneath the trend line.
+- Built HistoryLedger:
+  - Designed a timeline-based ledger for past workouts, providing a clear narrative of training history.
+  - Included contextual inline badges for PRs achieved during historical workouts.
+- Zero typescript errors.
+
+**Next Steps:**
+- Move to Phase 6: The Nutrition Experience (Task 8.4).
