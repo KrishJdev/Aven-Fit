@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { initDatabase } from '@/database';
 import { Typography } from '@/components/common/Typography';
+import { RootNavigator } from '@/navigation/RootNavigator';
 import { theme } from '@/theme';
 
 function App() {
@@ -21,38 +23,44 @@ function App() {
     setup();
   }, []);
 
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Typography variant="label" color={theme.colors.error}>
+          SYSTEM ERROR: {error}
+        </Typography>
+      </View>
+    );
+  }
+
+  if (!isDbReady) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <Typography variant="label" color={theme.colors.warning}>
+          INITIALIZING...
+        </Typography>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
-      {/* Force light-content as Aven Fit uses a premium dark theme by default */}
       <StatusBar barStyle="light-content" />
-      
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
-        <View style={styles.content}>
-          <Typography variant="h1" style={styles.title}>
-            AVEN FIT
-          </Typography>
-          
-          <Typography variant="body" color={theme.colors.textMuted} align="center" style={styles.subtitle}>
-            Premium Performance Tracking
-          </Typography>
-
-          <View style={styles.statusBox}>
-            {error ? (
-              <Typography variant="label" color={theme.colors.error}>
-                SYSTEM ERROR: {error}
-              </Typography>
-            ) : isDbReady ? (
-              <Typography variant="label" color={theme.colors.success}>
-                ● SYSTEM READY
-              </Typography>
-            ) : (
-              <Typography variant="label" color={theme.colors.warning}>
-                ○ INITIALIZING...
-              </Typography>
-            )}
-          </View>
-        </View>
-      </SafeAreaView>
+      <NavigationContainer theme={{
+        ...DefaultTheme,
+        dark: true,
+        colors: {
+          ...DefaultTheme.colors,
+          primary: theme.colors.primary,
+          background: theme.colors.background,
+          card: theme.colors.surface,
+          text: theme.colors.text,
+          border: theme.colors.surfaceHighlight,
+          notification: theme.colors.primary,
+        }
+      }}>
+        <RootNavigator />
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }
@@ -62,28 +70,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  content: {
-    flex: 1,
+  centered: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: theme.spacing.lg,
   },
-  title: {
-    letterSpacing: 2,
-    marginBottom: theme.spacing.sm,
-  },
-  subtitle: {
-    marginBottom: theme.spacing.xl,
-  },
-  statusBox: {
-    marginTop: theme.spacing.xxl,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radii.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
-  }
 });
 
 export default App;
