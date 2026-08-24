@@ -9,6 +9,39 @@
 
 ---
 
+### 2026-08-24 — OpenCode/Ox Alpha — Step 9 Sync Layer complete
+
+**Task:** DEVELOPMENT_PLAN.md Task 9.1 [BACKEND] — push/pull sync endpoints. Task 9.2 [FRONTEND] untouched.
+
+**Status:** Complete. **92 tests green** + live E2E vs PostgreSQL. This completes every `[BACKEND]`/`[SCHEMA]` task in the MVP plan; only Task 10.4 CI remains on the backend side.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `sync/dto/{SyncPushRequest,SyncPushResponse,SyncPullResponse}.java` | Plan shapes: batched operations w/ clientTimestamps; results carry `{clientId, serverId, status}`; pull returns exercises/workouts(full graphs)/routines(full templates)/foodItems + lastSyncTimestamp |
+| `sync/service/SyncOperationProcessor.java` | Per-type `@Transactional` handlers (exercise, workout, workout_exercise, workout_set, routine, food_item). Idempotency via shared client UUIDs (`CREATE` on existing → `IGNORED_DUPLICATE`); conflict = server `updated_at` newer than client snapshot **+1s grace window**; ownership enforced everywhere; deletes are idempotent; PR engine re-runs after synced sets |
+| `sync/service/SyncService.java` | Push orchestration with **per-operation error isolation** (one bad op never aborts the batch); pull assembly reusing detail-graph queries |
+| `sync/controller/SyncController.java` | `POST /api/sync/push`, `GET /api/sync/pull?since=` |
+| `routine/service/RoutineService.java` | Added `syncUpsert(user, id, request)` — creates under the client's own id or performs full replace (shared `doReplace` path) |
+| Repositories | Derived `...UpdatedAtAfter` finders (workouts/routines); FoodItem list-spec overload |
+| `common/exception/GlobalExceptionHandler.java` | Type-mismatched query params now → 400 (was falling through to 500) |
+
+**Bug found & fixed during testing:** immediate replay flagged CONFLICT because second-precision client timestamps lost to nanosecond server `updated_at`. Fixed with the documented 1-second grace window; also caught that my first patch attempt silently no-op'd (string-replace misses) — verified via grep before rebuilding.
+
+**Tests:** 9 new sync tests — offline batch creation, exact-batch replay idempotency, stale-vs-fresh conflict handling, unsupported-type isolation, delete+replay, foreign routine protection, validation, pull windows incl. full workout graphs, user scoping, malformed-since 400. Live E2E: 4-op batch (routine+workout+we+set) → CREATED×4 → replay IGNORED_DUPLICATE×4 → pull returns workout-with-set graph + routine → later-window pull empty.
+
+**Known Issues:** unchanged (deferred).
+
+**Next Steps:** Task 10.4 CI workflows (`backend-ci.yml`, `mobile-ci.yml`) is the last backend-tagged deliverable. Then Step 10 polish items that fall in backend scope. Frontend steps (0.3 post-init, 2.4–10.5) remain Antigravity's.
+
+**Notes for Antigravity:**
+- Sync API ready for mobile Task 9.2. Statuses your `conflictResolver` can expect: `CREATED`, `UPDATED`, `DELETED`, `IGNORED_DUPLICATE`, `CONFLICT`, `UNSUPPORTED_TYPE`, `NOT_FOUND`, `FAILED`, `VALIDATION_ERROR`.
+- Client timestamps SHOULD be millisecond ISO-8601 (`yyyy-MM-dd'T'HH:mm:ss.SSSZ`); a 1s grace window tolerates coarse clocks but precise stamps keep conflict semantics sharp.
+- Muscle-group links inside pushed exercises are NOT synced (scalar fields only) — create customs online if muscle tags matter, or we extend the mapper later.
+
+---
+
 ### 2026-08-24 — OpenCode/Ox Alpha — Step 8 Nutrition complete
 
 **Task:** DEVELOPMENT_PLAN.md Tasks 8.1–8.3 [BACKEND] — food-item endpoints, nutrition entry endpoints, Indian food seed. Task 8.4 [FRONTEND] untouched.
