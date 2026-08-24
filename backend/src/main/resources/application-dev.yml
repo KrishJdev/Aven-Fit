@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/avenfit_dev
+    username: avenfit
+    password: avenfit_dev_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+
+jwt:
+  secret: dev-secret-key-change-in-production-must-be-at-least-256-bits-long-for-hs256
+  access-token-expiration-ms: 900000       # 15 minutes
+  refresh-token-expiration-ms: 2592000000  # 30 days
