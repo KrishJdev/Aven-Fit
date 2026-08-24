@@ -9,6 +9,42 @@
 
 ---
 
+### 2026-08-24 — OpenCode/Ox Alpha — Step 8 Nutrition complete
+
+**Task:** DEVELOPMENT_PLAN.md Tasks 8.1–8.3 [BACKEND] — food-item endpoints, nutrition entry endpoints, Indian food seed. Task 8.4 [FRONTEND] untouched.
+
+**Status:** Complete. 83 tests green + live E2E vs PostgreSQL.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `nutrition/dto/{FoodItemDto,CreateFoodItemRequest,DailyNutritionDto,LogMealRequest}.java` | Exact plan shapes; DTO intentionally omits isCustom/createdBy/barcode echo |
+| `nutrition/service/FoodItemService.java` | Specification-based search (visibility + name + veg flag), custom creation |
+| `nutrition/service/NutritionService.java` | Server-computed macros (`food × quantity`, 2-dp HALF_UP), daily summary with **IST day boundaries** (`avenfit.nutrition.day-zone`, default Asia/Kolkata) |
+| `nutrition/controller/{FoodItemController,NutritionController}.java` | Search/get/create + entries GET/POST/DELETE per Appendix C |
+| `nutrition/repository/*` | FoodItemRepository → JpaSpecificationExecutor; entry owner lookup w/ EntityGraph |
+| `db/migration/V9__seed_indian_food_items.sql` | **201 verified Indian foods** across all 11 categories (GRAIN 30, DAL_LENTIL 22, VEGETABLE 20, PANEER_DAIRY 20, NON_VEG 22, INDIAN_SNACK 22, INDIAN_SWEET 18, BEVERAGE 12, PROTEIN_SUPPLEMENT 6, FRUIT 17, DRY_FRUIT 12); realistic per-serving macros; correct veg flags |
+
+**Semantics implemented (documented decisions):**
+1. Custom-food visibility mirrors exercises: foreign customs are invisible (404 on direct GET, absent from search).
+2. Macro calculation is literal to spec — `food.macros × quantity`; each seeded row defines one serving (servingSize/unit describe the unit). Client-supplied item unit overrides the label only.
+3. `loggedAt` optional in log-meal request (defaults to server now) — friendlier for quick logging; day attribution uses IST calendar boundaries.
+4. Search returns the standard paged envelope (plan example omitted metadata but §1 convention + page/size params require it).
+
+**Tests:** `.\gradlew.bat build` → BUILD SUCCESSFUL, **83 tests green** (12 new). Live E2E vs PostgreSQL: V9 migrated cleanly (v9 applied); `food_items=201`; "dal" search → 13 varieties; veg-filter on non-veg term → 0; real meal (Paneer Tikka ×1 + Roti ×2) computed **exactly** 240+208=448 kcal with per-item macro precision; IST daily summary matched; delete → empty day.
+
+**Known Issues:** unchanged (deferred).
+
+**Next Steps:** Step 9 Offline Sync backend (Task 9.1 — push/pull endpoints, idempotency), then Task 10.4 CI workflows. That completes every [BACKEND]/[SCHEMA]-tagged task in the plan.
+
+**Notes for Antigravity:**
+- Nutrition API ready for mobile Task 8.4. Search shape: `{data[],page,size,totalElements,totalPages}`; log-meal response echoes computed items incl. resolved units.
+- Day-boundary zone is configurable via `avenfit.nutrition.day-zone` if you ever need per-user zones.
+- Food DTO deliberately hides barcode for now (P1 scanner feature will surface it).
+
+---
+
 ### 2026-08-24 — OpenCode/Ox Alpha — Step 7 Analytics complete
 
 **Task:** DEVELOPMENT_PLAN.md Task 7.1 [BACKEND] — personal records, exercise history, windowed summary endpoints. (Step 6 Rest Timer is [FRONTEND]-only — no backend surface.) Tasks 7.2 [FRONTEND] untouched.
