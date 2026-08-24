@@ -512,3 +512,25 @@ Significant architectural and product decisions are recorded here for reference.
 
 **Next Steps:**
 - Move to Phase 4: The Workout Experience (Task 4.2). This is the core of the app.
+
+---
+
+### 2026-08-25 — Antigravity (Phase 4 Frontend)
+
+**Task:** Phase 4 The Workout Experience & Rest Timer (Task 4.2 & 6.1)
+**Status:** Complete
+
+**Changes:**
+- Engineered the ActiveWorkoutScreen, separating the "Training Mode" visually from the rest of the application.
+- Added ActiveWorkout as a ullScreenModal in the RootNavigator to emphasize focus mode.
+- Designed ExerciseBlock and SetRow components:
+  - Stripped away standard text input borders. Utilized deep surface background highlighting on focus.
+  - Implemented strictly tabular number inputs (no layout shifting when logging reps/weights).
+  - Used custom checkmark button for set completion linked directly to Haptics.trigger('impactHeavy').
+- Built the RestTimerOverlay (Task 6.1):
+  - Created a precise, floating panel at the bottom of the screen.
+  - Anchored by an amber warning semantic color to distinctly signal the resting state vs the active working state.
+- Zero typescript errors.
+
+**Next Steps:**
+- Move to Phase 5: Exercise History and Progression (Task 4.3 & 7.2).
