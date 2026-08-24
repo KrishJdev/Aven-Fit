@@ -304,15 +304,19 @@ class NutritionApiIntegrationTest {
 
     @Test
     void summaryTotalsSpanMultipleMeals() throws Exception {
-        Instant now = Instant.now();
-        JsonNode breakfast = logMeal("{\"mealType\": \"BREAKFAST\", \"loggedAt\": \"" + now + "\", " +
+        // Pin to noon IST of the computed "today" so a UTC/IST midnight
+        // crossing during the test can never split log-time from query-day
+        java.time.ZoneId ist = java.time.ZoneId.of("Asia/Kolkata");
+        java.time.LocalDate today = java.time.LocalDate.now(ist);
+        Instant noonIstToday = today.atTime(12, 0).atZone(ist).toInstant();
+
+        JsonNode breakfast = logMeal("{\"mealType\": \"BREAKFAST\", \"loggedAt\": \"" + noonIstToday + "\", " +
                 "\"items\": [{\"foodItemId\": \"" + roti.getId() + "\", \"quantity\": 2}]}", 201);
-        JsonNode snack = logMeal("{\"mealType\": \"SNACK\", \"loggedAt\": \"" + now.plusSeconds(60) + "\", " +
+        JsonNode snack = logMeal("{\"mealType\": \"SNACK\", \"loggedAt\": \"" + noonIstToday.plusSeconds(60) + "\", " +
                 "\"items\": [{\"foodItemId\": \"" + roti.getId() + "\", \"quantity\": 1}]}", 201);
 
-        String today = java.time.LocalDate.now(java.time.ZoneId.of("Asia/Kolkata")).toString();
         JsonNode day = objectMapper.readTree(mockMvc.perform(get("/api/nutrition/entries")
-                                .param("date", today)
+                                .param("date", today.toString())
                                 .header("Authorization", "Bearer " + tokenA))
                         .andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsString()).path("data");
