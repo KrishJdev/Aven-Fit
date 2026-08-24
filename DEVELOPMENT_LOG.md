@@ -9,6 +9,38 @@
 
 ---
 
+### 2026-08-24 — OpenCode/Ox Alpha — Step 5 Routines complete
+
+**Task:** DEVELOPMENT_PLAN.md Task 5.1 [BACKEND] — routine CRUD with nested exercises/default sets. Task 5.2 [FRONTEND] untouched.
+
+**Status:** Complete. 62 tests green + live E2E vs PostgreSQL.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `routine/repository/RoutineRepository.java` | **Fixed latent double-bag EntityGraph** (audit finding); added `findWithSetsByRoutineId` (single-bag join fetch), grouped `summarize` projection for exerciseCount, ordered bulk deletes |
+| `routine/dto/RoutineDto.java` | List row `{id, name, description, exerciseCount, createdAt}` per spec |
+| `routine/dto/RoutineDetailDto.java` | Detail exactly per example — sets echo `{position, setType, targetReps, targetWeightKg}` without ids; note `targetRpe` is stored but intentionally NOT echoed (spec omits it) |
+| `routine/dto/CreateRoutineRequest.java` | Nested validated request shared by POST/PUT (full replace) |
+| `routine/service/RoutineService.java` | CRUD, owner-only via `findByIdAndUserId` (foreign → 404), exercise-visibility checks (system or own custom), duplicate-position 400s, conflict-safe full replace: bulk delete children → flush+clear persistence context → re-fetch fresh aggregate → rebuild |
+| `routine/controller/RoutineController.java` | GET list / GET id / POST 201 / PUT / DELETE 204 |
+
+**Bug fixed during testing (predicted in audit):** naive clear()+re-add on replace caused two distinct failures — (1) `uq_routine_exercise_position` insert-before-delete ordering, and (2) after adding bulk deletes, Hibernate 6's row-count-checked orphan DELETEs threw `StaleObjectStateException` on stale managed children. Final sequence: FK-ordered JPQL deletes → `em.flush()` + `em.clear()` → re-fetch → rebuild. Regression test locks it in (`replaceSwappingPositionsOnSameExercisesDoesNotViolateUniqueConstraint`).
+
+**Tests:** `.\gradlew.bat build` → BUILD SUCCESSFUL, **62 tests green** (12 new: nested create fidelity, empty routine allowed, unknown/invisible exercise 404, duplicate positions 400, list visibility + counts + no foreign leakage, foreign detail/delete 404, full-replace swap/shrink regression, delete everywhere, blank name/invalid setType 400). Live E2E vs PostgreSQL: create(2ex, 2+1 sets) → list count → PUT position-swap clean → start workout from replaced routine (pre-population follows new order) → log set into pre-populated slot → delete routine 204 → workout intact via FK SET NULL → routine 404.
+
+**Known Issues:** unchanged from earlier entries (deferred per user instruction).
+
+**Next Steps:** Step 6 Rest Timer is [FRONTEND]-only per plan (no backend surface). Next backend phase = Step 7 Analytics endpoints (Tasks 7.1). Recommend Antigravity confirm whether to proceed straight to 7 or coordinate 5.2/6 first.
+
+**Notes for Antigravity:**
+- Routine API ready for mobile Task 5.2. "Start Workout" button flow: `POST /api/workouts {name, routineId, startedAt}` — pre-population verified end-to-end.
+- Routine detail deliberately does not echo `targetRpe` (your spec's set shape omits it); the column persists values if you later want them surfaced.
+- Committed this phase following repo hygiene (separate feat/docs commits).
+
+---
+
 ### 2026-08-24 — OpenCode/Ox Alpha — Step 4 Workout Logging complete (THE CORE)
 
 **Task:** DEVELOPMENT_PLAN.md Task 4.1 [BACKEND] — full workout lifecycle: start (with routine template), add/remove exercises, log/update/delete sets with automatic PR detection, complete/cancel, history summaries. Task 4.2/4.3 [FRONTEND] untouched.
