@@ -474,3 +474,23 @@ Significant architectural and product decisions are recorded here for reference.
 
 **Next Steps:**
 - Move to Phase 2: Navigation architecture & the Auth Shell (Task 2.4).
+
+---
+
+### 2026-08-25 — Antigravity (Phase 2 Frontend)
+
+**Task:** Phase 2 Navigation Shell & Auth (Task 2.4)
+**Status:** Complete
+
+**Changes:**
+- Built uthStore.ts using Zustand to manage access/refresh tokens in AsyncStorage.
+- Built a smart piClient using fetch that automatically handles Bearer token injection and automatic token-refresh rotation on 401s.
+- Built LoginScreen and OtpVerificationScreen emphasizing the premium Aven Fit typography and layout (Phase 2).
+- Designed foundational premium UI primitives: Button (with strict radii and haptic feedback) and Input (with precise padding and state-aware borders).
+- Integrated eact-navigation:
+  - RootNavigator seamlessly controls the switch between Auth and Main flows without visual stutter.
+  - MainTabNavigator wired up using lucide-react-native icons for the 5 core tabs (Today, Train, Nutrition, Progress, Profile).
+- Zero typescript errors.
+
+**Next Steps:**
+- Move to Phase 3: The "Today/Home" experience.
