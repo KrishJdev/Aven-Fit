@@ -456,3 +456,21 @@ Significant architectural and product decisions are recorded here for reference.
 | 6 | 2026-08-24 | Modular monolith (not microservices) | Appropriate for small team, early-stage product | User |
 | 7 | 2026-08-24 | Android-first (not cross-platform MVP) | >92% India market share, budget Android is primary target | User |
 | 8 | 2026-08-24 | Offline-first architecture | Indian gyms have unreliable connectivity; core logging must work offline | User + Analysis |
+
+---
+
+### 2026-08-25 — Antigravity (Phase 1 Frontend)
+
+**Task:** Phase 1 Design Foundations & Technical Setup (Task 0.3 & 1.4)
+**Status:** Complete
+
+**Changes:**
+- Initialized deep dark "Aven Fit" premium theme (colors.ts, 	ypography.ts, spacing.ts) emphasizing tabular-num data typography and high-contrast semantics.
+- Created precise directory architecture under mobile/src/.
+- Configured TS aliases @/* and Babel module resolution.
+- Initialized highly optimized op-sqlite engine (C++ JSI).
+- Drafted local SQLite schema mimicking the 16 Postgres tables + Sync Columns + sync_queue.
+- Re-wrote App.tsx to handle DB setup asynchronously while presenting a crisp loading visual.
+
+**Next Steps:**
+- Move to Phase 2: Navigation architecture & the Auth Shell (Task 2.4).
