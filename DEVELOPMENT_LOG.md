@@ -9,6 +9,201 @@
 
 ---
 
+### 2026-08-24 — OpenCode/Ox Alpha — Step 4 Workout Logging complete (THE CORE)
+
+**Task:** DEVELOPMENT_PLAN.md Task 4.1 [BACKEND] — full workout lifecycle: start (with routine template), add/remove exercises, log/update/delete sets with automatic PR detection, complete/cancel, history summaries. Task 4.2/4.3 [FRONTEND] untouched.
+
+**Status:** Complete. All Task 4.1 acceptance criteria verified — 52 tests green + live end-to-end run against PostgreSQL including DB-level assertions.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `workout/dto/{CreateWorkoutRequest,LogSetRequest,WorkoutDto,WorkoutSummaryDto,WorkoutExerciseDto,WorkoutSetDto,SetLogResponse}.java` | Exact plan shapes; SetLogResponse carries `prDetails {recordType, previousValue, newValue}` |
+| `workout/service/WorkoutService.java` | Start (+routine pre-population of exercises & empty typed sets), auto-positioning everywhere, ownership via `findByIdAndUserId`, state guards (`IN_PROGRESS` only → 409 otherwise), duration calculation on complete, position compaction on exercise removal |
+| `workout/controller/WorkoutController.java` | All 10 routes per Appendix C |
+| `workout/repository/WorkoutRepository.java` | Summary aggregate JPQL (exerciseCount / completed setCount / volume / prCount in one grouped query — no N+1); detail fetch split into two purposeful queries |
+| `analytics/service/PersonalRecordService.java` | PR engine: recomputes all four record types from completed sets on every set create/update/delete; upserts/deletes `personal_records`; syncs `is_pr` flags; Brzycki EST_1RM (reps ≤ 10) |
+| `common/exception/ConflictException.java` + handler case | Workout state violations → 409 |
+
+**PR semantics implemented (decisions documented for review):**
+1. **Warmup sets never count** toward records or PR badges.
+2. All four record types tracked truthfully in `personal_records`; when a set beats several at once, `prDetails` reports by priority MAX_WEIGHT → EST_1RM → MAX_VOLUME → MAX_REPS.
+3. `is_pr` badge = holder of a current best for MAX_WEIGHT / MAX_VOLUME / EST_1RM. **MAX_REPS alone never badges a set** (otherwise every new rep count at any weight would celebrate). Ties badge all holders.
+4. Update/delete re-evaluation is a full recompute — records can legitimately decrease and flags migrate to the new holder.
+
+**Bugs found & fixed during testing:**
+1. `MultipleBagFetchException`: the detail `@EntityGraph` fetched two `List` bags simultaneously. Replaced with two purposeful queries (workout plain + exercises-with-sets join-fetch).
+2. Latent same-class issue noted: `RoutineRepository` has an identical double-bag `@EntityGraph` — unused so far, MUST be fixed before Step 5 uses it.
+3. Test-side: probe exercises were owned by the wrong user (correctly 404'd), and tie-badge semantics corrected expectations.
+
+**Tests:** `.\gradlew.bat build` → BUILD SUCCESSFUL, **52 tests green** (19 new: lifecycle, PR detection matrix incl. warmup exclusion & Brzycki range guard, re-evaluation after update/delete, state locks, ownership, summary aggregates, position compaction). Live E2E vs PostgreSQL: warmup no-PR → 100×5 first PR → 110×5 beats it (prev=100.00/new=110) → update 110→95 migrated flag to the 100 set → complete (duration_seconds=1800 exact, verified via psql) → post-complete mutation 409 → history row correct (1 exercise / 3 sets / 1575 kg / 1 PR).
+
+**Known Issues:** unchanged from earlier entries (deferred per user instruction).
+
+**Next Steps:** Step 5 Routines backend (Task 5.1) — routine CRUD with nested exercises/sets; fix the RoutineRepository EntityGraph before wiring "start workout from routine" through the API (template path already proven inside start()).
+
+**Notes for Antigravity:**
+- The whole Task 4.1 API surface mobile needs for ActiveWorkoutScreen is live. `POST /api/workouts/{id}/exercises/{weId}/sets` response includes `prDetails` exactly as your spec example (null when not a PR).
+- Detail DTO intentionally omits `durationSeconds` (your example omits it); it's in the history summary DTO where your example shows it.
+- One active-workout-per-user is NOT yet enforced server-side (plan doesn't require it); say the word if you want it as an invariant.
+- Still nothing committed on my side.
+
+---
+
+### 2026-08-24 — OpenCode/Ox Alpha — Step 3 Exercise Library complete
+
+**Task:** DEVELOPMENT_PLAN.md Task 3.1 [BACKEND] — exercise browse/search/filter, custom exercise CRUD, muscle-groups endpoint. Task 3.2 [FRONTEND] untouched.
+
+**Status:** Complete. All Task 3.1 acceptance criteria verified via 22 integration/unit assertions plus a live end-to-end run against seeded PostgreSQL.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `exercise/dto/ExerciseDto.java` | Exact plan shape incl. `muscleGroups:[{name, role}]`, primaries first |
+| `exercise/dto/CreateExerciseRequest.java` | Validated; shared by POST + PUT |
+| `exercise/dto/MuscleGroupDto.java` | `{id, name, displayOrder}` |
+| `exercise/repository/ExerciseRepository.java` | Now extends `JpaSpecificationExecutor`; `@EntityGraph` overrides of `findAll(Specification, …)` prevent N+1 on DTO mapping |
+| `exercise/service/ExerciseService.java` | Dynamic Specification filters (visibility, search ignore-case, category, muscle-group EXISTS subquery), ownership enforcement, muscle-link **in-place sync** |
+| `exercise/controller/ExerciseController.java` | GET list (paged envelope `{data,page,size,totalElements,totalPages}`), GET id, POST → 201, PUT, DELETE → 204 |
+| `exercise/controller/MuscleGroupController.java` | `GET /api/muscle-groups` ordered by display_order (file added — not in plan tree) |
+| `common/exception/GlobalExceptionHandler.java` | Added: malformed body → 400 `VALIDATION_ERROR`; `DataIntegrityViolationException` → 409 `CONFLICT` |
+| `src/test/.../ExerciseApiIntegrationTest.java` | New: full matrix — visibility (excludes other users' customs), search, category+muscle filters, pagination metadata, invalid category/size 400s, DTO shape, create/update/delete + all 403 paths, unknown ids 404, overlap/no-primary 400s, ordered muscle groups |
+
+**Visibility rule implemented:** list/get return system exercises + the caller's own customs only; another user's custom returns **404** (no existence leak), while modify/delete attempts on system or foreign exercises return **403** per plan.
+
+**Bug found & fixed (important):**
+Updating an exercise's muscle groups originally did `collection.clear()` + re-add. Hibernate flushes orphan INSERTs before DELETEs non-deterministically → `uq_exercise_muscle` duplicate-key 409 on PostgreSQL (H2 tests had not caught it). Replaced with deterministic in-place sync (`update roles / remove dropped / insert new`) + regression test `updateSwappingRolesOnSameMuscleGroupsDoesNotViolateUniqueConstraint`. Live-verified all four update shapes (role-swap, all-new-keys, mixed keep+add, no-op) return 200 with exactly-correct DB rows.
+
+**Tests:**
+- `.\gradlew.bat build` → BUILD SUCCESSFUL, **33 tests green** (5 JWT + 7 auth-flow + 21 exercise)
+- Live bootRun E2E vs PostgreSQL 16.4 (seeded): paged list total=55/pages=11; search "bench"→5; BODYWEIGHT+Chest→Chest Dip, Push-Up; muscle-groups=14 Chest@1…Lower Back@14; custom create/get/update(×3 shapes)/delete all correct; system-exercise PUT & DELETE → 403; post-delete GET → 404; DB link-row count verified via psql
+
+**Known Issues:** unchanged from earlier entries (deferred per user instruction).
+
+**Next Steps:** Step 4 Workout Logging backend (Task 4.1) — the core feature: start/add-exercise/log-set endpoints with automatic PR detection (Brzycki for EST_1RM), workout completion/cancel, history pagination.
+
+**Notes for Antigravity:**
+- Exercise API is ready for mobile Task 3.2 wiring. Note `GET /api/exercises` returns the bare paged envelope (no `message` field) exactly as your example specifies.
+- Custom-exercise PUT is full-replace semantics (same body as POST); at least one primary muscle group is enforced.
+- Deleting a custom exercise that's referenced by workouts/routines returns **409 CONFLICT** rather than cascading.
+- Still nothing committed on my side.
+
+---
+
+### 2026-08-24 — OpenCode/Ox Alpha — Step 2 Authentication complete
+
+**Task:** DEVELOPMENT_PLAN.md Step 2 — Tasks 2.1 (JWT infrastructure), 2.2 (auth endpoints), 2.3 (user profile). Backend only; Task 2.4 [FRONTEND] untouched.
+
+**Status:** Complete. All Task 2.1–2.3 acceptance criteria verified, including a live end-to-end run against PostgreSQL.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `common/dto/ApiResponse.java`, `PagedResponse.java` | Response envelopes per plan §1 |
+| `common/exception/{ErrorResponse,GlobalExceptionHandler,ResourceNotFoundException}.java` | Centralized error handling → `{error, message, details}` |
+| `common/config/CorsConfig.java` | Permissive dev CORS (no credentials — JWT header auth) |
+| `auth/config/JwtProperties.java` | `@ConfigurationProperties(jwt)` record |
+| `auth/config/SecurityConfig.java` | Full stateless chain: CSRF off, `/api/health` + phone-OTP/google/refresh public, everything else under `/api/**` authenticated, JWT filter registered, JSON 401 entry point |
+| `auth/service/JwtService.java` | jjwt 0.12.x HS256; access (15m) + refresh (30d) tokens with `jti` claim |
+| `auth/filter/JwtAuthenticationFilter.java` | Bearer extraction → user lookup → SecurityContext principal = `User` entity |
+| `auth/service/OtpService.java` | MVP placeholder: static OTP `123456`, logged not sent — swap before production |
+| `auth/service/GoogleTokenService.java` | Verifies ID tokens via Google tokeninfo endpoint (RestClient) |
+| `auth/service/AuthService.java` | OTP verify (find-or-create "Gym User"), Google sign-in (links email-matched accounts), refresh rotation (old token invalidated), ownership-checked logout |
+| `auth/controller/AuthController.java` | The five endpoints per Task 2.2 |
+| `user/{controller/UserController,service/UserService,dto/UserProfileDto,dto/UpdateProfileRequest}.java` | GET/PUT `/api/users/me`, partial updates |
+| `auth/dto/{OtpRequest,GoogleAuthRequest,RefreshTokenRequest,AuthResponse}.java` | Validated request/response DTOs |
+| `src/test/.../JwtServiceTest.java` | Unit: round-trips, tamper, garbage, expiry |
+| `src/test/.../AuthFlowIntegrationTest.java` | MockMvc full flow on H2 |
+
+**Tests:**
+- `.\gradlew.bat build` → BUILD SUCCESSFUL, **11 tests green** (5 JWT unit + 6 integration)
+- Live bootRun E2E vs PostgreSQL 16.4 (all passed): request-otp → verify-otp (auto-created user) → GET me → PUT me → refresh rotation → old-refresh 401 → logout → post-logout refresh 401 → unauthenticated /me 401
+
+**Fixes made during testing (worth knowing):**
+1. JWTs lacked a unique claim — two logins for the same user within one millisecond produced byte-identical tokens and violated the unique index on `refresh_tokens.token`. Fixed by adding a `jti` claim.
+2. H2 treats `value` (`personal_records`) as reserved — Hibernate silently skipped creating that table in tests. Fixed test-only via `hibernate.auto_quote_keyword: true`. PostgreSQL/Flyway path unaffected.
+
+**Deviations from plan:**
+- Added `GoogleTokenService` + `RefreshTokenRequest`/`ErrorResponse` files not in the structure tree (needed for the specified behavior).
+- Did NOT create `LoginRequest` from the tree — no endpoint in the API summary uses it.
+- `AuthResponse.user` intentionally compact ({id, phoneNumber, displayName, unitPreference}) to match the Task 2.2 response example exactly.
+
+**Known Issues:** unchanged from previous entry (Android SDK absent; portable Postgres needs manual start after reboot) — deferred per user instruction.
+
+**Next Steps:** Step 3 Exercise Library backend (Task 3.1): exercise + muscle-group CRUD/search/filter endpoints per Appendix C.
+
+**Notes for Antigravity:**
+- Auth is fully wired — mobile Task 2.4 can build against it now. Emulator base URL: `http://10.0.2.2:8080`.
+- OTP is static `123456` in this phase by design; the response envelope shapes match the plan examples exactly.
+- Nothing committed yet on my side.
+
+---
+
+### 2026-08-24 — OpenCode/Ox Alpha — Step 0 (Backend) + Step 1 complete
+
+**Task:** Execute DEVELOPMENT_PLAN.md Step 0 (Tasks 0.1, 0.2, backend half of 0.4) and Step 1 (Tasks 1.1–1.3).
+
+**Status:** Complete. All Step 0 + Step 1 acceptance criteria verified.
+
+**Changes:**
+
+| File/Dir | Action | Description |
+|:---|:---|:---|
+| `server/` | Deleted | My earlier non-conformant Maven/Boot-4.1 scaffold; replaced by spec layout below |
+| `backend/build.gradle.kts` | Created | Boot 3.3.5, Java 21, full spec dependency set (web/jpa/security/validation/postgres/flyway/jjwt/devtools/lombok/h2-test/security-test), Gradle KTS |
+| `backend/settings.gradle.kts` | Created | `aven-fit-backend` |
+| `backend/gradle/wrapper/*`, `gradlew(.bat)` | Created | Gradle 8.10.2 wrapper |
+| `backend/src/main/resources/application.yml` | Created | Exactly per plan §Task 0.1 |
+| `backend/src/main/resources/application-dev.yml` | Created | Exactly per plan §Task 0.1 |
+| `backend/src/test/resources/application-test.yml` | Added | H2 profile for tests (`flyway.enabled=false`, create-drop) |
+| `backend/src/main/java/com/avenfit/AvenFitApplication.java` | Created | Main class |
+| `common/entity/CreatableEntity.java` | Added | id+createdAt base — see Deviations #1 |
+| `common/entity/BaseEntity.java` | Created | Per plan, extends CreatableEntity |
+| `common/controller/HealthController.java` | Created | `GET /api/health` → `{status, timestamp}` per Task 0.4 |
+| `auth/config/SecurityConfig.java` | Created | Interim stateless config permitting `/api/health`; superseded by Task 2.1 |
+| `auth/entity/{User,RefreshToken,UnitPreference,Gender}` | Created | Task 1.2 |
+| `exercise/entity/{Exercise,MuscleGroup,ExerciseMuscleGroup,ExerciseCategory,Equipment,MuscleRole}` | Created | Task 1.2 |
+| `workout/entity/{Workout,WorkoutExercise,WorkoutSet,WorkoutStatus,SetType}` | Created | Task 1.2 |
+| `routine/entity/{Routine,RoutineExercise,RoutineSet}` | Created | Task 1.2 |
+| `nutrition/entity/{FoodItem,NutritionEntry,NutritionEntryItem,MealType}` | Created | Task 1.2 |
+| `analytics/entity/{PersonalRecord,BodyMeasurement,RecordType}` | Created | Task 1.2 |
+| `*/repository/*.java` (9 repos) | Created | Task 1.3 incl. all custom queries from plan |
+| `db/migration/V1..V8__*.sql` | Created | Verbatim from plan Appendix/§Task 1.1; V8 seeds **55** exercises (≥50 required), 105 muscle links |
+| `scripts/setup-dev-db.sql`, `scripts/README.md` | Created | Task 0.2 |
+
+**Tests:**
+- `.\gradlew.bat build` → BUILD SUCCESSFUL (compile + context-load test on H2 test profile)
+- `bootRun` against PostgreSQL 16.4 → Flyway applied **8/8 migrations**; `ddl-auto: validate` passed with all 16 entities
+- DB counts verified via psql: muscle_groups=14, exercises=55, exercise_muscle_groups=105, 16 domain tables + flyway history
+- `GET /api/health` → 200 `{"status":"UP","timestamp":"..."}`
+
+**Environment note:** Installed portable PostgreSQL 16.4 (EDB binaries) at `%LOCALAPPDATA%\PostgreSQLDev\16`, running detached on port 5432, superuser password `postgres`. Started with `pg_ctl -D %LOCALAPPDATA%\PostgreSQLDev\16\data start`. It is NOT a Windows service — it must be started manually after reboot.
+
+**Deviations from plan (flagging for review):**
+1. Added `CreatableEntity` (id + createdAt only). Four tables in the plan's own schema have no `updated_at` (`refresh_tokens`, `exercise_muscle_groups`, `nutrition_entry_items`, `personal_records`), so those entities extend it instead of BaseEntity. Required for `ddl-auto: validate` to pass.
+2. Plan asked for Boot "3.3.x" but start.spring.io no longer serves 3.x; build files are hand-pinned to **3.3.5** as specified.
+3. Plan listed both `List<...>` and `Optional<...> findByUserIdAndStatus(...)` — impossible overload; implemented `findFirstByUserIdAndStatus` (+ paginated variants).
+4. Removed `@OrderBy("muscleGroup.displayOrder")` on Exercise.muscleGroups (crashes Hibernate 6 metadata init); display-order sorting will be done in the DTO/service layer.
+5. `application-dev.yml` contains dev-only DB credentials verbatim from the plan — acceptable local defaults, but production config must use env vars (noted for Task 10 / release prep).
+
+**Known Issues:**
+- No Android SDK on this machine → `mobile/` cannot be built to APK here yet (Antigravity's domain).
+- `mobile/` exists (RN 0.87 bare CLI, TS; lint/tsc/jest green) but Task 0.3 post-init steps (path aliases, src/ structure, nav+sqlite deps) are not done — left for [FRONTEND] owner.
+
+**Next Steps:**
+- Step 2 Authentication (Tasks 2.1–2.3 backend): JwtService, filter, full SecurityConfig, OTP flow, user profile endpoints.
+- Then Step 3 exercise endpoints.
+
+**Notes for Antigravity:**
+- Step 0 + Step 1 backend are done and verified end-to-end against a live Postgres — please review deviations above, especially #1 and #4.
+- `GET /api/health` is live if you want to wire the temporary mobile health-check screen (use `10.0.2.2:8080` from emulator).
+- Nothing has been committed by me; working tree contains my changes plus your committed docs. Suggest committing backend once reviewed.
+
+---
+
 ### 2026-08-24 — Antigravity
 
 **Task:** Project initialization and technical architecture alignment
