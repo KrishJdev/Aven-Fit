@@ -9,6 +9,41 @@
 
 ---
 
+### 2026-08-25 — OpenCode/Ox Alpha — Full backend QA pass complete
+
+**Task:** Phased testing & debugging pass over all completed backend work (senior-dev/tester review). Policy: fix-as-found; OTP throttle deferred; sync bypasses state guards (pinned).
+
+**Status:** Complete. **122 tests green across two consecutive full runs** (was 92 → +30 QA tests). Fresh-DB drill passed. Findings ledger below.
+
+**QA suites added (`com.avenfit.qa` + security/nutrition additions):**
+- `SecurityAuditIntegrationTest` (9) — JWT negatives at endpoint level, cross-user authz matrix incl. sync handlers, refresh-token cross-user logout protection, LIKE/quote injection probes, wildcard predictability, unicode round-trip
+- `FunctionalBoundariesTest` (9) — RPE exact bounds, zero-weight legality, pagination edges, empty-PUT profile, non-sequential routine positions pinned, shrink-to-empty replace, Brzycki reps=10-in/11-out, analytics window clamps, macro HALF_UP rounding, **sync-bypasses-state-guards semantics pinned end-to-end**
+- `ReferentialIntegrityTest` (4) — referenced-exercise delete→409, referenced-food sync-delete degrades to FAILED, PR downgrade on synced workout deletion, routine-deleted-after-use keeps workouts intact
+- `ConcurrencyProbeTest` (2) — double-refresh race exactly-one-winner; 5-way parallel set logging all-succeed-unique-positions
+- `QueryBudgetSmokeTest` (4) — Hibernate-statistics query budgets: list=1 query/7ms, detail graph=2/6ms, daily summary=1/11ms, pull=5/23ms. **No N+1 anywhere.**
+
+## Findings Ledger
+
+| # | Severity | Finding | Resolution |
+|:---:|:---|:---|:---|
+| F1 | 🔴 Critical | **Windows builds corrupted all non-ASCII string literals** (javac ran at platform CP1252): Hindi names would have been stored as garbage on any Windows dev build. Linux CI would have masked it | Fixed: `options.encoding="UTF-8"` via `configureEach`; test JVM `-Dfile.encoding=UTF-8`. Verified via codepoint probe (प=2346) |
+| F2 | 🔴 High | **`workout_sets` had no unique constraint on `(workout_exercise_id, position)`** — spec gap inherited from plan V3; concurrent logging could silently duplicate positions in production too | Fixed: new migration `V10__add_workout_set_position_unique.sql` + entity `@UniqueConstraint` mirror |
+| F3 | 🔴 High | Position assignment raced under concurrent writes (`MAX+1` read-then-insert); naive retry poisoned the transaction | Fixed: pessimistic `PESSIMISTIC_WRITE` locks on parent rows (workout / workout_exercise) serialize assignment per aggregate — no exceptions, strict ordering |
+| F4 | 🟠 Medium | Refresh rotation was double-spendable: two concurrent `/refresh` calls with one token could both mint pairs | Fixed: conditional bulk delete returns row-count; 0 rows ⇒ loser gets 401. Race test proves exactly-one-winner |
+| F5 | 🟠 Medium | Synced `workout DELETE` left personal_records orphaned (source sets cascade-vanished, records lingered unmoored) | Fixed: processor captures affected exercises pre-delete and re-syncs PRs after |
+| F6 | 🟡 Low | Wrong HTTP method on an endpoint returned **500** instead of 405 | Fixed: `HttpRequestMethodNotSupportedException` → 405 `METHOD_NOT_ALLOWED` |
+| F7 | 🟡 Low | Test-infra gotchas documented in-code: MockMvc string bodies default ISO-8859-1; `getContentAsString()` needs explicit UTF-8 for unicode assertions; javap console output mangles non-ASCII (display only) | Test-side fixes only |
+| F8 | ⚪ Known-issue (deferred per user) | No OTP brute-force throttling (static MVP OTP makes it moot today) | Documented here; revisit pre-production with real SMS |
+| F9 | ⚪ Known-issue | Flyway migrations only exercised against real Postgres locally; CI uses H2 (V5 GIN index incompatible) | Candidate post-MVP: Testcontainers job in backend-ci |
+
+**Verification:** fresh empty DB → V1–V9 applied clean (14/55/201 seeds) · full suite ×2 consecutive green (122) · mobile gates re-run green · all live E2E behaviors from earlier phases still hold.
+
+**Next Steps:** Backend is QA-signed-off. Remaining plan work is frontend-owned ([FRONTEND] tasks 0.3-post-init → 10.5) plus shared Step 10 polish. Recommended near-term: first `git push` to activate CI pipelines.
+
+**Notes for Antigravity:** please review F1–F5 especially — F1/F2 change build+schema behavior (both are strictly safer than before). Sync-bypasses-guards is now a tested contract your conflict resolver can rely on.
+
+---
+
 ### 2026-08-24 — OpenCode/Ox Alpha — Task 10.4 CI workflows complete
 
 **Task:** DEVELOPMENT_PLAN.md Task 10.4 [BACKEND] — GitHub Actions CI for both projects.
