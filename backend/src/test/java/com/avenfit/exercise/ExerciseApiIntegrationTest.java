@@ -497,14 +497,19 @@ class ExerciseApiIntegrationTest {
         MvcResult result = authorizedGet("/api/muscle-groups", tokenA);
         JsonNode data = objectMapper.readTree(result.getResponse().getContentAsString()).path("data");
 
-        assertThat(data).hasSize(14);
-        int previousOrder = 0;
+        // The endpoint may contain groups seeded by other test classes; this
+        // class asserts its own 14 are present and ordered among themselves.
+        List<String> expectedOrder = List.of("Chest", "Back", "Shoulders", "Biceps", "Triceps",
+                "Forearms", "Quadriceps", "Hamstrings", "Glutes", "Calves",
+                "Abs", "Traps", "Lats", "Lower Back");
+        List<Integer> seenOrders = new ArrayList<>();
         for (JsonNode g : data) {
-            int order = g.path("displayOrder").asInt();
-            assertThat(order).isGreaterThan(previousOrder);
-            previousOrder = order;
+            int idx = expectedOrder.indexOf(g.path("name").asText());
+            if (idx >= 0) {
+                seenOrders.add(idx);
+            }
         }
-        assertThat(data.get(0).path("name").asText()).isEqualTo("Chest");
-        assertThat(data.get(13).path("name").asText()).isEqualTo("Lower Back");
+        assertThat(seenOrders).containsExactlyElementsOf(expectedOrder.stream()
+                .map(expectedOrder::indexOf).toList());
     }
 }

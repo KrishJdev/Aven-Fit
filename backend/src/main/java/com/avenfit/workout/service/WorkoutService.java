@@ -6,7 +6,7 @@ import com.avenfit.common.dto.PagedResponse;
 import com.avenfit.common.exception.ConflictException;
 import com.avenfit.common.exception.ResourceNotFoundException;
 import com.avenfit.exercise.entity.Exercise;
-import com.avenfit.exercise.repository.ExerciseRepository;
+import com.avenfit.exercise.service.ExerciseService;
 import com.avenfit.routine.entity.Routine;
 import com.avenfit.routine.repository.RoutineRepository;
 import com.avenfit.workout.dto.CreateWorkoutRequest;
@@ -48,20 +48,20 @@ public class WorkoutService {
     private final WorkoutRepository workoutRepository;
     private final WorkoutExerciseRepository workoutExerciseRepository;
     private final WorkoutSetRepository workoutSetRepository;
-    private final ExerciseRepository exerciseRepository;
+    private final ExerciseService exerciseService;
     private final RoutineRepository routineRepository;
     private final PersonalRecordService personalRecordService;
 
     public WorkoutService(WorkoutRepository workoutRepository,
                           WorkoutExerciseRepository workoutExerciseRepository,
                           WorkoutSetRepository workoutSetRepository,
-                          ExerciseRepository exerciseRepository,
+                          ExerciseService exerciseService,
                           RoutineRepository routineRepository,
                           PersonalRecordService personalRecordService) {
         this.workoutRepository = workoutRepository;
         this.workoutExerciseRepository = workoutExerciseRepository;
         this.workoutSetRepository = workoutSetRepository;
-        this.exerciseRepository = exerciseRepository;
+        this.exerciseService = exerciseService;
         this.routineRepository = routineRepository;
         this.personalRecordService = personalRecordService;
     }
@@ -294,16 +294,7 @@ public class WorkoutService {
     }
 
     private Exercise visibleExercise(UUID userId, UUID exerciseId) {
-        Exercise exercise = exerciseRepository.findById(exerciseId)
-                .orElseThrow(() -> ResourceNotFoundException.of("Exercise", exerciseId));
-        boolean system = !Boolean.TRUE.equals(exercise.getIsCustom());
-        boolean ownCustom = Boolean.TRUE.equals(exercise.getIsCustom())
-                && exercise.getCreatedBy() != null
-                && userId.equals(exercise.getCreatedBy().getId());
-        if (!system && !ownCustom) {
-            throw ResourceNotFoundException.of("Exercise", exerciseId);
-        }
-        return exercise;
+        return exerciseService.getVisibleExerciseEntity(userId, exerciseId);
     }
 
     private UUID exerciseIdOf(WorkoutSet set) {

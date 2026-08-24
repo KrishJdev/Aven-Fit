@@ -117,6 +117,19 @@ public class ExerciseService {
         exerciseRepository.delete(exercise);
     }
 
+    /**
+     * Returns the exercise entity when visible to the user: system exercises
+     * always; custom only when owned. Shared by workout/routine/analytics
+     * flows so the 404-on-foreign rule has a single implementation.
+     */
+    @Transactional(readOnly = true)
+    public Exercise getVisibleExerciseEntity(UUID userId, UUID exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> ResourceNotFoundException.of("Exercise", exerciseId));
+        requireVisible(userId, exercise);
+        return exercise;
+    }
+
     private Exercise loadOwnedCustomExercise(UUID userId, UUID exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId)
                 .orElseThrow(() -> ResourceNotFoundException.of("Exercise", exerciseId));
