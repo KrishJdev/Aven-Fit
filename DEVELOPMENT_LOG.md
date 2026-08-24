@@ -9,6 +9,42 @@
 
 ---
 
+### 2026-08-24 — OpenCode/Ox Alpha — Step 7 Analytics complete
+
+**Task:** DEVELOPMENT_PLAN.md Task 7.1 [BACKEND] — personal records, exercise history, windowed summary endpoints. (Step 6 Rest Timer is [FRONTEND]-only — no backend surface.) Tasks 7.2 [FRONTEND] untouched.
+
+**Status:** Complete. 71 tests green + live E2E vs PostgreSQL with hand-computed expectations matching exactly.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `analytics/controller/AnalyticsController.java` | GET `/api/analytics/personal-records[?exerciseId]`, `/exercise/{id}/history`, `/summary?days` |
+| `analytics/service/AnalyticsService.java` | Grouping/aggregation logic; reuses PR-engine query for history |
+| `analytics/dto/{PersonalRecordGroupDto,ExerciseHistoryDto,SummaryDto}.java` | Exact plan shapes; records keyed by RecordType enum (only existing types); history sets carry `{weightKg, reps, setType}` per spec |
+| `workout/repository/WorkoutRepository.java` | Added analytics queries: totals projection, set-totals projection (warmup-excluded), muscle-group volume grouped by PRIMARY muscle (volume desc), completed-since finder |
+| `analytics/repository/PersonalRecordRepository.java` | Added `countByUserIdAndAchievedAtGreaterThanEqual` for newPRs |
+| `exercise/service/ExerciseService.java` | Promoted shared `getVisibleExerciseEntity(userId, id)` — single implementation of the 404-on-foreign rule (was triplicated); WorkoutService refactored onto it |
+
+**Semantics implemented (documented decisions):**
+1. Warmup sets: listed in history but excluded from bestSet/volume/totals/muscle breakdown — consistent with the Step 4 PR engine.
+2. Muscle-group volume attributes to PRIMARY muscle only (no double counting).
+3. History groups by workout START date (UTC) and sorts chronologically ascending (chart-friendly).
+4. Summary window filters on COMPLETED workouts by startedAt; newPRs counts record rows achieved in-window (approximation of "PR events" for MVP).
+
+**Tests:** `.\gradlew.bat build` → BUILD SUCCESSFUL, **71 tests green** (9 new: empty state, grouping/types/filter, per-user isolation, foreign 404s, day grouping with warmup exclusion, summary windows + validation, Brzycki cross-check via API). Fixed during testing: my own test bugs (wrong probe ownership → correct 404s; wrong MAX_VOLUME arithmetic 330<500; cross-test contamination on shared probes → per-scenario probes; exercise-test muscle-group assertion made resilient to extra seeds).
+
+**Known Issues:** unchanged (deferred). Note: top-level summary totals now exclude warmups consistently with the muscle-group breakdown (inconsistency caught in live verification and fixed before commit).
+
+**Next Steps:** Remaining backend phases: Step 8 Nutrition (Task 8.1–8.3 incl. V9 Indian food seed ≥200 items) and Step 9 Sync (Task 9.1), then Task 10.4 CI. Frontend steps belong to Antigravity.
+
+**Notes for Antigravity:**
+- Analytics API ready for mobile chart wiring. `records` map omits types with no data; `bestSet` may be null if a day had only bodyweight-empty sets.
+- `GET /summary?days=` defaults to 30, clamped 1..365.
+- Committed this phase.
+
+---
+
 ### 2026-08-24 — OpenCode/Ox Alpha — Step 5 Routines complete
 
 **Task:** DEVELOPMENT_PLAN.md Task 5.1 [BACKEND] — routine CRUD with nested exercises/default sets. Task 5.2 [FRONTEND] untouched.
