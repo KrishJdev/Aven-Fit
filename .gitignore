@@ -1,0 +1,24 @@
+# ---- Agent / assistant local state ----
+.opencode/
+
+# ---- IDEs & editors ----
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# ---- OS junk ----
+Thumbs.db
+.DS_Store
+
+# ---- Local environment / secrets ----
+.env
+.env.*
+!.env.example
+
+# ---- Logs ----
+*.log
+
+# ---- Local databases (dev Postgres lives outside repo, just in case) ----
+*.db
+*.sqlite
