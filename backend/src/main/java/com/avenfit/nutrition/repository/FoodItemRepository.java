@@ -27,4 +27,7 @@ public interface FoodItemRepository
 
     @Nullable
     Page<FoodItem> findAll(@Nullable Specification<FoodItem> spec, Pageable pageable);
+
+    @Nullable
+    List<FoodItem> findAll(@Nullable Specification<FoodItem> spec);
 }

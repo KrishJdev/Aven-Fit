@@ -35,6 +35,9 @@ public interface WorkoutRepository extends JpaRepository<Workout, UUID> {
 
     List<Workout> findByUserIdAndStatusAndStartedAtAfter(UUID userId, WorkoutStatus status, Instant since);
 
+    /** Sync pull: user's workouts modified since the given instant. */
+    List<Workout> findByUserIdAndUpdatedAtAfterOrderByUpdatedAtAsc(UUID userId, Instant since);
+
     @Query("""
             select count(w.id) as totalWorkouts,
                    coalesce(sum(w.durationSeconds), 0) as totalDurationSeconds

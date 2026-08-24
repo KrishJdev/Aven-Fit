@@ -85,7 +85,34 @@ public class RoutineService {
     @Transactional
     public RoutineDetailDto replace(UUID userId, UUID routineId, CreateRoutineRequest request) {
         owned(userId, routineId);
+        return doReplace(routineId, request);
+    }
 
+    /**
+     * Idempotent sync path (Step 9): creates the routine under the client's
+     * own id when missing, otherwise performs a full replace. Ownership is
+     * verified before any replace.
+     */
+    @Transactional
+    public RoutineDetailDto syncUpsert(User user, UUID routineId, CreateRoutineRequest request) {
+        Routine existing = routineRepository.findById(routineId).orElse(null);
+        if (existing != null && !existing.getUser().getId().equals(user.getId())) {
+            throw new com.avenfit.common.exception.ConflictException(
+                    "Routine belongs to another user");
+        }
+        if (existing == null) {
+            Routine routine = new Routine();
+            routine.setId(routineId);
+            routine.setUser(user);
+            applyFields(routine, request);
+            rebuildChildren(routine, user.getId(), request);
+            routine = routineRepository.saveAndFlush(routine);
+            return toDetail(routine, routine.getExercises());
+        }
+        return doReplace(routineId, request);
+    }
+
+    private RoutineDetailDto doReplace(UUID routineId, CreateRoutineRequest request) {
         routineRepository.deleteSetsForRoutine(routineId);
         routineRepository.deleteExercisesForRoutine(routineId);
         entityManager.flush();
@@ -95,7 +122,7 @@ public class RoutineService {
                 .orElseThrow(() -> ResourceNotFoundException.of("Routine", routineId));
 
         applyFields(routine, request);
-        rebuildChildren(routine, userId, request);
+        rebuildChildren(routine, routine.getUser().getId(), request);
         routine = routineRepository.saveAndFlush(routine);
         return toDetail(routine, routineRepository.findWithSetsByRoutineId(routineId));
     }

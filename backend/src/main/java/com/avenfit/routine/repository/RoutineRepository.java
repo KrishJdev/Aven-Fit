@@ -15,6 +15,9 @@ public interface RoutineRepository extends JpaRepository<Routine, UUID> {
 
     List<Routine> findByUserIdOrderByUpdatedAtDesc(UUID userId);
 
+    /** Sync pull: user's routines modified since the given instant. */
+    List<Routine> findByUserIdAndUpdatedAtAfterOrderByUpdatedAtAsc(UUID userId, java.time.Instant since);
+
     Optional<Routine> findByIdAndUserId(UUID id, UUID userId);
 
     /**
