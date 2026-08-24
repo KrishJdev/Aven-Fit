@@ -9,6 +9,30 @@
 
 ---
 
+### 2026-08-24 — OpenCode/Ox Alpha — Task 10.4 CI workflows complete
+
+**Task:** DEVELOPMENT_PLAN.md Task 10.4 [BACKEND] — GitHub Actions CI for both projects.
+
+**Status:** Complete. **This closes out every `[BACKEND]`/`[SCHEMA]`-tagged task in DEVELOPMENT_PLAN.md** (Steps 0–5, 7, 8, 9 + 10.4). Remaining plan work is `[FRONTEND]`/`[BOTH]`: mobile Tasks 0.3-post-init through 10.5, and Step 10 polish items shared across agents.
+
+**Changes:**
+
+| File | Description |
+|:---|:---|
+| `.github/workflows/backend-ci.yml` | Push/PR → dev. JDK 21 (Temurin), Gradle cache, `build` + `test`, JUnit report via dorny/test-reporter, artifact upload (7-day retention) |
+| `.github/workflows/mobile-ci.yml` | Push/PR → dev. Node 20, npm cache from lockfile, `npm ci` → lint → `tsc --noEmit` → jest (`--ci`) |
+
+Both include concurrency cancellation per ref. YAML validated programmatically; mobile's exact commands re-run locally green (eslint clean / tsc clean / 1-1 tests). Backend build+test proven 92-green.
+
+**Known Issues:** unchanged (deferred).
+
+**Notes for Antigravity:**
+- First push to `origin/dev` will trigger both pipelines — expect green given local parity.
+- Backend CI runs against H2 (test profile); Flyway migrations are exercised only on real Postgres, so keep the local bootRun ritual until Testcontainers lands (candidate post-MVP hardening).
+- dorny/test-reporter needs `checks: write` — already set in the workflow permissions block.
+
+---
+
 ### 2026-08-24 — OpenCode/Ox Alpha — Step 9 Sync Layer complete
 
 **Task:** DEVELOPMENT_PLAN.md Task 9.1 [BACKEND] — push/pull sync endpoints. Task 9.2 [FRONTEND] untouched.
