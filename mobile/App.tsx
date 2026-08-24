@@ -7,6 +7,8 @@ import { Typography } from '@/components/common/Typography';
 import { RootNavigator } from '@/navigation/RootNavigator';
 import { theme } from '@/theme';
 
+import { SyncEngine } from '@/services/sync/SyncEngine';
+
 function App() {
   const [isDbReady, setIsDbReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,6 +17,7 @@ function App() {
     async function setup() {
       try {
         await initDatabase();
+        SyncEngine.init(); // Start listening for network to sync
         setIsDbReady(true);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Database initialization failed');
