@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { initDatabase } from '@/database';
 import { Typography } from '@/components/common/Typography';
 import { RootNavigator } from '@/navigation/RootNavigator';
 import { theme } from '@/theme';
-
 import { SyncEngine } from '@/services/sync/SyncEngine';
 
 function App() {
@@ -17,7 +16,7 @@ function App() {
     async function setup() {
       try {
         await initDatabase();
-        SyncEngine.init(); // Start listening for network to sync
+        SyncEngine.init();
         setIsDbReady(true);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Database initialization failed');
@@ -47,8 +46,8 @@ function App() {
   }
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaProvider initialWindowMetrics={initialWindowMetrics} style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
       <NavigationContainer theme={{
         ...DefaultTheme,
         dark: true,

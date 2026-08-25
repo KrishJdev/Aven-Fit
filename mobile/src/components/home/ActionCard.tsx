@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Typography } from '../common/Typography';
 import { theme } from '@/theme';
-import { Play, ArrowRight } from 'lucide-react-native';
+import { ArrowRight } from 'lucide-react-native';
 import * as Haptics from 'react-native-haptic-feedback';
 
 interface ActionCardProps {
@@ -19,24 +19,26 @@ export const ActionCard: React.FC<ActionCardProps> = ({ title, subtitle, onPress
 
   return (
     <TouchableOpacity 
-      activeOpacity={0.9} 
+      activeOpacity={0.8} 
       onPress={handlePress}
       style={styles.container}
     >
-      <View style={styles.content}>
-        <Typography variant="label" color={theme.colors.primary} style={styles.label}>
-          NEXT UP
-        </Typography>
-        <Typography variant="h2" style={styles.title}>
-          {title}
-        </Typography>
-        <Typography variant="body" color={theme.colors.textMuted}>
-          {subtitle}
-        </Typography>
+      <View style={styles.topRow}>
+        <View style={styles.badge}>
+          <Typography variant="label" color={theme.colors.background} style={styles.badgeText}>
+            NEXT UP
+          </Typography>
+        </View>
+        <ArrowRight color={theme.colors.primary} size={24} strokeWidth={1.5} />
       </View>
       
-      <View style={styles.iconContainer}>
-        <ArrowRight color={theme.colors.background} size={24} />
+      <View style={styles.bottomRow}>
+        <Typography variant="h1" style={styles.title} numberOfLines={1}>
+          {title.toUpperCase()}
+        </Typography>
+        <Typography variant="body" color={theme.colors.textMuted} style={styles.subtitle}>
+          {subtitle.toUpperCase()}
+        </Typography>
       </View>
     </TouchableOpacity>
   );
@@ -44,31 +46,40 @@ export const ActionCard: React.FC<ActionCardProps> = ({ title, subtitle, onPress
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radii.md,
-    padding: theme.spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
+    backgroundColor: 'transparent',
+    paddingVertical: theme.spacing.xl,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
     borderColor: theme.colors.surfaceHighlight,
+    marginVertical: theme.spacing.md,
   },
-  content: {
-    flex: 1,
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
   },
-  label: {
-    marginBottom: theme.spacing.sm,
+  badge: {
+    backgroundColor: theme.colors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  badgeText: {
+    letterSpacing: 2,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  bottomRow: {
+    flexDirection: 'column',
   },
   title: {
-    marginBottom: theme.spacing.xs,
+    fontSize: 40,
+    lineHeight: 44,
+    letterSpacing: -1,
+    marginBottom: 4,
   },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: theme.colors.text,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: theme.spacing.md,
+  subtitle: {
+    letterSpacing: 1,
+    fontSize: 12,
   },
 });

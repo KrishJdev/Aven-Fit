@@ -6,36 +6,38 @@ import { theme } from '@/theme';
 const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 export const MomentumChart: React.FC = () => {
-  // Mock data representing a typical week's consistency
-  const activeDays = [true, false, true, true, false, false, false];
+  // Mock data: height of the bar represents intensity or just binary completed
+  const activity = [1, 0, 0.8, 1, 0, 0, 0];
 
   return (
     <View style={styles.container}>
-      <Typography variant="label" style={styles.sectionTitle}>MOMENTUM</Typography>
+      <View style={styles.headerRow}>
+        <Typography variant="label" style={styles.sectionTitle} color={theme.colors.textSubtle}>MOMENTUM</Typography>
+        <Typography variant="tabular" style={styles.streakText}>3 DAY STREAK</Typography>
+      </View>
       
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Typography variant="h2">3 Day Streak</Typography>
-          <Typography variant="body" color={theme.colors.textMuted}>This Week</Typography>
-        </View>
-
-        <View style={styles.grid}>
-          {DAYS.map((day, index) => {
-            const isActive = activeDays[index];
-            return (
-              <View key={index} style={styles.dayCol}>
-                <View style={[styles.dot, isActive && styles.dotActive]} />
-                <Typography 
-                  variant="label" 
-                  color={isActive ? theme.colors.text : theme.colors.textSubtle}
-                  style={styles.dayLabel}
-                >
-                  {day}
-                </Typography>
+      <View style={styles.grid}>
+        {DAYS.map((day, index) => {
+          const val = activity[index];
+          const isActive = val > 0;
+          return (
+            <View key={index} style={styles.dayCol}>
+              <View style={styles.barTrack}>
+                <View style={[
+                  styles.barFill, 
+                  { height: `${val * 100}%`, backgroundColor: isActive ? theme.colors.text : 'transparent' }
+                ]} />
               </View>
-            );
-          })}
-        </View>
+              <Typography 
+                variant="label" 
+                color={isActive ? theme.colors.text : theme.colors.textSubtle}
+                style={styles.dayLabel}
+              >
+                {day}
+              </Typography>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -46,45 +48,43 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xl,
     marginBottom: theme.spacing.xxl,
   },
-  sectionTitle: {
-    marginBottom: theme.spacing.md,
-    letterSpacing: 1,
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radii.md,
-    padding: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
-  },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
+    borderBottomWidth: 1,
+    borderColor: theme.colors.surfaceHighlight,
+    paddingBottom: theme.spacing.sm,
     marginBottom: theme.spacing.lg,
+  },
+  sectionTitle: {
+    letterSpacing: 2,
+    fontSize: 10,
+  },
+  streakText: {
+    fontSize: 12,
+    color: theme.colors.primary,
   },
   grid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.xs,
   },
   dayCol: {
     alignItems: 'center',
+    width: 32,
   },
-  dot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: theme.colors.background,
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+  barTrack: {
+    width: 6,
+    height: 48,
+    backgroundColor: theme.colors.surfaceHighlight,
+    justifyContent: 'flex-end',
+    marginBottom: theme.spacing.md,
   },
-  dotActive: {
-    backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
+  barFill: {
+    width: '100%',
   },
   dayLabel: {
-    fontSize: 12,
+    fontSize: 10,
+    letterSpacing: 1,
   },
 });

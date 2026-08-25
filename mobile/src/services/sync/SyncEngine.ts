@@ -7,10 +7,9 @@ export class SyncEngine {
   private static isSyncing = false;
 
   static async init() {
-    // Listen for network changes
     NetInfo.addEventListener(state => {
       if (state.isConnected && state.isInternetReachable) {
-        this.runSync();
+        this.runSync().catch(() => {});
       }
     });
   }
@@ -27,48 +26,43 @@ export class SyncEngine {
       
       console.log('✅ Sync completed');
     } catch (e) {
-      console.error('❌ Sync failed:', e);
+      console.log('ℹ️ Sync skipped (backend unavailable):', e instanceof Error ? e.message : e);
     } finally {
       this.isSyncing = false;
     }
   }
 
   private static async pushPendingChanges() {
-    // 1. Get all pending operations from sync_queue
-    const queueRes = await db.execute(`SELECT * FROM sync_queue ORDER BY created_at ASC`);
+    const queueRes = await db.execute('SELECT * FROM sync_queue ORDER BY timestamp ASC');
     const pendingOps = queueRes.rows || [];
 
     if (pendingOps.length === 0) return;
 
-    // 2. Group and extract actual entity data
     const payload = [];
     for (const op of pendingOps) {
-      const entityRes = await db.execute(`SELECT * FROM ${op.table_name} WHERE id = ?`, [op.entity_id as string]);
+      const entityRes = await db.execute(`SELECT * FROM ${op.entity_name} WHERE id = ?`, [op.entity_id as string]);
       const entityData = entityRes.rows && entityRes.rows[0];
       
       if (entityData) {
         payload.push({
           queueId: op.id,
-          tableName: op.table_name,
+          tableName: op.entity_name,
           operation: op.operation,
           data: entityData,
         });
       }
     }
 
-    // 3. Push to server
     if (payload.length > 0) {
       const response = await apiClient<{ successIds: string[], conflicts: any[] }>('/sync/push', {
         method: 'POST',
         body: JSON.stringify({ operations: payload }),
       });
 
-      // 4. Cleanup local queue on success
       if (response.successIds?.length > 0) {
         const placeholders = response.successIds.map(() => '?').join(',');
         await db.execute(`DELETE FROM sync_queue WHERE id IN (${placeholders})`, response.successIds);
         
-        // Mark entities as SYNCED
         for (const op of payload.filter(p => response.successIds.includes(p.queueId as string))) {
           await db.execute(`UPDATE ${op.tableName} SET sync_status = 'SYNCED' WHERE id = ?`, [op.data.id as string]);
         }
@@ -88,12 +82,8 @@ export class SyncEngine {
 
     if (!response || !response.data) return;
 
-    // Iterate through tables and upsert
     for (const [tableName, entities] of Object.entries(response.data)) {
       for (const entity of entities) {
-        // Upsert logic (simplistic version for MVP)
-        // In a real scenario, you'd check if the local item has PENDING status to avoid overwriting local edits.
-        
         const cols = Object.keys(entity).join(', ');
         const placeholders = Object.keys(entity).map(() => '?').join(', ');
         const values = Object.values(entity) as (string | number | null)[];

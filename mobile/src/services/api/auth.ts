@@ -1,28 +1,27 @@
-import { apiClient } from './client';
+﻿import { apiClient } from './client';
 import { useAuthStore } from '@/store/authStore';
 
 export const authApi = {
-  requestOtp: (phoneNumber: string) => 
-    apiClient('/auth/request-otp', {
-      method: 'POST',
-      body: JSON.stringify({ phoneNumber }),
-    }),
+  requestOtp: async (phoneNumber: string) => {
+    // MOCK FOR DEMO
+    return new Promise((resolve) => setTimeout(resolve, 800));
+  },
 
   verifyOtp: async (phoneNumber: string, code: string) => {
-    const response = await apiClient<{
-      accessToken: string;
-      refreshToken: string;
-      user: any;
-    }>('/auth/verify-otp', {
-      method: 'POST',
-      body: JSON.stringify({ phoneNumber, code }),
+    // MOCK FOR DEMO
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        const store = useAuthStore.getState();
+        await store.setTokens('mock_access_token', 'mock_refresh_token');
+        store.setUser({
+          id: 'user_123',
+          phoneNumber: phoneNumber,
+          displayName: 'Krish',
+          unitPreference: 'METRIC'
+        });
+        resolve({ accessToken: 'mock_access_token' });
+      }, 800);
     });
-
-    const store = useAuthStore.getState();
-    await store.setTokens(response.accessToken, response.refreshToken);
-    store.setUser(response.user);
-    
-    return response;
   },
 
   fetchProfile: async () => {

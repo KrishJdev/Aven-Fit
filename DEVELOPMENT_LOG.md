@@ -594,3 +594,39 @@ Significant architectural and product decisions are recorded here for reference.
 
 **Next Steps:**
 - Complete! All 10 Phases of the Frontend implementation strategy and the Mobile plan are successfully executed in this sprint.
+
+---
+
+### 2026-08-25 - Antigravity (UI Polish & Bug Fixes)
+
+**Task:** Native UI Boot Crash Debugging & Demo Auth
+**Status:** Complete / Pivoting
+
+**Changes:**
+- **Resolved Fatal Native Crash (Grey Screen):** The application was rendering a completely blank screen on the physical Android device. Root cause discovered: react-native-safe-area-context's SafeAreaProvider and react-native-screens were miscalculating the native window insets, collapsing the React root view into 0 pixels. Fixed by removing the SafeAreaView wrapper from the custom Screen component and substituting it with manual top padding.
+- **Resolved Metro HMR Crash:** Addressed RNSScreenStackHeaderConfig duplication bug by forcefully clearing Metro's node cache and natively restarting the Android Intent via ADB.
+- **Database Engine Validated:** Confirmed op-sqlite C++ bindings are actively and successfully reading/writing data on the native device.
+- **Mocked Auth API:** Temporarily bypassed the Spring Boot authApi.ts since the backend is not yet running locally. Substituted with setTimeout promises to simulate OTP sending and instantly authorize the user with a mock token, allowing full navigation into the frontend application.
+
+**Feedback & Pivots:**
+- **USER REJECTED CURRENT UI/UX.** The user reviewed the React Native screens (Today, Workout, Nutrition, etc.) and explicitly disliked the layouts and UI.
+- We are stopping frontend implementation for today.
+
+**Next Steps for Tomorrow:**
+- **DO NOT CONTINUE CURRENT UI IMPLEMENTATION.**
+- Initiate a brand new Planning Phase tomorrow specifically targeting the React Native View layer and UX design.
+- The underlying architecture (Zustand stores, SyncEngine, op-sqlite Repositories, authApi client, Navigation Stack) is structurally sound and approved, but the visual layer (components, typography, colors, layouts) will be entirely redesigned based on new instructions.
+
+---
+
+### 2026-08-25 — Antigravity (Pixel 8 Emulator Setup & Live Launch)
+
+**Task:** Android Studio Emulator Setup & UI Redesign Launch
+**Status:** Complete
+
+**Changes:**
+- **Resolved NDK Version Mismatch:** Generated ndroid/local.properties referencing local Android SDK paths and aligned with the project's configured NDK (27.1.12297006).
+- **Configured Emulator Environment:** Cold-booted Pixel_8 AVD via ADB (emulator-5554), set up port reverse tunneling (	cp:8081), and deployed debug APK directly via Gradle.
+- **Fixed Babel Plugin Config:** Switched to eact-native-worklets/plugin paired with eact-native-reanimated/plugin in abel.config.js to match Reanimated v4.
+- **Fixed SyncEngine & Macro Syntax Errors:** Cleaned up SQL parameter template literals and escaped width percentages in FuelSummary.tsx and MomentumChart.tsx.
+- **Live Verification on Pixel 8:** Verified successful boot, OTP authentication, and rendered the refined brutalist/editorial TodayScreen on the Pixel 8 emulator window.

@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, ViewProps, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+﻿import React from 'react';
+import { View, ViewProps, StyleSheet, StatusBar } from 'react-native';
 import { theme } from '@/theme';
 
 interface ScreenProps extends ViewProps {
@@ -15,16 +14,9 @@ export const Screen: React.FC<ScreenProps> = ({
   children,
   ...props
 }) => {
-  if (safeArea) {
-    return (
-      <SafeAreaView style={[styles.container, style]} edges={edges} {...props}>
-        {children}
-      </SafeAreaView>
-    );
-  }
-
   return (
     <View style={[styles.container, style]} {...props}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
       {children}
     </View>
   );
@@ -34,5 +26,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: 40,
   },
 });
