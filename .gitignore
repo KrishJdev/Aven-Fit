@@ -22,3 +22,11 @@ Thumbs.db
 # ---- Local databases (dev Postgres lives outside repo, just in case) ----
 *.db
 *.sqlite
+
+# ---- Internal Agent, Planning & Analysis Documentation ----
+AGENTS.md
+DEVELOPMENT_LOG.md
+DEVELOPMENT_PLAN.md
+PRODUCT_ROADMAP.md
+gym_tracker_analysis.md
+
