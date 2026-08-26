@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Typography } from '../common/Typography';
 import { theme } from '@/theme';
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xl,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     marginVertical: theme.spacing.md,
   },
   topRow: {

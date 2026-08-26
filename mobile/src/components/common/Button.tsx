@@ -75,12 +75,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primary,
   },
   secondary: {
-    backgroundColor: theme.colors.surfaceHighlight,
+    backgroundColor: theme.colors.glassBorder,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
   },
   disabled: {
     opacity: 0.5,

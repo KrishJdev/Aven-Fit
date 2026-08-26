@@ -70,9 +70,9 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 56,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.glassBase,
     borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     borderRadius: theme.radii.sm,
     color: theme.colors.text,
     paddingHorizontal: theme.spacing.md,

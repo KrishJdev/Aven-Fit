@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'baseline',
     borderBottomWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     paddingBottom: theme.spacing.sm,
     marginBottom: theme.spacing.lg,
   },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   barTrack: {
     width: 6,
     height: 48,
-    backgroundColor: theme.colors.surfaceHighlight,
+    backgroundColor: theme.colors.glassBorder,
     justifyContent: 'flex-end',
     marginBottom: theme.spacing.md,
   },

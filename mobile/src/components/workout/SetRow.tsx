@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { Typography } from '../common/Typography';
-import { theme } from '@/theme';
+import { Typography } from '../ui/Typography';
+import { colors } from '../../theme/colors';
+import { spacing, radii } from '../../theme/spacing';
 import { Check } from 'lucide-react-native';
-import * as Haptics from 'react-native-haptic-feedback';
 
 export interface SetData {
   id: string;
   index: number;
-  previousString: string; // e.g. "60 × 10"
+  previousString: string;
   kg: string;
   reps: string;
   isCompleted: boolean;
@@ -16,157 +16,131 @@ export interface SetData {
 
 interface SetRowProps {
   data: SetData;
-  onChange: (id: string, field: 'kg' | 'reps', value: string) => void;
-  onToggleStatus: (id: string) => void;
+  onUpdate: (field: 'kg' | 'reps', value: string) => void;
+  onToggle: () => void;
 }
 
-export const SetRow: React.FC<SetRowProps> = ({ data, onChange, onToggleStatus }) => {
-  const [focusedField, setFocusedField] = useState<'kg' | 'reps' | null>(null);
-
-  const handleToggle = () => {
-    if (!data.isCompleted) {
-      Haptics.trigger('impactHeavy'); // Satisfying click for finishing a set
-    } else {
-      Haptics.trigger('impactLight');
-    }
-    onToggleStatus(data.id);
-  };
-
-  const isCompleted = data.isCompleted;
+export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
+  const isDone = data.isCompleted;
 
   return (
-    <View style={[styles.container, isCompleted && styles.containerCompleted]}>
-      {/* Set Number */}
-      <View style={styles.colIndex}>
-        <Typography 
-          variant="tabular" 
-          color={isCompleted ? theme.colors.textMuted : theme.colors.text}
-        >
-          {String(data.index).padStart(2, '0')}
-        </Typography>
+    <View style={[styles.row, isDone && styles.rowCompleted]}>
+      {/* Set Index */}
+      <View style={styles.indexCol}>
+        <View style={[styles.indexBadge, isDone && styles.indexBadgeCompleted]}>
+          <Typography variant="microcopy" color={isDone ? colors.background : colors.textMuted}>
+            {data.index}
+          </Typography>
+        </View>
       </View>
 
       {/* Previous Data */}
-      <View style={styles.colPrev}>
-        <Typography variant="body" color={theme.colors.textSubtle}>
-          {data.previousString || '—'}
+      <View style={styles.prevCol}>
+        <Typography variant="body" color={colors.textSubtle} tabular>
+          {data.previousString}
         </Typography>
       </View>
 
-      {/* KG Input */}
-      <View style={styles.colInput}>
+      {/* Inputs (KG & Reps) */}
+      <View style={styles.inputWrap}>
         <TextInput
-          style={[
-            styles.input,
-            focusedField === 'kg' && styles.inputFocused,
-            isCompleted && styles.inputCompleted,
-          ]}
+          style={[styles.input, isDone && styles.inputCompleted]}
           keyboardType="decimal-pad"
           value={data.kg}
-          onChangeText={(val) => onChange(data.id, 'kg', val)}
-          onFocus={() => setFocusedField('kg')}
-          onBlur={() => setFocusedField(null)}
-          editable={!isCompleted}
-          selectTextOnFocus
-          placeholder="—"
-          placeholderTextColor={theme.colors.textSubtle}
+          onChangeText={(val) => onUpdate('kg', val)}
+          placeholder="-"
+          placeholderTextColor={colors.textSubtle}
+          editable={!isDone}
         />
       </View>
-
-      {/* REPS Input */}
-      <View style={styles.colInput}>
+      
+      <View style={styles.inputWrap}>
         <TextInput
-          style={[
-            styles.input,
-            focusedField === 'reps' && styles.inputFocused,
-            isCompleted && styles.inputCompleted,
-          ]}
+          style={[styles.input, isDone && styles.inputCompleted]}
           keyboardType="number-pad"
           value={data.reps}
-          onChangeText={(val) => onChange(data.id, 'reps', val)}
-          onFocus={() => setFocusedField('reps')}
-          onBlur={() => setFocusedField(null)}
-          editable={!isCompleted}
-          selectTextOnFocus
-          placeholder="—"
-          placeholderTextColor={theme.colors.textSubtle}
+          onChangeText={(val) => onUpdate('reps', val)}
+          placeholder="-"
+          placeholderTextColor={colors.textSubtle}
+          editable={!isDone}
         />
       </View>
 
-      {/* Status Toggle */}
-      <View style={styles.colStatus}>
-        <TouchableOpacity 
-          activeOpacity={0.8} 
-          onPress={handleToggle}
-          style={[styles.checkButton, isCompleted && styles.checkButtonActive]}
-        >
-          {isCompleted && <Check color={theme.colors.background} size={16} strokeWidth={3} />}
-        </TouchableOpacity>
-      </View>
+      {/* Check Button */}
+      <TouchableOpacity 
+        style={[styles.checkBtn, isDone && styles.checkBtnCompleted]} 
+        onPress={onToggle}
+        activeOpacity={0.7}
+      >
+        <Check color={isDone ? colors.background : colors.textMuted} size={20} />
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.background,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    backgroundColor: 'transparent',
+    borderRadius: radii.sm,
+    marginBottom: spacing.xs,
   },
-  containerCompleted: {
-    backgroundColor: theme.colors.surfaceHighlight, // Subtle highlight when done
+  rowCompleted: {
+    backgroundColor: 'rgba(0, 255, 163, 0.05)', // Faint neon emerald
   },
-  colIndex: {
-    width: 32,
+  indexCol: { width: 32, alignItems: 'center' },
+  indexBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: radii.sm,
+    backgroundColor: colors.glassBase,
+    justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.glassBorder,
   },
-  colPrev: {
-    flex: 1,
-    alignItems: 'center',
+  indexBadgeCompleted: {
+    backgroundColor: colors.success,
+    borderColor: colors.success,
   },
-  colInput: {
-    width: 72,
-    alignItems: 'center',
-    marginHorizontal: theme.spacing.xs,
-  },
-  colStatus: {
-    width: 48,
-    alignItems: 'center',
+  prevCol: { flex: 1, alignItems: 'center' },
+  inputWrap: {
+    width: 64,
+    marginHorizontal: spacing.xs,
   },
   input: {
-    width: '100%',
-    height: 36,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radii.sm,
-    color: theme.colors.text,
-    textAlign: 'center',
-    fontSize: theme.typography.sizes.lg,
-    fontFamily: theme.typography.primary,
-    fontVariant: ['tabular-nums'],
-    fontWeight: '600',
-  },
-  inputFocused: {
-    backgroundColor: theme.colors.surfaceHighlight,
-    borderColor: theme.colors.primary,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: radii.sm,
+    color: colors.text,
+    fontSize: 16,
+    fontVariant: ['tabular-nums'],
+    textAlign: 'center',
+    height: 40,
+    fontWeight: '500',
   },
   inputCompleted: {
     backgroundColor: 'transparent',
-    color: theme.colors.success, // Turns green when logged
+    borderColor: 'transparent',
+    color: colors.success,
   },
-  checkButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 4,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+  checkBtn: {
+    width: 44,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: radii.sm,
+    backgroundColor: colors.glassBase,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    marginLeft: spacing.xs,
   },
-  checkButtonActive: {
-    backgroundColor: theme.colors.success,
-    borderColor: theme.colors.success,
-  },
+  checkBtnCompleted: {
+    backgroundColor: colors.success,
+    borderColor: colors.success,
+  }
 });

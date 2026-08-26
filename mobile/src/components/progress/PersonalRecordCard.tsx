@@ -48,11 +48,11 @@ export const PersonalRecordCard: React.FC<PersonalRecordProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.glassBase,
     borderRadius: theme.radii.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     marginBottom: theme.spacing.md,
   },
   header: {

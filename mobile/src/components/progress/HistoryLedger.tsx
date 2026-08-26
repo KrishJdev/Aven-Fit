@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     width: 2,
-    backgroundColor: theme.colors.surfaceHighlight,
+    backgroundColor: theme.colors.glassBorder,
     marginVertical: -4,
     zIndex: 1,
   },

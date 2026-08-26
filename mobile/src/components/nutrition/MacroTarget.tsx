@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   track: {
     width: 6,
     height: 80,
-    backgroundColor: theme.colors.surfaceHighlight,
+    backgroundColor: theme.colors.glassBorder,
     borderRadius: theme.radii.full,
     justifyContent: 'flex-end',
     marginBottom: theme.spacing.sm,

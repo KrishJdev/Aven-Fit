@@ -54,9 +54,9 @@ export const TrendChart: React.FC<TrendChartProps> = ({ title, data, height = 18
           </Defs>
           
           {/* Subtle Grid Lines */}
-          <Path d={`M 0,0 L ${graphWidth},0`} stroke={theme.colors.surfaceHighlight} strokeWidth="1" strokeDasharray="4,4" />
-          <Path d={`M 0,${graphHeight/2} L ${graphWidth},${graphHeight/2}`} stroke={theme.colors.surfaceHighlight} strokeWidth="1" strokeDasharray="4,4" />
-          <Path d={`M 0,${graphHeight} L ${graphWidth},${graphHeight}`} stroke={theme.colors.surfaceHighlight} strokeWidth="1" strokeDasharray="4,4" />
+          <Path d={`M 0,0 L ${graphWidth},0`} stroke={theme.colors.glassBorder} strokeWidth="1" strokeDasharray="4,4" />
+          <Path d={`M 0,${graphHeight/2} L ${graphWidth},${graphHeight/2}`} stroke={theme.colors.glassBorder} strokeWidth="1" strokeDasharray="4,4" />
+          <Path d={`M 0,${graphHeight} L ${graphWidth},${graphHeight}`} stroke={theme.colors.glassBorder} strokeWidth="1" strokeDasharray="4,4" />
 
           {/* Area Fill */}
           <Path 
@@ -86,11 +86,11 @@ export const TrendChart: React.FC<TrendChartProps> = ({ title, data, height = 18
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.glassBase,
     borderRadius: theme.radii.md,
     padding: theme.spacing.lg,
     borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     marginBottom: theme.spacing.xl,
   },
   header: {

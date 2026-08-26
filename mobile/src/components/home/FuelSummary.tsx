@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     paddingBottom: theme.spacing.sm,
     marginBottom: theme.spacing.md,
   },
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   track: {
     flex: 1,
     height: 4,
-    backgroundColor: theme.colors.surfaceHighlight,
+    backgroundColor: theme.colors.glassBorder,
   },
   fill: {
     height: '100%',

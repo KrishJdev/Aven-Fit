@@ -1,90 +1,103 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Typography } from '../common/Typography';
-import { theme } from '@/theme';
-import { X, Plus, Minus } from 'lucide-react-native';
+import { Typography } from '../ui/Typography';
+import { colors } from '../../theme/colors';
+import { spacing, radii } from '../../theme/spacing';
+import { Timer, X, Plus, Minus } from 'lucide-react-native';
 
-export const RestTimerOverlay: React.FC = () => {
-  // Mock timer state for design phase
+interface RestTimerOverlayProps {
+  timeRemaining: number;
+  onClose: () => void;
+  onAddTime: (seconds: number) => void;
+  onSubtractTime: (seconds: number) => void;
+}
+
+export const RestTimerOverlay: React.FC<RestTimerOverlayProps> = ({
+  timeRemaining,
+  onClose,
+  onAddTime,
+  onSubtractTime,
+}) => {
+  const mins = Math.floor(timeRemaining / 60);
+  const secs = timeRemaining % 60;
+  const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.left}>
-          <Typography variant="label" color={theme.colors.warning}>RESTING</Typography>
-          <Typography variant="display" style={styles.timerText}>01:25</Typography>
+    <View style={styles.overlayContainer} pointerEvents="box-none">
+      <View style={styles.pill}>
+        <View style={styles.timerLeft}>
+          <Timer color={colors.primary} size={20} />
+          <Typography variant="header" tabular style={styles.timeText}>{timeStr}</Typography>
         </View>
-
+        
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Minus color={theme.colors.text} size={20} />
+          <TouchableOpacity style={styles.actionBtn} onPress={() => onSubtractTime(15)}>
+            <Typography variant="body" color={colors.textMuted}>-15s</Typography>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Plus color={theme.colors.text} size={20} />
+          <TouchableOpacity style={styles.actionBtn} onPress={() => onAddTime(15)}>
+            <Typography variant="body" color={colors.textMuted}>+15s</Typography>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionBtn, styles.closeBtn]}>
-            <X color={theme.colors.background} size={20} />
+          <View style={styles.divider} />
+          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+            <X color={colors.text} size={24} />
           </TouchableOpacity>
         </View>
-      </View>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: '45%' }]} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  overlayContainer: {
     position: 'absolute',
-    bottom: 24,
-    left: theme.spacing.screenHorizontal,
-    right: theme.spacing.screenHorizontal,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radii.md,
+    bottom: spacing.xxl, // Float above bottom
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+  },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(15, 17, 21, 0.95)', // Deep glass
     borderWidth: 1,
-    borderColor: theme.colors.warningMuted,
-    overflow: 'hidden',
-    shadowColor: '#000',
+    borderColor: 'rgba(0, 240, 255, 0.3)', // Cyan glow border
+    borderRadius: radii.full,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    width: '100%',
+    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
+    shadowOpacity: 0.3,
+    shadowRadius: 24,
     elevation: 10,
   },
-  content: {
+  timerLeft: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: theme.spacing.md,
+    gap: spacing.sm,
   },
-  left: {
-    justifyContent: 'center',
-  },
-  timerText: {
-    fontVariant: ['tabular-nums'],
-    marginTop: -4,
+  timeText: {
+    color: colors.primary,
+    fontWeight: '600',
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
   },
   actionBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.surfaceHighlight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: theme.spacing.xs,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  divider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.glassBorder,
+    marginHorizontal: spacing.xs,
   },
   closeBtn: {
-    backgroundColor: theme.colors.warning,
-  },
-  progressTrack: {
-    height: 4,
-    backgroundColor: theme.colors.surfaceHighlight,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: theme.colors.warning,
+    padding: spacing.xs,
   },
 });

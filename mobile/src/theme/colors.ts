@@ -1,31 +1,33 @@
 export const colors = {
-  // Core Backgrounds
-  background: '#09090B', // Zinc 950 - Absolute deep background
-  surface: '#18181B', // Zinc 900 - Cards/Elevated areas
-  surfaceHighlight: '#27272A', // Zinc 800 - Borders/Hover states
+  // Midnight Glass Theme
+  background: '#030305', // Deep space midnight
+  
+  // Translucent Surfaces (Glass)
+  glassBase: 'rgba(255, 255, 255, 0.03)',
+  glassHover: 'rgba(255, 255, 255, 0.08)',
+  glassBorder: 'rgba(255, 255, 255, 0.12)',
+  glassBorderHighlight: 'rgba(255, 255, 255, 0.25)',
 
   // Typography
-  text: '#FAFAFA', // Zinc 50 - Primary text
-  textMuted: '#A1A1AA', // Zinc 400 - Secondary text, labels
-  textSubtle: '#52525B', // Zinc 600 - Disabled/very low emphasis
+  text: '#FFFFFF', // Pure white primary
+  textMuted: 'rgba(255, 255, 255, 0.6)', // Frosted silver
+  textSubtle: 'rgba(255, 255, 255, 0.35)', // Ghost text
 
-  // Brand Signature
-  // Aven Fit identity: premium athletic Burnt Orange/Rust
-  primary: '#E85D04', 
-  primaryMuted: '#9D3D00',
-
+  // Accents (Ice & Neon)
+  primary: '#00F0FF', // Ice Blue / Cyan glow
+  primaryMuted: 'rgba(0, 240, 255, 0.15)',
+  
   // Semantics
-  success: '#10B981', // Emerald 500 - Completed sets, goals reached
-  successMuted: '#064E3B', // Emerald 900
+  success: '#00FFA3', // Neon Emerald
+  successMuted: 'rgba(0, 255, 163, 0.15)',
   
-  error: '#EF4444', // Red 500 - Errors, destructive actions
-  errorMuted: '#7F1D1D', // Red 900
+  error: '#FF2A55', // Neon Crimson
+  errorMuted: 'rgba(255, 42, 85, 0.15)',
   
-  warning: '#F59E0B', // Amber 500 - Rest timers, warnings
-  warningMuted: '#78350F', // Amber 900
-
-  // Specifically for PRs / Highlights
-  highlight: '#E2F835', // Volt Green - strictly for Personal Records and extreme highlights
+  warning: '#FFB300', // Neon Amber
+  warningMuted: 'rgba(255, 179, 0, 0.15)',
+  
+  highlight: '#E2F835', // Keep Volt for PRs if we want, or use Cyan. Let's stick to Cyan for highlights to keep the cool theme.
 };
 
 export type Colors = typeof colors;

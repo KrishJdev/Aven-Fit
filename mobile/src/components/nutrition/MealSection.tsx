@@ -52,7 +52,7 @@ export const MealSection: React.FC<MealSectionProps> = ({ title, items, onAddFoo
         <TouchableOpacity 
           style={[
             styles.addAction, 
-            items.length > 0 && { borderTopWidth: 1, borderTopColor: theme.colors.surfaceHighlight }
+            items.length > 0 && { borderTopWidth: 1, borderTopColor: theme.colors.glassBorder }
           ]} 
           onPress={onAddFood} 
           activeOpacity={0.7}
@@ -79,9 +79,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.screenHorizontal,
   },
   itemsContainer: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.glassBase,
     borderWidth: 1,
-    borderColor: theme.colors.surfaceHighlight,
+    borderColor: theme.colors.glassBorder,
     borderLeftWidth: 0,
     borderRightWidth: 0,
   },
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: theme.colors.surfaceHighlight,
+    backgroundColor: theme.colors.glassBorder,
     marginLeft: theme.spacing.screenHorizontal,
   },
   addAction: {
