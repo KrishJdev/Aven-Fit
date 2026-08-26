@@ -23,55 +23,38 @@ export const RestTimerOverlay: React.FC<RestTimerOverlayProps> = ({
   const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
 
   return (
-    <View style={styles.overlayContainer} pointerEvents="box-none">
-      <View style={styles.pill}>
-        <View style={styles.timerLeft}>
-          <Timer color={colors.primary} size={20} />
-          <Typography variant="header" tabular style={styles.timeText}>{timeStr}</Typography>
-        </View>
-        
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => onSubtractTime(15)}>
-            <Typography variant="body" color={colors.textMuted}>-15s</Typography>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} onPress={() => onAddTime(15)}>
-            <Typography variant="body" color={colors.textMuted}>+15s</Typography>
-          </TouchableOpacity>
-          <View style={styles.divider} />
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <X color={colors.text} size={24} />
-          </TouchableOpacity>
-        </View>
+    <View style={styles.barContainer}>
+      <View style={styles.timerLeft}>
+        <Timer color={colors.primary} size={20} />
+        <Typography variant="body" tabular style={styles.timeText}>{timeStr}</Typography>
+      </View>
+      
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.actionBtn} onPress={() => onSubtractTime(15)}>
+          <Typography variant="body" color={colors.textMuted}>-15s</Typography>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionBtn} onPress={() => onAddTime(15)}>
+          <Typography variant="body" color={colors.textMuted}>+15s</Typography>
+        </TouchableOpacity>
+        <View style={styles.divider} />
+        <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+          <X color={colors.textSubtle} size={20} />
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  overlayContainer: {
-    position: 'absolute',
-    bottom: spacing.xxl, // Float above bottom
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-  },
-  pill: {
+  barContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(15, 17, 21, 0.95)', // Deep glass
-    borderWidth: 1,
-    borderColor: 'rgba(0, 240, 255, 0.3)', // Cyan glow border
-    borderRadius: radii.full,
+    backgroundColor: colors.glassBase,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.glassBorder,
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    width: '100%',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 24,
-    elevation: 10,
+    paddingHorizontal: spacing.md,
   },
   timerLeft: {
     flexDirection: 'row',
@@ -81,6 +64,7 @@ const styles = StyleSheet.create({
   timeText: {
     color: colors.primary,
     fontWeight: '600',
+    fontSize: 18,
   },
   actions: {
     flexDirection: 'row',
@@ -93,7 +77,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: 1,
-    height: 24,
+    height: 16,
     backgroundColor: colors.glassBorder,
     marginHorizontal: spacing.xs,
   },
