@@ -1,22 +1,14 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MainTabParamList } from './types';
-import { theme } from '@/theme';
-import { 
-  Calendar, 
-  Dumbbell, 
-  Apple, 
-  TrendingUp, 
-  User 
-} from 'lucide-react-native';
+import { Home, Dumbbell, TrendingUp, UtensilsCrossed } from 'lucide-react-native';
+import { colors } from '../theme/colors';
 
-import { TodayScreen } from '@/screens/workout/TodayScreen';
-import { TrainScreen } from '@/screens/workout/TrainScreen';
-import { NutritionScreen } from '@/screens/nutrition/NutritionScreen';
-import { ProgressScreen } from '@/screens/history/ProgressScreen';
-import { ProfileScreen } from '@/screens/profile/ProfileScreen';
+import { HomeScreen } from '../screens/home/HomeScreen';
+import { WorkoutListScreen } from '../screens/workout/WorkoutListScreen';
+import { ProgressDashboardScreen } from '../screens/progress/ProgressDashboardScreen';
+import { NutritionDashboardScreen } from '../screens/nutrition/NutritionDashboardScreen';
 
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Tab = createBottomTabNavigator();
 
 export const MainTabNavigator = () => {
   return (
@@ -24,56 +16,51 @@ export const MainTabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.surfaceHighlight,
+          backgroundColor: '#000000', // Pitch black tab bar
           borderTopWidth: 1,
-          height: 84,
-          paddingBottom: 24,
-          paddingTop: 12,
+          borderTopColor: colors.glassBorder, // Zinc 800
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
         },
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.textMuted,
+        tabBarActiveTintColor: '#FFFFFF',
+        tabBarInactiveTintColor: colors.textSubtle,
         tabBarLabelStyle: {
-          fontFamily: theme.typography.primary,
-          fontSize: 12,
-          fontWeight: '500',
-          marginTop: 4,
-        },
+          fontSize: 10,
+          fontWeight: '700',
+        }
       }}
     >
       <Tab.Screen 
-        name="Today" 
-        component={TodayScreen} 
+        name="Home" 
+        component={HomeScreen} 
         options={{
-          tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} />
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />
         }}
       />
       <Tab.Screen 
-        name="Train" 
-        component={TrainScreen} 
+        name="Workouts" 
+        component={WorkoutListScreen} 
         options={{
+          tabBarLabel: 'Workouts',
           tabBarIcon: ({ color, size }) => <Dumbbell color={color} size={size} />
         }}
       />
       <Tab.Screen 
-        name="Nutrition" 
-        component={NutritionScreen} 
-        options={{
-          tabBarIcon: ({ color, size }) => <Apple color={color} size={size} />
-        }}
-      />
-      <Tab.Screen 
         name="Progress" 
-        component={ProgressScreen} 
+        component={ProgressDashboardScreen} 
         options={{
+          tabBarLabel: 'Progress',
           tabBarIcon: ({ color, size }) => <TrendingUp color={color} size={size} />
         }}
       />
       <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen} 
+        name="Nutrition" 
+        component={NutritionDashboardScreen} 
         options={{
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />
+          tabBarLabel: 'Nutrition',
+          tabBarIcon: ({ color, size }) => <UtensilsCrossed color={color} size={size} />
         }}
       />
     </Tab.Navigator>
