@@ -12,6 +12,8 @@ export interface SetData {
   kg: string;
   reps: string;
   isCompleted: boolean;
+  suggestedKg?: string;
+  suggestedReps?: string;
 }
 
 interface SetRowProps {
@@ -22,6 +24,15 @@ interface SetRowProps {
 
 export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
   const isDone = data.isCompleted;
+
+  const handleCheck = () => {
+    // Autofill if empty and we have suggestions
+    if (!isDone) {
+      if (!data.kg && data.suggestedKg) onUpdate('kg', data.suggestedKg);
+      if (!data.reps && data.suggestedReps) onUpdate('reps', data.suggestedReps);
+    }
+    onToggle();
+  };
 
   return (
     <View style={[styles.row, isDone && styles.rowCompleted]}>
@@ -48,7 +59,7 @@ export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
           keyboardType="decimal-pad"
           value={data.kg}
           onChangeText={(val) => onUpdate('kg', val)}
-          placeholder="-"
+          placeholder={data.suggestedKg || "-"}
           placeholderTextColor={colors.textSubtle}
           editable={!isDone}
         />
@@ -60,7 +71,7 @@ export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
           keyboardType="number-pad"
           value={data.reps}
           onChangeText={(val) => onUpdate('reps', val)}
-          placeholder="-"
+          placeholder={data.suggestedReps || "-"}
           placeholderTextColor={colors.textSubtle}
           editable={!isDone}
         />
@@ -69,7 +80,7 @@ export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
       {/* Check Button */}
       <TouchableOpacity 
         style={[styles.checkBtn, isDone && styles.checkBtnCompleted]} 
-        onPress={onToggle}
+        onPress={handleCheck}
         activeOpacity={0.7}
       >
         <Check color={isDone ? colors.background : colors.textMuted} size={20} />

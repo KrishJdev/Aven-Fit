@@ -41,19 +41,27 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   loadRecentWorkouts: async () => {
     try {
       const res = await db.execute(`
-        SELECT id, name, started_at, completed_at, status
-        FROM workouts 
-        WHERE status = 'COMPLETED' 
-        ORDER BY completed_at DESC LIMIT 10
+        SELECT 
+          w.id, w.name, w.started_at, w.completed_at, w.status,
+          COALESCE(SUM(ws.weight_kg * ws.reps), 0) as volume,
+          COUNT(ws.id) as sets,
+          GROUP_CONCAT(DISTINCT e.name) as exercisesStr
+        FROM workouts w
+        LEFT JOIN workout_exercises we ON we.workout_id = w.id
+        LEFT JOIN exercises e ON we.exercise_id = e.id
+        LEFT JOIN workout_sets ws ON ws.workout_exercise_id = we.id AND ws.is_completed = 1
+        WHERE w.status = 'COMPLETED'
+        GROUP BY w.id
+        ORDER BY w.completed_at DESC LIMIT 10
       `);
       // @ts-ignore
       const workouts = res.rows?._array || res.rows || [];
       
       const summaries = workouts.map((w: any) => ({
         ...w,
-        volume: 0,
-        sets: 0,
-        exercisesStr: 'Workout data',
+        volume: w.volume || 0,
+        sets: w.sets || 0,
+        exercisesStr: w.exercisesStr ? w.exercisesStr.split(',').join(' • ') : 'No exercises',
       }));
       set({ recentWorkouts: summaries });
     } catch (e) {
@@ -139,7 +147,35 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     const position = ex.sets.length;
     const setId = `ws-${Date.now()}`;
     
+    let suggestedKg = '';
+    let suggestedReps = '';
+
     try {
+      if (position > 0) {
+        // Carry over from the previous set in the current workout
+        const prevSet = ex.sets[position - 1];
+        if (prevSet.kg) suggestedKg = prevSet.kg;
+        if (prevSet.reps) suggestedReps = prevSet.reps;
+      } else {
+        // First set, look up the last completed set for this exercise in DB history
+        const histRes = await db.execute(`
+          SELECT ws.weight_kg, ws.reps 
+          FROM workout_sets ws
+          JOIN workout_exercises we ON ws.workout_exercise_id = we.id
+          WHERE we.exercise_id = (SELECT exercise_id FROM workout_exercises WHERE id = ?)
+            AND ws.is_completed = 1
+          ORDER BY ws.created_at DESC
+          LIMIT 1
+        `, [workoutExerciseId]);
+        
+        // @ts-ignore
+        const histSet = histRes.rows?._array?.[0] || histRes.rows?.item?.(0);
+        if (histSet) {
+          suggestedKg = histSet.weight_kg ? histSet.weight_kg.toString() : '';
+          suggestedReps = histSet.reps ? histSet.reps.toString() : '';
+        }
+      }
+
       await db.execute(
         `INSERT INTO workout_sets (id, workout_exercise_id, position, set_type, weight_kg, reps, is_completed, created_at)
          VALUES (?, ?, ?, 'NORMAL', 0, 0, 0, ?)`,
@@ -149,10 +185,12 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       const newSet: SetData = {
         id: setId,
         index: position + 1,
-        previousString: '-',
+        previousString: suggestedKg && suggestedReps ? `${suggestedKg} kg × ${suggestedReps}` : '-',
         kg: '',
         reps: '',
-        isCompleted: false
+        isCompleted: false,
+        suggestedKg,
+        suggestedReps
       };
       
       const updatedEx = { ...ex, sets: [...ex.sets, newSet] };
@@ -235,14 +273,33 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         
         // @ts-ignore
         const dbSets = resSets.rows?._array || resSets.rows || [];
-        const sets: SetData[] = dbSets.map((s: any) => ({
-          id: s.id,
-          index: s.position + 1,
-          previousString: '-', // Need separate query for history
-          kg: s.weight_kg ? s.weight_kg.toString() : '',
-          reps: s.reps ? s.reps.toString() : '',
-          isCompleted: s.is_completed === 1
-        }));
+        const sets: SetData[] = [];
+        
+        for (let i = 0; i < dbSets.length; i++) {
+          const s = dbSets[i];
+          let sKg = '';
+          let sReps = '';
+          
+          if (i > 0) {
+             const prev = sets[i-1];
+             if (prev.kg) sKg = prev.kg;
+             if (prev.reps) sReps = prev.reps;
+          } else {
+             // For the first set, we should ideally fetch history, but for resumed workouts, 
+             // we can skip this heavy query unless the user adds a new set.
+          }
+
+          sets.push({
+            id: s.id,
+            index: s.position + 1,
+            previousString: '-', // Could fetch history if needed
+            kg: s.weight_kg ? s.weight_kg.toString() : '',
+            reps: s.reps ? s.reps.toString() : '',
+            isCompleted: s.is_completed === 1,
+            suggestedKg: sKg,
+            suggestedReps: sReps
+          });
+        }
         
         populatedExercises.push({
           id: we.id,
