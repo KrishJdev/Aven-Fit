@@ -20,8 +20,13 @@ interface WorkoutState {
   activeExercises: ExerciseBlockData[];
   recentWorkouts: WorkoutSummary[];
   
+  durationCounter: number;
+  isPaused: boolean;
+  tickDuration: () => void;
+  togglePause: () => void;
+  
   startWorkout: (routineId?: string) => Promise<string>;
-  finishWorkout: () => Promise<void>;
+  finishWorkout: (finalName?: string) => Promise<void>;
   
   addExerciseToWorkout: (exerciseId: string, exerciseName: string) => Promise<void>;
   addSetToExercise: (workoutExerciseId: string) => Promise<void>;
@@ -37,6 +42,20 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   activeWorkoutName: 'Workout',
   activeExercises: [],
   recentWorkouts: [],
+  
+  durationCounter: 0,
+  isPaused: false,
+  
+  tickDuration: () => {
+    const { isPaused, activeWorkoutId } = get();
+    if (activeWorkoutId && !isPaused) {
+      set(state => ({ durationCounter: state.durationCounter + 1 }));
+    }
+  },
+  
+  togglePause: () => {
+    set(state => ({ isPaused: !state.isPaused }));
+  },
 
   loadRecentWorkouts: async () => {
     try {
@@ -71,8 +90,20 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
 
   startWorkout: async (routineId?: string) => {
     const id = `wk-${Date.now()}`;
-    const now = new Date().toISOString();
-    let name = 'Empty Workout';
+    const now = new Date();
+    const nowIso = now.toISOString();
+    
+    // Dynamic naming based on time
+    const hour = now.getHours();
+    let defaultName = 'Workout';
+    if (hour >= 0 && hour < 5) defaultName = Math.random() > 0.5 ? 'Late Night Lift' : 'Midnight Session';
+    else if (hour >= 5 && hour < 9) defaultName = Math.random() > 0.5 ? 'Early Bird Workout' : 'Dawn Patrol';
+    else if (hour >= 9 && hour < 12) defaultName = Math.random() > 0.5 ? 'Morning Grind' : 'Morning Workout';
+    else if (hour >= 12 && hour < 17) defaultName = Math.random() > 0.5 ? 'Afternoon Pump' : 'Midday Session';
+    else if (hour >= 17 && hour < 21) defaultName = Math.random() > 0.5 ? 'Evening Workout' : 'Sundown Session';
+    else defaultName = Math.random() > 0.5 ? 'Night Session' : 'Late Lift';
+
+    let name = defaultName;
     
     try {
       if (routineId) {
@@ -85,9 +116,16 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       await db.execute(
         `INSERT INTO workouts (id, name, started_at, status, routine_id, created_at, updated_at) 
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [id, name, now, 'IN_PROGRESS', routineId || null, now, now]
+        [id, name, nowIso, 'IN_PROGRESS', routineId || null, nowIso, nowIso]
       );
-      set({ activeWorkoutId: id, activeWorkoutName: name, activeExercises: [] });
+      
+      set({ 
+        activeWorkoutId: id, 
+        activeWorkoutName: name, 
+        activeExercises: [],
+        durationCounter: 0,
+        isPaused: false
+      });
       return id;
     } catch (e) {
       console.error(e);
@@ -95,17 +133,30 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     }
   },
 
-  finishWorkout: async () => {
-    const { activeWorkoutId } = get();
+  finishWorkout: async (finalName?: string) => {
+    const { activeWorkoutId, durationCounter } = get();
     if (!activeWorkoutId) return;
+    
     try {
-      const now = new Date().toISOString();
-      await db.execute(
-        `UPDATE workouts SET status = 'COMPLETED', completed_at = ? WHERE id = ?`,
-        [now, activeWorkoutId]
-      );
-      set({ activeWorkoutId: null, activeExercises: [] });
-      get().loadRecentWorkouts();
+      if (finalName) {
+        await db.execute(
+          `UPDATE workouts SET status = 'COMPLETED', completed_at = ?, duration_seconds = ?, name = ? WHERE id = ?`,
+          [new Date().toISOString(), durationCounter, finalName, activeWorkoutId]
+        );
+      } else {
+        await db.execute(
+          `UPDATE workouts SET status = 'COMPLETED', completed_at = ?, duration_seconds = ? WHERE id = ?`,
+          [new Date().toISOString(), durationCounter, activeWorkoutId]
+        );
+      }
+      set({ 
+        activeWorkoutId: null, 
+        activeWorkoutName: 'Workout', 
+        activeExercises: [],
+        durationCounter: 0,
+        isPaused: false
+      });
+      await get().loadRecentWorkouts();
     } catch (e) {
       console.error(e);
     }
@@ -247,10 +298,22 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
 
   loadActiveWorkoutState: async (workoutId: string) => {
     try {
-      const resW = await db.execute(`SELECT name FROM workouts WHERE id = ?`, [workoutId]);
+      const resW = await db.execute(
+        `SELECT name, duration_seconds, status, started_at FROM workouts WHERE id = ?`, 
+        [workoutId]
+      );
       // @ts-ignore
-      const wName = resW.rows?._array?.[0]?.name || resW.rows?.item?.(0)?.name || 'Workout';
+      const wRow = resW.rows?._array?.[0] || resW.rows?.item?.(0);
+      const wName = wRow?.name || 'Workout';
       
+      let initialDuration = wRow?.duration_seconds || 0;
+      let initialPaused = wRow?.status === 'PAUSED';
+      
+      // If it's IN_PROGRESS, calculate elapsed time since started_at (naive approach for MVP)
+      if (wRow?.status === 'IN_PROGRESS' && wRow?.started_at && !initialDuration) {
+        initialDuration = Math.floor((Date.now() - new Date(wRow.started_at).getTime()) / 1000);
+      }
+
       const resWe = await db.execute(`
         SELECT we.id, e.name 
         FROM workout_exercises we
@@ -308,7 +371,13 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         });
       }
       
-      set({ activeWorkoutId: workoutId, activeWorkoutName: wName, activeExercises: populatedExercises });
+      set({ 
+        activeWorkoutId: workoutId, 
+        activeWorkoutName: wName, 
+        activeExercises: populatedExercises,
+        durationCounter: Math.max(0, initialDuration),
+        isPaused: initialPaused
+      });
     } catch (e) {
       console.error(e);
     }
