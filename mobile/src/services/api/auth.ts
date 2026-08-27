@@ -1,10 +1,10 @@
-﻿import { apiClient } from './client';
+import { apiClient } from './client';
 import { useAuthStore } from '@/store/authStore';
 
 export const authApi = {
   requestOtp: async (phoneNumber: string) => {
     // MOCK FOR DEMO
-    return new Promise((resolve) => setTimeout(resolve, 800));
+    return new Promise((resolve) => setTimeout(() => resolve(undefined), 800));
   },
 
   verifyOtp: async (phoneNumber: string, code: string) => {
@@ -30,3 +30,4 @@ export const authApi = {
     return user;
   }
 };
+

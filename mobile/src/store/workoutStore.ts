@@ -26,7 +26,7 @@ interface WorkoutState {
   togglePause: () => void;
   
   startWorkout: (routineId?: string) => Promise<string>;
-  finishWorkout: (finalName?: string) => Promise<void>;
+  finishWorkout: (finalName?: string) => Promise<string | null>;
   
   addExerciseToWorkout: (exerciseId: string, exerciseName: string) => Promise<void>;
   addSetToExercise: (workoutExerciseId: string) => Promise<void>;
@@ -133,9 +133,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     }
   },
 
-  finishWorkout: async (finalName?: string) => {
+  finishWorkout: async (finalName?: string): Promise<string | null> => {
     const { activeWorkoutId, durationCounter } = get();
-    if (!activeWorkoutId) return;
+    if (!activeWorkoutId) return null;
     
     try {
       if (finalName) {
@@ -149,6 +149,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
           [new Date().toISOString(), durationCounter, activeWorkoutId]
         );
       }
+      
+      const finishedId = activeWorkoutId;
+      
       set({ 
         activeWorkoutId: null, 
         activeWorkoutName: 'Workout', 
@@ -157,8 +160,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         isPaused: false
       });
       await get().loadRecentWorkouts();
+      return finishedId;
     } catch (e) {
       console.error(e);
+      return null;
     }
   },
 

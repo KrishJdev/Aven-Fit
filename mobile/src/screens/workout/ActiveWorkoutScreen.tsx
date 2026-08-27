@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/types';
@@ -42,10 +42,6 @@ export const ActiveWorkoutScreen: React.FC<Props> = ({ navigation, route }) => {
 
   const [timerActive, setTimerActive] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(90);
-  
-  // Finish Modal State
-  const [finishModalVisible, setFinishModalVisible] = useState(false);
-  const [finalName, setFinalName] = useState('');
 
   // Load the workout data if it's not already in store
   useEffect(() => {
@@ -53,12 +49,6 @@ export const ActiveWorkoutScreen: React.FC<Props> = ({ navigation, route }) => {
       loadActiveWorkoutState(workoutId);
     }
   }, [workoutId]);
-  
-  useEffect(() => {
-    if (activeWorkoutName && !finalName) {
-      setFinalName(activeWorkoutName);
-    }
-  }, [activeWorkoutName]);
 
   // Workout Timer Ticker
   useEffect(() => {
@@ -74,15 +64,11 @@ export const ActiveWorkoutScreen: React.FC<Props> = ({ navigation, route }) => {
     setTimeRemaining(90);
   };
 
-  const handleFinishPress = () => {
-    if (!isPaused) togglePause(); // Pause the timer while renaming
-    setFinishModalVisible(true);
-  };
-
-  const handleConfirmFinish = async () => {
-    await finishWorkout(finalName.trim() || activeWorkoutName);
-    setFinishModalVisible(false);
-    navigation.goBack();
+  const handleFinishPress = async () => {
+    const finishedId = await finishWorkout(activeWorkoutName);
+    if (finishedId) {
+      navigation.replace('WorkoutSummary', { workoutId: finishedId });
+    }
   };
 
   return (
@@ -149,60 +135,7 @@ export const ActiveWorkoutScreen: React.FC<Props> = ({ navigation, route }) => {
         </ScrollView>
       </KeyboardAvoidingView>
       
-      {/* Finish Workout Modal */}
-      <Modal
-        visible={finishModalVisible}
-        transparent
-        animationType="fade"
-      >
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Typography variant="title" style={{ marginBottom: spacing.md, textAlign: 'center' }}>
-              Great Workout!
-            </Typography>
-            
-            <Typography variant="microcopy" color={colors.textMuted} style={{ marginBottom: spacing.xs }}>
-              WORKOUT NAME
-            </Typography>
-            <TextInput 
-              style={styles.nameInput}
-              value={finalName}
-              onChangeText={setFinalName}
-              placeholder="e.g. Leg Day"
-              placeholderTextColor={colors.textSubtle}
-              autoFocus
-              selectTextOnFocus
-            />
-            
-            <View style={styles.statsRow}>
-              <View style={styles.statBox}>
-                <Typography variant="title" color={colors.primary}>{formatDuration(durationCounter)}</Typography>
-                <Typography variant="microcopy" color={colors.textMuted}>DURATION</Typography>
-              </View>
-              <View style={styles.statBox}>
-                <Typography variant="title" color={colors.primary}>{activeExercises.reduce((acc, ex) => acc + ex.sets.filter(s => s.isCompleted).length, 0)}</Typography>
-                <Typography variant="microcopy" color={colors.textMuted}>SETS DONE</Typography>
-              </View>
-            </View>
 
-            <GlassButton 
-              title="SAVE TO LOG" 
-              variant="primary"
-              onPress={handleConfirmFinish}
-              style={{ marginTop: spacing.xl }}
-            />
-            <GlassButton 
-              title="RESUME WORKOUT" 
-              variant="secondary"
-              onPress={() => {
-                togglePause();
-                setFinishModalVisible(false);
-              }}
-              style={{ marginTop: spacing.md }}
-            />
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
     </View>
   );
 };
@@ -236,39 +169,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xxl,
   },
   
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  modalContent: {
-    width: '100%',
-    backgroundColor: colors.glassBase,
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    borderRadius: radii.md,
-    padding: spacing.xl,
-  },
-  nameInput: {
-    height: 52,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: colors.glassBorder,
-    borderRadius: radii.sm,
-    color: colors.text,
-    paddingHorizontal: spacing.md,
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: spacing.xl,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statBox: {
-    alignItems: 'center',
-  }
 });
+
+

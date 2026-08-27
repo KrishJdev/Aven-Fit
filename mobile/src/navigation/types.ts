@@ -16,6 +16,7 @@ export type RootStackParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList>;
   Main: NavigatorScreenParams<MainTabParamList>;
   ActiveWorkout: { workoutId?: string; routineId?: string };
+  WorkoutSummary: { workoutId: string };
   
   // Workouts
   RoutineDetail: { routineId: string };

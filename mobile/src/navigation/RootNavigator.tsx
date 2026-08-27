@@ -6,6 +6,7 @@ import { AuthNavigator } from './AuthNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
 
 import { ActiveWorkoutScreen } from '@/screens/workout/ActiveWorkoutScreen';
+import { WorkoutSummaryScreen } from '@/screens/workout/WorkoutSummaryScreen';
 import { RoutineDetailScreen } from '@/screens/workout/RoutineDetailScreen';
 import { RoutineMetadataScreen } from '@/screens/workout/RoutineMetadataScreen';
 import { RoutineExerciseListEditor } from '@/screens/workout/RoutineExerciseListEditor';
@@ -39,6 +40,7 @@ export const RootNavigator = () => {
           <Stack.Screen name="Main" component={MainTabNavigator} />
           
           <Stack.Screen name="ActiveWorkout" component={ActiveWorkoutScreen} options={{ presentation: 'fullScreenModal' }} />
+          <Stack.Screen name="WorkoutSummary" component={WorkoutSummaryScreen} options={{ presentation: 'fullScreenModal' }} />
           <Stack.Screen name="RoutineDetail" component={RoutineDetailScreen} />
           <Stack.Screen name="RoutineMetadata" component={RoutineMetadataScreen} options={{ presentation: 'modal' }} />
           <Stack.Screen name="RoutineExerciseListEditor" component={RoutineExerciseListEditor} />
