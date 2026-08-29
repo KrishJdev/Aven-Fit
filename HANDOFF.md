@@ -47,5 +47,6 @@
 
 ## Notes for Other Agent
 
+- **Feature spec:** `docs/FEATURES.md` — business-level features & user workflows from the RN era (with build-status legend); read it before implementing any screen
 - The archived RN codebase (`archive/react-native-frontend/`) is the spec: replicate behavior and UX intent, not code
 - WorkoutSummaryScreen had robust "not found" and error-alert handling — preserve this UX quality in Flutter
