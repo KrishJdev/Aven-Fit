@@ -14,7 +14,7 @@
 | Component | Status |
 |:---|:---|
 | Backend (Spring Boot) | Scaffolded, not actively developed |
-| Mobile (React Native) | **Superseded** — last stable state on `dev` (commit `ed9370c`) |
+| Mobile (React Native) | **Archived** — moved to `archive/react-native-frontend/` (tag `rn-final` = `ed9370c` on `dev`) |
 | Mobile (Flutter) | **Not started** — no Flutter project exists yet |
 
 ## Completed Milestones (RN era — reference for re-implementation)
@@ -27,8 +27,7 @@
 
 ## Next Steps (Flutter)
 
-1. Delete the React Native `mobile/` directory
-2. Initialize a Flutter project in `mobile/`
+1. Initialize a Flutter project in `mobile/`
 3. Re-implement: Glassmorphism theme → SQLite (sqflite) → workout engine → screens, using Riverpod for state
 4. Read `docs/archive/DEVELOPMENT_LOG.md` for detailed UI/DB implementation decisions worth carrying over
 
@@ -42,11 +41,11 @@
 
 ## Known Issues / Decisions
 
-- RN `mobile/` on `dev` contains a debug script (`mobile/test-db.js`) — do not carry over
+- RN source lives in `archive/react-native-frontend/`; tag `rn-final` marks the last RN commit on `dev`
 - Stack is locked per `AGENTS.md`: Flutter + Dart, Riverpod, sqflite, Spring Boot backend
 - Root docs (`AGENTS.md`, `PRODUCT_ROADMAP.md`, `README.md`) are untracked in git — keep them updated in place
 
 ## Notes for Other Agent
 
-- The RN codebase on `dev` is the spec: replicate behavior and UX intent, not code
+- The archived RN codebase (`archive/react-native-frontend/`) is the spec: replicate behavior and UX intent, not code
 - WorkoutSummaryScreen had robust "not found" and error-alert handling — preserve this UX quality in Flutter

@@ -25,3 +25,9 @@ PRODUCT_ROADMAP.md
 gym_tracker_analysis.md
 
 UI_UX_PLAN.md
+
+# ---- Build artifacts & dependencies ----
+node_modules/
+backend/bin/
+archive/react-native-frontend/node_modules/
+mobile/
