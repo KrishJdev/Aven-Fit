@@ -1,6 +1,6 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Alert, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Typography, GlassButton } from '../../components/ui';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
@@ -23,7 +23,7 @@ export const RoutineMetadataScreen = () => {
       await createRoutine(name, description);
       navigation.goBack();
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Error', (e as any)?.message || 'Failed to save routine.');
     } finally {
       setIsSaving(false);
     }
@@ -131,3 +131,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   }
 });
+
+

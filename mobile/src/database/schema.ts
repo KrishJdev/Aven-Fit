@@ -163,12 +163,15 @@ const INITIALIZATION_QUERIES = [
 
 export const initDatabase = async () => {
   try {
-    // Note: op-sqlite allows running multiple statements separated by semicolon
-    // or we can run them in a transaction.
     for (const query of INITIALIZATION_QUERIES) {
       await db.execute(query);
     }
-    console.log('✅ SQLite Schema initialized successfully');
+    try {
+      await db.execute('ALTER TABLE workouts ADD COLUMN last_resumed_at TEXT');
+    } catch (e) {
+      // Column might already exist
+    }
+    console.log('📦 SQLite Schema initialized successfully');
   } catch (error) {
     console.error('❌ Error initializing SQLite schema:', error);
     throw error;

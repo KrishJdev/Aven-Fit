@@ -5,8 +5,8 @@
 
 ---
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.87-blue?logo=react&logoColor=white)](https://reactnative.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Flutter](https://img.shields.io/badge/Flutter-3.24-02569B?logo=flutter&logoColor=white)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-3.5-0175C2?logo=dart&logoColor=white)](https://dart.dev/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -52,9 +52,9 @@
 
 | Layer | Technology | Description |
 |:---|:---|:---|
-| **Mobile Client** | React Native (0.87, Fabric) + TypeScript | High-performance Android application with 0px brutalist styling |
-| **State Management** | Zustand | Lightweight, decoupled global state stores |
-| **Local Database** | SQLite (`op-sqlite`) | High-speed C++ native bindings for offline persistence |
+| **Mobile Client** | Flutter + Dart | High-performance Android application with 0px brutalist styling |
+| **State Management** | Riverpod | Reactive state management and dependency injection |
+| **Local Database** | SQLite (`sqflite`) | High-speed native bindings for offline persistence |
 | **Backend API** | Spring Boot 3.3 + Java 21 | Modular REST architecture with clean domain separation |
 | **Security & Auth** | Spring Security + JWT | Phone OTP and OAuth token rotation |
 | **Server Database** | PostgreSQL 16 + Flyway | Scalable relational storage with version-controlled migrations |
@@ -65,17 +65,17 @@
 
 ```
 aven-fit/
-├── mobile/                      # React Native Android application
+├── mobile/                      # Flutter Android application
 │   ├── android/                 # Native Android project files
-│   ├── src/
+│   ├── lib/
 │   │   ├── components/          # Reusable UI primitives & feature components
 │   │   ├── database/            # SQLite schema, migrations & local repositories
-│   │   ├── navigation/          # Root, Auth, and MainTab navigators
+│   │   ├── navigation/          # Router and navigation setup
 │   │   ├── screens/             # Today, Train, Workout, Nutrition, Progress
 │   │   ├── services/            # API clients & background SyncEngine
-│   │   ├── store/               # Zustand stores (Auth, Workout, etc.)
+│   │   ├── providers/           # Riverpod state providers
 │   │   └── theme/               # Brutalist design system, typography & palette
-│   └── App.tsx                  # Application entry & database initialization
+│   └── main.dart                # Application entry & initialization
 │
 └── backend/                     # Spring Boot application
     ├── src/main/java/com/avenfit/
@@ -96,23 +96,23 @@ aven-fit/
 
 ### Prerequisites
 
-- **Node.js**: `v20+` & `npm`
+- **Flutter SDK**: `v3.24+`
 - **JDK**: `Java 21`
 - **Android Studio**: Android SDK & Android 14/15 Virtual Device (Pixel 8 recommended)
 - **PostgreSQL**: `v16+` (for backend development)
 
 ---
 
-### 📱 Mobile Setup (React Native)
+### 📱 Mobile Setup (Flutter)
 
 1. **Navigate to the mobile directory:**
    ```bash
    cd mobile
    ```
 
-2. **Install dependencies:**
+2. **Get dependencies:**
    ```bash
-   npm install
+   flutter pub get
    ```
 
 3. **Configure local Android SDK path:**  
@@ -121,14 +121,9 @@ aven-fit/
    sdk.dir=C\:\\Users\\<YourUsername>\\AppData\\Local\\Android\\Sdk
    ```
 
-4. **Start Metro Bundler:**
+4. **Launch on Android Emulator / Device:**
    ```bash
-   npm start
-   ```
-
-5. **Launch on Android Emulator / Device:**
-   ```bash
-   npm run android
+   flutter run
    ```
 
 ---

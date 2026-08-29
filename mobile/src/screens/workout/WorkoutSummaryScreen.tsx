@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Alert, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/navigation/types';
@@ -45,8 +45,13 @@ export const WorkoutSummaryScreen: React.FC<Props> = ({ navigation, route }) => 
         SELECT name, duration_seconds, started_at, completed_at
         FROM workouts WHERE id = ?
       `, [workoutId]);
-      // @ts-ignore
-      const wData = wRes.rows?._array?.[0] || wRes.rows?.item?.(0);
+      const wRowsArray = wRes.rows?._array || (Array.isArray(wRes.rows) ? wRes.rows : []);
+      const wData = wRowsArray[0] || wRes.rows?.item?.(0);
+      
+      if (!wData) {
+        throw new Error(`Workout ID ${workoutId} not found in database.`);
+      }
+
       setWorkout(wData);
       setEditedName(wData?.name || 'Workout');
 
@@ -67,7 +72,7 @@ export const WorkoutSummaryScreen: React.FC<Props> = ({ navigation, route }) => 
       `, [workoutId]);
       
       // @ts-ignore
-      const rows = weRes.rows?._array || [];
+      const rows = weRes.rows?._array || (Array.isArray(weRes.rows) ? weRes.rows : []);
       
       // Group by exercise
       const exMap = new Map<string, any>();
@@ -86,7 +91,7 @@ export const WorkoutSummaryScreen: React.FC<Props> = ({ navigation, route }) => 
       }
       setExercises(Array.from(exMap.values()));
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Error', (e as any)?.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
@@ -130,7 +135,7 @@ export const WorkoutSummaryScreen: React.FC<Props> = ({ navigation, route }) => 
       }
       setStreak(currentStreak || 1); // Minimum 1 since they just finished a workout
     } catch (e) {
-      console.error('Streak calculation failed', e);
+      console.error('Streak calculation failed', e); Alert.alert('Error', 'Failed to calculate streak.');
       setStreak(1);
     }
   };
@@ -139,17 +144,33 @@ export const WorkoutSummaryScreen: React.FC<Props> = ({ navigation, route }) => 
 
   const handleNameSave = async () => {
     try {
-      await db.execute(`UPDATE workouts SET name = ? WHERE id = ?`, [editedName, workoutId]);
+      const finalName = editedName.trim() || 'Workout';
+      await db.execute(`UPDATE workouts SET name = ? WHERE id = ?`, [finalName, workoutId]);
       setIsEditingName(false);
-      setWorkout({ ...workout, name: editedName });
+      setEditedName(finalName);
+      setWorkout({ ...workout, name: finalName });
       loadRecentWorkouts();
-    } catch (e) {
-      console.error(e);
+} catch (e) {
+      console.error(e); Alert.alert('Error', (e as any)?.message || 'An unexpected error occurred.');
     }
   };
 
-  if (loading || !workout) {
+  if (loading) {
     return <View style={styles.safeArea} />
+  }
+
+  if (!workout) {
+    return (
+      <View style={[styles.safeArea, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Typography variant="body" color={colors.textMuted}>Workout not found.</Typography>
+        <GlassButton 
+          title="GO BACK" 
+          variant="secondary" 
+          onPress={() => navigation.navigate('Main', { screen: 'Workouts' })} 
+          style={{ marginTop: spacing.lg }} 
+        />
+      </View>
+    );
   }
 
   const totalSets = exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
@@ -318,4 +339,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.glassBorder,
   }
 });
+
+
+
 

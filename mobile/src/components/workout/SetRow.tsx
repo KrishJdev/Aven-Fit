@@ -58,7 +58,14 @@ export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
           style={[styles.input, isDone && styles.inputCompleted]}
           keyboardType="decimal-pad"
           value={data.kg}
-          onChangeText={(val) => onUpdate('kg', val)}
+          onChangeText={(val) => {
+            let sanitized = val.replace(/[^0-9.]/g, '');
+            // Prevent multiple decimals
+            if ((sanitized.match(/\./g) || []).length > 1) {
+              sanitized = sanitized.replace(/\.+$/, '');
+            }
+            onUpdate('kg', sanitized);
+          }}
           placeholder={data.suggestedKg || "-"}
           placeholderTextColor={colors.textSubtle}
           editable={!isDone}
@@ -70,7 +77,10 @@ export const SetRow: React.FC<SetRowProps> = ({ data, onUpdate, onToggle }) => {
           style={[styles.input, isDone && styles.inputCompleted]}
           keyboardType="number-pad"
           value={data.reps}
-          onChangeText={(val) => onUpdate('reps', val)}
+          onChangeText={(val) => {
+            const sanitized = val.replace(/[^0-9]/g, '');
+            onUpdate('reps', sanitized);
+          }}
           placeholder={data.suggestedReps || "-"}
           placeholderTextColor={colors.textSubtle}
           editable={!isDone}

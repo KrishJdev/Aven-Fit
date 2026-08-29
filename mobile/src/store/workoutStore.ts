@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Alert } from 'react-native';
 import { db } from '../database';
 import { ExerciseBlockData } from '../components/workout/ExerciseBlock';
 import { SetData } from '../components/workout/SetRow';
@@ -23,7 +24,7 @@ interface WorkoutState {
   durationCounter: number;
   isPaused: boolean;
   tickDuration: () => void;
-  togglePause: () => void;
+  togglePause: () => Promise<void>;
   
   startWorkout: (routineId?: string) => Promise<string>;
   finishWorkout: (finalName?: string) => Promise<string | null>;
@@ -53,8 +54,31 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     }
   },
   
-  togglePause: () => {
-    set(state => ({ isPaused: !state.isPaused }));
+  togglePause: async () => {
+    const { isPaused, activeWorkoutId, durationCounter } = get();
+    if (!activeWorkoutId) return;
+
+    const newPaused = !isPaused;
+    
+    try {
+      if (newPaused) {
+        // Pausing: save current accumulated duration and set status to PAUSED
+        await db.execute(
+          `UPDATE workouts SET duration_seconds = ?, status = 'PAUSED' WHERE id = ?`,
+          [durationCounter, activeWorkoutId]
+        );
+      } else {
+        // Resuming: set status to IN_PROGRESS and updated_at (which is our last_resumed_at proxy) to NOW
+        await db.execute(
+          `UPDATE workouts SET status = 'IN_PROGRESS', last_resumed_at = ? WHERE id = ?`,
+          [new Date().toISOString(), activeWorkoutId]
+        );
+      }
+      set({ isPaused: newPaused });
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Database Error', (e as any)?.message || 'Failed to pause workout.');
+    }
   },
 
   loadRecentWorkouts: async () => {
@@ -84,7 +108,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       }));
       set({ recentWorkouts: summaries });
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
     }
   },
 
@@ -114,9 +138,9 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       }
       
       await db.execute(
-        `INSERT INTO workouts (id, name, started_at, status, routine_id, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [id, name, nowIso, 'IN_PROGRESS', routineId || null, nowIso, nowIso]
+        `INSERT INTO workouts (id, name, started_at, last_resumed_at, status, routine_id, created_at, updated_at) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, name, nowIso, nowIso, 'IN_PROGRESS', routineId || null, nowIso, nowIso]
       );
       
       set({ 
@@ -128,7 +152,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       });
       return id;
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
       throw e;
     }
   },
@@ -162,7 +186,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       await get().loadRecentWorkouts();
       return finishedId;
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
       return null;
     }
   },
@@ -190,7 +214,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       // Add first empty set
       await get().addSetToExercise(weId);
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
     }
   },
 
@@ -255,7 +279,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       set({ activeExercises: newExercises });
       
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
     }
   },
 
@@ -274,7 +298,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       const dbField = field === 'kg' ? 'weight_kg' : 'reps';
       await db.execute(`UPDATE workout_sets SET ${dbField} = ? WHERE id = ?`, [numVal, setId]);
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
     }
   },
 
@@ -297,25 +321,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     try {
       await db.execute(`UPDATE workout_sets SET is_completed = ? WHERE id = ?`, [isCompletedNow ? 1 : 0, setId]);
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
     }
   },
 
   loadActiveWorkoutState: async (workoutId: string) => {
     try {
       const resW = await db.execute(
-        `SELECT name, duration_seconds, status, started_at FROM workouts WHERE id = ?`, 
+        `SELECT name, duration_seconds, status, started_at, last_resumed_at FROM workouts WHERE id = ?`, 
         [workoutId]
       );
-      // @ts-ignore
-      const wRow = resW.rows?._array?.[0] || resW.rows?.item?.(0);
+      const wRowArray = resW.rows?._array || (Array.isArray(resW.rows) ? resW.rows : []);
+      const wRow = wRowArray[0] || resW.rows?.item?.(0);
       const wName = wRow?.name || 'Workout';
       
       let initialDuration = wRow?.duration_seconds || 0;
       let initialPaused = wRow?.status === 'PAUSED';
       
-      // If it's IN_PROGRESS, calculate elapsed time since started_at (naive approach for MVP)
-      if (wRow?.status === 'IN_PROGRESS' && wRow?.started_at && !initialDuration) {
+      // If it's IN_PROGRESS, calculate elapsed time since last_resumed_at
+      if (wRow?.status === 'IN_PROGRESS' && wRow?.last_resumed_at) {
+        initialDuration += Math.floor((Date.now() - new Date(wRow.last_resumed_at).getTime()) / 1000);
+      } else if (wRow?.status === 'IN_PROGRESS' && wRow?.started_at && !initialDuration) {
+        // Fallback for older workouts
         initialDuration = Math.floor((Date.now() - new Date(wRow.started_at).getTime()) / 1000);
       }
 
@@ -328,7 +355,7 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       `, [workoutId]);
       
       // @ts-ignore
-      const workoutExercises = resWe.rows?._array || resWe.rows || [];
+      const workoutExercises = resWe.rows?._array || (Array.isArray(resWe.rows) ? resWe.rows : []);
       const populatedExercises: ExerciseBlockData[] = [];
       
       for (const we of workoutExercises) {
@@ -384,7 +411,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
         isPaused: initialPaused
       });
     } catch (e) {
-      console.error(e);
+      console.error(e); Alert.alert('Database Error', (e as any)?.message || 'An unexpected error occurred while saving.');
     }
   }
 }));
+
+
+
