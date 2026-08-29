@@ -1,137 +1,405 @@
-# Aven Fit — Features & Workflows
+# Aven Fit — Comprehensive Feature Spec
 
-> **Purpose:** Business-level feature spec, extracted from the archived React Native frontend (tag `rn-final`). This is the source of truth for *what the app does and how users flow through it* — implementation details are intentionally excluded.
+> **Purpose:** The complete product feature specification — every feature, every screen, every sub-page across the full product vision (MVP → V2), with implementation-ready detail per screen.
+> **Source:** Archived React Native frontend (tag `rn-final`) + `PRODUCT_ROADMAP.md` + new proposals.
 > **Rule:** Replicate behavior and UX intent, not code.
-> **Extracted:** 2026-08-30
 
-**Status legend:** ✅ Fully built in the archived app (re-implement first) · ◐ UI/design exists, logic not wired · 🔜 Planned, not built
+---
+
+## Phase Legend
+
+Every feature/screen is tagged with its roadmap phase. Build order = phase order.
+
+| Tag | Phase | Meaning |
+|:---|:---|:---|
+| `[P0]` | MVP P0 — "Ship It" | Authorized for current development |
+| `[P1]` | MVP P1 | Build after P0 is stable |
+| `[V1.1]` | V1.1 — "Delight" | Build after MVP is released |
+| `[V2]` | V2.0 — "Dominate" | Only when explicitly authorized |
+| `[PROPOSED]` | — | New proposal not yet in `PRODUCT_ROADMAP.md`; needs approval before building |
+
+Within each phase, screens inherit the phase of their feature. A screen tagged `[P0]` may contain `[P1]`-tagged sub-sections.
 
 ---
 
 ## 1. Product Overview
 
-Aven Fit is an **offline-first gym tracker** for Android. A user can log a workout at the gym with no account and no internet, and the app still records everything, suggests weights from history, and shows progress. Visual identity: dark, translucent "glass" surfaces with a neon-cyan accent — premium and focused.
+Aven Fit is an **offline-first gym tracker for Android**, targeting Indian fitness enthusiasts on budget phones. A user can log a workout at the gym with no account and no internet, and the app records everything, suggests weights from history, and shows progress. Visual identity: dark "Sharp Glassmorphism" — pitch-black surfaces, translucent glass cards, neon-cyan (#00F0FF) accent.
+
+**Non-negotiable quality bar** (applies to every screen):
+
+| Requirement | Target |
+|:---|:---|
+| APK size | <30MB |
+| Set logging speed | <3s per set |
+| Offline reliability | 100% for core workout flow — no network needed |
+| First workout | <60s from install to first logged set |
+| Battery | Minimal — no CPU polling |
+| Target devices | Budget Android (₹8,000–₹15,000) |
 
 ---
 
-## 2. Workout Logging (Core Feature) ✅
+## 2. Complete Screen Map
 
-The heart of the app: create a session, add exercises, log sets set-by-set.
+Every screen and sub-page in the product. Sub-pages are indented.
 
-### Workflow: Start → Log → Finish
+```
+AUTH [P0]
+├─ Login (phone number)                       [P0]
+│  └─ OTP Verification                        [P0]
+└─ (Google Sign-In — same entry screen)       [P0]
 
-1. **Start** — User taps **START NEW SESSION** (Home tab) or **START** on a saved routine (Workouts tab).
-2. **Auto-naming** — The workout is named by time of day (randomized within a band), e.g.:
-   | Time | Name options |
-   |:---|:---|
-   | 00:00–05:00 | Late Night Lift · Midnight Session |
-   | 05:00–09:00 | Early Bird Workout · Dawn Patrol |
-   | 09:00–12:00 | Morning Grind · Morning Workout |
-   | 12:00–17:00 | Afternoon Pump · Midday Session |
-   | 17:00–21:00 | Evening Workout · Sundown Session |
-   | 21:00–24:00 | Night Session · Late Lift |
+MAIN TABS [P0]
+├─ Home                                       [P0]
+├─ Workouts (Routines)                        [P0]
+├─ Progress                                   [P0]
+└─ Nutrition                                  [P0]
 
-   Starting from a routine names the workout after the routine instead. The user can always rename later.
-3. **Add exercises** — "+ ADD EXERCISE" opens the Exercise Directory; picking one adds it as a block in the session and automatically preparses one empty set row.
-4. **Log sets** — For each exercise, rows show: SET # | PREV (previous performance) | KG | REPS | ✓.
-   - **Ghost placeholders:** tapping ADD SET pre-fills the *hint* text (not the value) with the most likely numbers — the previous set in this session, or for a first set, the last time this exercise was performed. The user can type over it, or simply tap ✓ to accept the suggestion.
-   - **Accepting a set:** ✓ auto-fills any empty field from the suggestion, then locks the row (green, read-only).
-   - **Input rules:** weight accepts decimals only (one decimal point); reps accepts whole numbers only. Invalid entries are blocked and reported, never silently dropped.
-5. **Rest timer** — Completing a set automatically starts a **90-second rest countdown** shown as a slim bar under the header (never blocks the screen). User can add/remove 15s or dismiss it; it can also be started manually from the header.
-6. **Session timer** — Header shows elapsed time, continuously ticking.
-   - **Pause** freezes the timer and visibly marks the session as PAUSED.
-   - **Pause/resume survives app restarts:** closing the app mid-session and reopening restores the exact exercises, sets, and elapsed time — resumed time keeps counting; paused time stays frozen.
-7. **Finish** — "FINISH WORKOUT" offers an optional rename, then saves the session and lands on the Workout Summary.
+WORKOUT
+├─ Active Workout                             [P0]
+│  ├─ Exercise Picker (in-session mode)       [P0]
+│  └─ Rest Timer overlay/bar                  [P0]
+├─ Workout Summary                            [P0]
+├─ Workout History list + calendar            [P0][PROPOSED: calendar]
+│  └─ Past Workout Detail                     [P0][PROPOSED]
+└─ Routine Editor
+   ├─ Routine Metadata (name/description)     [P0]
+   └─ Routine Exercise Editor                 [P0]
 
-### Workflow: Resume an interrupted session
+EXERCISES
+├─ Exercise Directory                         [P0]
+├─ Exercise Detail                            [P0]
+│  └─ Exercise History (per-exercise log)     [P0][PROPOSED]
+└─ Create Custom Exercise                     [P0]
 
-Reopening an unfinished workout restores full state from local storage: exercise order, logged sets, timer (elapsed + paused/unpaused). The user never loses a session to a crash or app switch.
+PROGRESS
+├─ Progress Dashboard                         [P0]
+│  ├─ PR Vault                                [P0]
+│  ├─ Body Weight History + log               [P1]
+│  ├─ 1RM Chart per exercise                  [V1.1]
+│  ├─ Muscle Volume Distribution              [V1.1]
+│  └─ Workout Calendar (heatmap)              [P0][PROPOSED]
+└─ [V1.1] Advanced analytics (date ranges, heatmap polish)
+
+NUTRITION
+├─ Nutrition Dashboard                        [P0]
+│  └─ Meal Logging (per-meal view)            [P0]
+│     ├─ Food Database Search                 [P0]
+│     │  └─ Food Item Detail                  [P0]
+│     ├─ Create Custom Food                   [P1][PROPOSED]
+│     └─ Barcode Scanner                      [P1]
+│  └─ Day Nutrition History                   [P1][PROPOSED]
+├─ Vrat/Fasting Mode                          [V1.1]
+└─ AI Photo Meal Recognition                  [V2]
+
+ACCOUNT & SYNC
+├─ Profile                                    [P0]
+├─ Settings hub                               [P1][PROPOSED]
+│  ├─ Units (kg/lb)                           [P1][PROPOSED]
+│  ├─ Dark/Light theme                        [P1] (dark is default)
+│  ├─ Language                                [V1.1] (Hindi) / [V2]
+│  ├─ Data Export                             [P1][PROPOSED]
+│  └─ Account / Sign out                      [V1.1] (sync-dependent)
+└─ Sync status (background; surfaced in Settings) [V1.1]
+
+SOCIAL [V1.1]
+├─ Social Feed (tab or entry from Home)       [V1.1]
+│  ├─ Create Post (share workout)             [V1.1]
+│  ├─ Post Detail (kudos, comments)           [V1.1]
+│  ├─ Friend Search / Follow                  [V1.1]
+│  └─ Notifications                           [V1.1]
+├─ Private Squads & Challenges                [V2]
+└─ Trainer/Client Mode                        [V2]
+
+AI [V2]
+├─ AI Workout Generator                       [V2]
+├─ Adaptive TDEE Engine (goal settings page)  [V2]
+└─ Voice Logging (Hinglish)                   [V2]
+```
+
+Dead prototypes in the RN archive (`TrainScreen`, `TodayScreen`, `history/ProgressScreen`, `NutritionScreen` v1, `ProfileScreen` stub) were superseded by the final set above — do **not** re-implement them.
 
 ---
 
-## 3. Workout Summary ✅
+## 3. Auth `[P0]`
 
+### 3.1 Login Screen `[P0]`
+**Purpose:** Sign in / sign up via phone number (no passwords — sign-up is implicit: same flow for new and returning users) or Google.
+
+- **Elements:** app logo/wordmark, country code selector (+91 default), phone number input, "Continue" button, Google Sign-In button, skip/continue-as-guest link.
+- **Interactions:** phone validation (10-digit Indian numbers primary); Continue → OTP Verification. Google → direct sign-in. Guest → lands on Home with local-only data.
+- **States:**
+  - *Empty/invalid phone:* inline validation error, no navigation.
+  - *Network error:* toast/alert with retry.
+  - *Guest mode:* everything works offline; sign-in offered later from Profile.
+
+### 3.2 OTP Verification `[P0]`
+**Purpose:** Verify the phone number with a 6-digit OTP.
+
+- **Elements:** 6-cell OTP input (auto-advance, auto-read SMS where possible), resend timer (30s countdown), change-number link.
+- **Interactions:** auto-submit when 6 digits filled; resend; edit phone number.
+- **States:** *verifying* (spinner), *invalid code* (shake + clear + error), *expired* (prompt resend), *success* → Home.
+
+---
+
+## 4. Main Tabs `[P0]`
+
+Bottom tab bar: **Home · Workouts · Progress · Nutrition** — pitch-black bar, white active tint, glass border top. (Profile/Settings is reached from Home header, not a tab.)
+
+### 4.1 Home `[P0]`
+**Purpose:** Today's launchpad — start a workout in one tap, see recent activity.
+
+- **Sections:**
+  1. Greeting + date; profile/settings avatar (→ Profile).
+  2. **START NEW SESSION** — prominent primary action → Active Workout.
+  3. **Suggested routine** card (if routines exist) — one-tap start from today's plan `[PROPOSED: smart suggestion]`.
+  4. **Glance stats:** sets this week, this week's volume, current streak, today's calories remaining (wired to real data — was placeholder in RN).
+  5. **Recent Logs:** last 10 completed workouts — name, date, exercise list, sets count, total volume. Tap → Past Workout Detail `[PROPOSED]`.
+- **States:** *first-run empty* (welcome state that drives straight to first workout — the 60s goal), *no recent workouts* ("Your history will appear here").
+
+### 4.2 Workouts Tab (Routines) `[P0]`
+See §5.2 Routines.
+
+### 4.3 Progress Tab `[P0]`
+See §7 Progress.
+
+### 4.4 Nutrition Tab `[P0]`
+See §8 Nutrition.
+
+---
+
+## 5. Workout (Core Feature) `[P0]`
+
+The heart of the app: create a session, add exercises, log sets set-by-set. Offline-first, always.
+
+### 5.1 Active Workout Screen `[P0]`
+**Purpose:** The live logging surface. Must be fast, thumb-friendly, and never lose state.
+
+**Entry points:** START NEW SESSION (Home) · START on a routine (Workouts tab) · Resume notification/banner.
+
+- **Header:** workout name (tappable to rename), ticking session timer, pause/resume button, FINISH button. Rest-timer slim bar lives under the header (never blocks content).
+- **Auto-naming:** by time of day (randomized within a band) —
+  | Time | Name options |
+  |:---|:---|
+  | 00:00–05:00 | Late Night Lift · Midnight Session |
+  | 05:00–09:00 | Early Bird Workout · Dawn Patrol |
+  | 09:00–12:00 | Morning Grind · Morning Workout |
+  | 12:00–17:00 | Afternoon Pump · Midday Session |
+  | 17:00–21:00 | Evening Workout · Sundown Session |
+  | 21:00–24:00 | Night Session · Late Lift |
+  Starting from a routine names it after the routine. User can always rename.
+- **Exercise blocks:** each added exercise renders a block: exercise name, "+ ADD SET" button, rows of `SET # | PREV | KG | REPS | ✓`.
+  - **Ghost placeholders:** ADD SET pre-fills the *hint* (not the value) with the most likely numbers — previous set this session, or last performance of this exercise. Type over it, or tap ✓ to accept.
+  - **Accepting a set:** ✓ auto-fills empty fields from the suggestion, locks the row (green, read-only), and starts the rest timer.
+  - **Input rules:** weight = decimals only (one point); reps = whole numbers only. Invalid entries blocked and reported — never silently dropped.
+  - **Row actions:** swipe/tap to delete an unlocked set; completed sets can be edited via long-press/tap `[PROPOSED: edit UX]`.
+- **Exercise block actions:** reorder (drag), remove exercise, swap exercise `[PROPOSED]`, add superset marker `[V1.1]`.
+- **"+ ADD EXERCISE"** → Exercise Picker (in-session mode).
+- **Session timer:** continuously ticking. **Pause** freezes it and visibly marks PAUSED.
+- **Persistence (critical):** closing the app mid-session and reopening restores exact exercises, sets, elapsed time; resumed time keeps counting, paused time stays frozen (`last_resumed_at` pattern from RN). Survives crashes.
+- **Finish:** optional rename dialog → save → Workout Summary.
+- **Discard workout:** confirm dialog ("Discard session? This can't be undone") `[PROPOSED: explicit discard UX]`.
+- **States:** *empty session* ("Add your first exercise"), *restored session* banner ("Workout resumed"), *saving* spinner on Finish, *save error* with retry (data stays local).
+
+### 5.1.1 Exercise Picker (in-session) `[P0]`
+The Exercise Directory opened in workout mode (see §6.1): tapping any exercise adds it to the session and returns.
+
+### 5.1.2 Rest Timer `[P0]`
+- Completing a set auto-starts a **90-second countdown**, rendered as a slim bar under the header (never blocks the screen).
+- Controls: +15s / −15s, dismiss, restart. Manually startable from header.
+- **Lock-screen / notification widget:** countdown persists outside the app (roadmap #4).
+- `[PROPOSED]` per-exercise default rest durations (auto-set from routine target or muscle group).
+
+### 5.2 Workout Summary `[P0]`
 Shown immediately after finishing (replaces the workout screen).
 
-- **Streak badge** — consecutive-day training streak (counts today's workout; tolerates a "yesterday" start; minimum 1).
-- **Stats grid:** session duration · total volume (weight × reps of completed sets) · set count.
-- **Workout breakdown:** one card per exercise listing each completed set as `weight × reps`.
-- **Inline rename** — pencil icon on the title; saves on submit/blur; blank names fall back to "Workout".
-- **Robust error UX** — if the workout can't be found, a clear "Workout not found" state with a way back (never a blank/crashed screen). Preserve this quality bar.
+- **Streak badge:** consecutive-day streak (counts today; tolerates a "yesterday" start; min 1). PR celebration micro-animation on new records `[PROPOSED]`.
+- **Stats grid:** duration · total volume (weight × reps of completed sets) · set count.
+- **Workout breakdown:** one card per exercise, each completed set as `weight × reps`.
+- **Inline rename:** pencil on title; saves on submit/blur; blank → "Workout".
+- **Actions:** Done (→ Home) · Share `[V1.1 with social]` `[PROPOSED: image export earlier]`.
+- **Error UX (preserve):** workout-not-found → clear state with a way back; never blank/crashed.
 
----
+### 5.3 Workout History `[P0]` + Calendar `[PROPOSED]`
+**Purpose:** Browse every past workout. (Home shows only 10 — this is the full list.)
 
-## 4. Dashboard / Recent History ✅
+- **Full workout list** (this page itself is `[PROPOSED]` as a dedicated screen; RN only surfaced 10 on Home): grouped by week/month, name, date, duration, volume, sets.
+- **Calendar view `[PROPOSED]`:** month grid with workout-day dots + streak visualization; tap a day → that day's workouts.
+- **Filter/search `[PROPOSED]`:** by name, date range, exercise performed.
 
-- Prominent start button and greeting.
-- **Recent Logs:** the last 10 completed workouts — name, date, exercise list, sets count, and total volume.
-- Glance stats (sets this week, calories) — placeholder in the archived app; wire to real data in Flutter.
+### 5.3.1 Past Workout Detail `[P0]` `[PROPOSED]`
+**Purpose:** Read-only view of a finished workout. (Not built in RN — Home "Recent Logs" items went nowhere.)
 
----
+- Same layout as Workout Summary minus celebrations; actions: **Repeat this workout** (starts a new session pre-loaded with these exercises/sets), rename, delete (with confirm).
 
-## 5. Exercise Directory ✅
+### 5.4 Routine Editor `[P0]`
+Three sub-pages (designed in RN, builder was never wired — build for Flutter with this schema of intent):
 
-- Searchable list of exercises with **equipment filter chips** (All / Barbell / Dumbbell / Machine / Cable / Bodyweight).
-- Ships with a starter set of 10 common exercises (bench press, squat, deadlift, pull-up, OHP, etc.) grouped by muscle category; users can add custom exercises.
-- **Context-aware tap:** during an active workout, tapping an exercise adds it to the session; outside a workout, it opens the exercise's detail view.
-
----
-
-## 6. Routines (Workouts Tab) ◐
-
-- "All Routines" list with name + description; each routine can be **START**ed (creates a pre-named session) or opened for detail/editing.
-- The routine **builder** (name/description metadata, ordered exercise list, per-exercise target sets with weight/reps/RPE and rest durations) was designed but never wired — build for Flutter using this schema of intent.
+#### 5.4.1 Routines List (Workouts tab) `[P0]`
+- All routines: name + description; each has **START** (creates pre-named session) and opens for detail/editing.
 - Empty state guides users to create their first plan.
 
----
+#### 5.4.2 Routine Detail `[P0]`
+- Full routine preview: ordered exercises, per-exercise target sets, weight/reps/RPE targets, rest durations.
+- Actions: START, Edit, Duplicate `[PROPOSED]`, Delete (confirm).
 
-## 7. Progress & Analytics ◐
+#### 5.4.3 Routine Metadata `[P0]`
+- Name, description, (cover color/icon `[PROPOSED]`). Saves back to list.
 
-- Dashboard with three sections: **PR Vault** (personal-record trophy room), **Body Weight** (current weight + trend), **Strength 1RM** (pick an exercise, see estimated 1RM trend over time).
-- Sub-pages: body-weight log, 1RM chart per exercise, PR list, muscle-group volume distribution.
-- All displayed with mock data in the archived app — the screens define the UX target; the calculations (1RM from set history, PR detection, volume by muscle group) must be built for Flutter.
-
----
-
-## 8. Nutrition ◐
-
-- Daily dashboard: calories remaining vs. goal, plus macro targets (protein / carbs / fat — consumed vs. target).
-- Four meal sections (Breakfast / Lunch / Dinner / Snacks), each listing logged foods (name, serving, kcal, protein) with quick add.
-- Food flow: meal → food database search → item detail → add to meal.
-- Entirely mock data in the archived app — no storage existed. Build data layer for Flutter.
+#### 5.4.4 Routine Exercise Editor `[P0]`
+- Ordered exercise list: add (→ Directory in picker mode), remove, reorder (drag), per-exercise editor: target sets, target weight/reps, RPE, rest seconds.
 
 ---
 
-## 9. Account & Multi-Device Sync 🔜
+## 6. Exercises `[P0]`
 
-- **Sign-in:** phone number + OTP (no passwords). Sign-up is implicit — same flow for new and returning users.
-- **Offline-first:** all features above work with no account and no connection. Local data is the primary store.
-- **Background sync:** when the app has an account and connectivity, it pushes local changes and pulls changes from other devices (conflict-safe). Backend was not built in the RN era; the app must behave identically offline.
+### 6.1 Exercise Directory `[P0]`
+- Searchable list, grouped by muscle category; ships with starter library (roadmap: 200+ exercises with muscle-group tags; RN era had 10 common ones).
+- **Equipment filter chips:** All / Barbell / Dumbbell / Machine / Cable / Bodyweight `[PROPOSED: + muscle-group filter, favourites]`.
+- **Context-aware tap:** during an active workout → adds it to the session; otherwise → Exercise Detail.
+
+### 6.2 Exercise Detail `[P0]`
+- Name, muscle group(s), equipment, instructions/notes.
+- **Exercise History `[PROPOSED]`:** last performances (date, best set, volume) + mini 1RM/volume trend — the data that powers ghost suggestions.
+- Actions: add to current session (if one is active), edit (custom exercises), delete (custom only, confirm + re-assign logged data).
+
+### 6.3 Create Custom Exercise `[P0]`
+- Name (required, unique), muscle group, equipment type, notes. Lands on its Detail.
 
 ---
 
-## 10. Suggested Re-Implementation Priority
+## 7. Progress & Analytics `[P0]` (basics) → `[V1.1]` (advanced)
 
-| Phase | Scope |
+### 7.1 Progress Dashboard (tab) `[P0]`
+Three sections (real calculations for Flutter — RN showed mocks):
+1. **PR Vault preview** — recent personal records → full PR Vault.
+2. **Body Weight preview** — current weight + trend → Body Weight History `[P1]`.
+3. **Strength preview** — top-exercise 1RM trend → 1RM Chart `[V1.1]`.
+4. **Workout Calendar `[PROPOSED]`:** streak/consistency heatmap on the dashboard.
+
+### 7.2 PR Vault `[P0]`
+Personal-record trophy room. PR detection = new max weight, and est. 1RM (Epley), and volume PRs per exercise `[PROPOSED: PR type breakdown]`. Each entry: exercise, record type, value, date. Empty state explains how PRs are earned.
+
+### 7.3 Body Weight History `[P1]`
+- Current weight, trend chart (7/30/90-day ranges), log entry (quick-add today's weight), edit/delete entries, goal weight line `[PROPOSED]`.
+
+### 7.4 1RM Chart (per exercise) `[V1.1]`
+- Exercise picker → estimated-1RM trend over time from set history (Epley formula), configurable range.
+
+### 7.5 Muscle Volume Distribution `[V1.1]`
+- Volume by muscle group over a selected period — bar/pie "heatmap" view; informs weak-point training.
+
+### 7.6 Advanced Analytics `[V1.1]`
+- Custom date ranges across all analytics; muscle heatmap (roadmap #15).
+
+---
+
+## 8. Nutrition `[P0]` (basics) → `[P1]`/`[V1.1]`
+
+### 8.1 Nutrition Dashboard (tab) `[P0]`
+- **Calories remaining vs. goal** (primary visual), **macro targets** — protein / carbs / fat consumed vs. target.
+- **Four meal sections:** Breakfast / Lunch / Dinner / Snacks — each lists logged foods (name, serving, kcal, protein) with quick-add.
+- **Day navigation `[PROPOSED]`:** swipe/date-picker to view previous days (RN was today-only).
+- Goal editing (calorie + macro targets) lives on first-run onboarding or settings `[PROPOSED: onboarding quiz]`.
+
+### 8.2 Meal Logging (per-meal view) `[P0]`
+- Opens from a meal section: that meal's foods for the day, serving edit, remove item, add food → Food Database Search.
+
+### 8.3 Food Database Search `[P0]`
+- Search ~5,000 curated Indian food entries (roadmap #8 — paneer, roti, dal, idli, poha, etc., with household servings like "1 katori", "2 roti").
+- Results: name, standard serving, kcal, protein. Tap → Food Item Detail. Recent/frequent foods at top `[PROPOSED]`.
+
+### 8.4 Food Item Detail `[P0]`
+- Full nutrition panel (kcal, protein, carbs, fat, fiber `[PROPOSED]`), serving-size selector (household units + grams), quantity stepper, meal selection, Add.
+
+### 8.5 Create Custom Food `[P1]` `[PROPOSED]`
+- Homemade recipes: name, serving definition, per-serving macros → searchable like database items.
+
+### 8.6 Barcode Scanner `[P1]`
+- Scan packaged food → product lookup (roadmap #9) → same add-to-meal flow.
+
+### 8.7 Vrat/Fasting Mode `[V1.1]`
+- Festival-calendar aware fasting mode (roadmap #14): adjusts calorie/macro targets, offers fasting-friendly food suggestions.
+
+### 8.8 Vegetarian Protein Intelligence `[V1.1]`
+- Protein-gap insights + veg-friendly protein suggestions (roadmap #16).
+
+---
+
+## 9. Account, Profile & Settings
+
+### 9.1 Profile `[P0]`
+- Name, photo, body metrics (height, weight link to body-weight log `[PROPOSED]`), member-since, quick stats (total workouts, streak record).
+- Entry to Settings.
+
+### 9.2 Settings Hub `[P1]` `[PROPOSED]`
+- **Units (kg/lb):** display conversion; storage stays kg `[P1][PROPOSED]`.
+- **Theme:** dark (default) / light — roadmap #11 `[P1]`.
+- **Language:** English → Hindi `[V1.1]`; Tamil/Telugu/Marathi `[V2]` (roadmap #19, #27).
+- **Data Export `[PROPOSED]:** CSV/JSON of workouts + nutrition; automatic local backups `[PROPOSED]`.
+- **Default rest timer `[PROPOSED]`, haptics/sound `[PROPOSED]`, about/licenses `[PROPOSED]`.**
+
+### 9.3 Auth & Multi-Device Sync `[V1.1]`
+- Offline-first invariant: all features work with no account/connection; local SQLite is the primary store.
+- **Background sync (roadmap #12):** when signed in + online, push local changes, pull from other devices, conflict-safe (last-writer-wins per entity + operation queue pattern).
+- Sync status + sign-out surfaced in Settings.
+
+---
+
+## 10. Social `[V1.1]`
+
+| Screen | Phase | Detail |
+|:---|:---|:---|
+| Social Feed | `[V1.1]` | Followed users' workouts/kudos feed (roadmap #13); entry from Home or tab |
+| Create Post | `[V1.1]` | Share a completed workout (auto-card from Workout Summary) or text |
+| Post Detail | `[V1.1]` | Kudos, comments |
+| People Search / Follow | `[V1.1]` | Find friends, follow/unfollow, profile view |
+| Notifications | `[V1.1]` | Kudos, comments, follows, streak milestones |
+| Private Squads & Challenges | `[V2]` | Cooperative challenges (roadmap #22) |
+| Trainer/Client Mode | `[V2]` | Trainers assign routines, view client logs (roadmap #23) |
+
+---
+
+## 11. AI & Intelligence `[V2]`
+
+| Feature | Detail |
 |:---|:---|
-| 1 | Workout logging engine, summary, dashboard, exercise directory (all ✅ features) |
-| 2 | Routines incl. builder |
-| 3 | Progress analytics with real calculations |
-| 4 | Nutrition with real data |
-| 5 | Auth + background sync |
-
-*(Final sequencing per `PRODUCT_ROADMAP.md`.)*
+| Adaptive TDEE Engine | Dynamic calorie/macro targets from weight trend + logging (roadmap #20); adds a goal-settings page |
+| AI Workout Generator | Goal/experience/equipment → generated routine, saved into the normal routine system (roadmap #21) |
+| Voice Logging (Hinglish) | Log sets/meals by voice (roadmap #24) |
+| AI Photo Meal Recognition | Photograph food → identify + estimate macros (roadmap #25) |
+| Wearable Integration | Google Health Connect + Indian wearables (roadmap #26) |
+| Supplement Tracker | Stack logging + schedules (roadmap #28) |
+| Cycle-Aware Training | Menstrual cycle-aware recommendations (roadmap #29) |
+| Quick-Commerce Rewards | Reward integrations (roadmap #30) |
 
 ---
 
-## 11. User-Facing Surfaces (Inventory)
+## 12. Cross-Cutting Requirements (every phase)
 
-| Area | Screens |
-|:---|:---|
-| Auth | Login (phone), OTP verification |
-| Tabs | Home · Workouts (routines) · Progress · Nutrition |
-| Workout | Active workout · Workout summary · Routine detail · Routine metadata · Routine exercise editor |
-| Exercises | Directory · Detail · Create custom |
-| Progress | Dashboard · Body weight log · 1RM chart · PR vault · Muscle volume distribution |
-| Nutrition | Dashboard · Meal logging · Food search · Food item detail |
-| Other | Profile |
+- **Offline-first:** core flows (workout, routines, history, basic analytics) work with zero connectivity; network is enhancement only.
+- **Persistence:** every screen survives app kill; destructive actions require confirmation.
+- **Error UX:** every screen has designed empty / loading / error states — never blank or crashed (WorkoutSummary standard).
+- **Performance:** budget-phone targets; list virtualization; no jank on set logging.
+- **Security:** no secrets in code; auth tokens handled per Spring Security backend contracts.
+
+---
+
+## 13. Suggested Build Order (within phases)
+
+| Order | Scope | Phase |
+|:---|:---|:---|
+| 1 | Theme + navigation shell + SQLite schema | `[P0]` |
+| 2 | Workout engine: Active Workout → Summary → Home | `[P0]` |
+| 3 | Exercise Directory/Detail/Custom | `[P0]` |
+| 4 | Routines incl. builder | `[P0]` |
+| 5 | History + Past Workout Detail + PR Vault + dashboard basics | `[P0]` |
+| 6 | Auth (phone OTP + Google) | `[P0]` |
+| 7 | Nutrition with real Indian food DB | `[P0]` |
+| 8 | Body weight, dark/light theme, barcode scanner | `[P1]` |
+| 9 | Settings hub (units, export) | `[P1]` |
+| 10 | Cloud sync | `[V1.1]` |
+| 11 | Advanced analytics + social + vrat mode + Hindi | `[V1.1]` |
+| 12 | AI + squads + trainer mode | `[V2]` |
+
+*(Final sequencing authority: `PRODUCT_ROADMAP.md`.)*
