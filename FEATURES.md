@@ -301,7 +301,11 @@ The heart of the app: create a session, add exercises, log sets set-by-set. Offl
 - **Exercise blocks:** each added exercise renders a block:
   - **Block header:** exercise name (tap → quick-info sheet: muscles, last performance summary "Last: 4 sets · best 62.5 kg × 8"), drag handle, overflow menu (Remove, Swap `[V1.1: smart same-muscle suggestions]`, Add note, Rest-time override `[P1][PROPOSED]`).
   - **Rows:** `SET # | PREV | KG | REPS | ✓` (+ optional RPE chip `[P1][PROPOSED]`, warm-up toggle `[P0][PROPOSED]`).
-  - **Ghost placeholders:** ADD SET pre-fills the *hint* (not the value) with the most likely numbers — previous set this session, else last performance of this exercise. Type over it, or tap ✓ to accept.
+  - **Historical Set Prefill & Ghost Value Fallback (Standard Set Population Logic):**
+    - **Initial Exercise Addition:** Fetch the most recent completed workout containing this exercise. Render matching set rows prefilled with historical weight and reps as low-opacity placeholder (ghost) values.
+    - **Adding Existing Sets ($N \le \text{Historical Count}$):** Use Set $N$'s historical weight and reps as ghost text.
+    - **Adding New/Overflow Sets ($N > \text{Historical Count}$):** Fall back to copying the values from Set $N-1$ in the active workout.
+    - **Accepting Ghost Values:** Tap ✓ to accept/commit ghost values into confirmed entries, or type directly over them.
   - **Routine targets:** when started from a routine, rows show targets ("Target: 80 × 8") and hints prefill from targets.
   - **Accepting a set:** ✓ auto-fills empty fields from the suggestion, locks the row (Volt Green accent, read-only), starts the rest timer, fires a short haptic tick. Row shows a tiny **PR badge** if it beat any personal record (weight, e1RM, reps-at-weight, volume) — computed instantly from local history.
   - **Quick steppers `[P0][PROPOSED]`:** +/−2.5 kg buttons flanking the weight field (adaptive step: 1 kg for dumbbells) so logging can avoid typing entirely.
