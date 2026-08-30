@@ -1,4 +1,4 @@
-﻿# ---- Agent / assistant local state ----
+# ---- Agent / assistant local state ----
 .opencode/
 # ---- IDEs & editors ----
 .idea/
@@ -17,17 +17,10 @@ Thumbs.db
 # ---- Local databases (dev Postgres lives outside repo, just in case) ----
 *.db
 *.sqlite
-# ---- Internal Agent, Planning & Analysis Documentation ----
-AGENTS.md
-DEVELOPMENT_LOG.md
-DEVELOPMENT_PLAN.md
-PRODUCT_ROADMAP.md
-gym_tracker_analysis.md
-
-UI_UX_PLAN.md
-
 # ---- Build artifacts & dependencies ----
 node_modules/
 backend/bin/
 archive/react-native-frontend/node_modules/
-mobile/
+mobile/node_modules/
+mobile/.dart_tool/
+mobile/build/
