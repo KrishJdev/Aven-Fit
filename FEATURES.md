@@ -211,12 +211,24 @@ Dead prototypes in the RN archive (`TrainScreen`, `TodayScreen`, `history/Progre
 - First launch lands on **Home**, not a quiz. Home's empty state *is* the onboarding: giant "START FIRST WORKOUT" primary action + three-line explainer ("No account needed. Works offline.").
 - The single fastest path must always be alive: **START → search "bench" → type 40×8 → ✓**. Nothing in between.
 
+#### Acceptance Criteria:
+- First launch lands on Home with the **START FIRST WORKOUT** empty state — no account, quiz, or permission wall in the path (L2).
+- Install → first logged set in <60s, fully offline: START → search "bench" → type 40×8 → ✓ (L1).
+- Empty/first-run states render from local SQLite in <2s cold start on a ₹9,000 phone; never blank (L6).
+- Every onboarding offer is skippable/deferrable without blocking the first-workout path.
+
 ### 5.2 Optional setup quiz `[P0][PROPOSED]`
 - **Skippable bottom sheet**, never blocking. Three questions max, each with a skip affordance:
   1. **Goal:** Build muscle / Lose fat / Get stronger / General fitness → seeds calorie/macro targets (Mifflin-St Jeor from profile values; height/weight asked in the same sheet, both optional).
   2. **Units:** kg (default) / lb.
   3. **Days per week:** 3 / 4 / 5 / 6 → seeds the matching **starter routine** (§8.9) and the weekly streak target (§17).
 - Completing takes <20s and immediately yields: goals set + a routine ready + a weekly target. Skipping yields defaults (kg, no goals, 3/week target).
+
+#### Acceptance Criteria:
+- Quiz is a skippable bottom sheet; skip is one tap and yields working defaults (kg, no goals, 3/week) — the first-workout path is unaffected either way.
+- Completing all 3 questions takes <20s and persists answers to SQLite immediately (write-through) so goals/routine survive an app kill mid-quiz (L7).
+- Selected units (kg/lb) apply instantly to all logging surfaces with no restart.
+- Days-per-week answer seeds a starter routine and the weekly streak target verifiably (visible on Home "X of Y").
 
 ### 5.3 Just-in-time permission primers `[P0]`
 - Permissions are requested **in context, never at launch**:
@@ -225,9 +237,21 @@ Dead prototypes in the RN archive (`TrainScreen`, `TodayScreen`, `history/Progre
   - SMS Retriever API for OTP autofill — **no SMS permission needed** (battery- and privacy-friendly).
 - Denial never breaks a core flow: rest timer still works in-app; barcode has manual-entry fallback.
 
+#### Acceptance Criteria:
+- Zero permissions requested at launch; each primer appears only at first contextual need (notifications → first lock-screen rest countdown; camera → first scan).
+- Denying any permission never blocks or degrades a core flow: in-app rest timer works, barcode manual entry works, OTP autofill silently degrades to manual typing.
+- Notification primer explains value ("See your rest countdown on the lock screen") before the OS prompt; denial is never re-nagged.
+- OTP uses SMS Retriever API — no SMS permission, no battery cost; verification completes offline-degraded (manual code entry) with no crash (L2).
+
 ### 5.4 Guest mode `[P0]`
 - Full feature set, local-only data, clearly labeled in Profile ("Local profile — sign in to back up").
 - Sign-in later silently links local data to the account (client-generated UUIDs make this trivial — no merge conflicts possible for a fresh account).
+
+#### Acceptance Criteria:
+- Guest mode is the default path — full feature set (log, routines, history, PRs, nutrition) with zero network and zero account (L2).
+- All guest data writes through to local SQLite; a crash/kill mid-workout loses nothing and the session restores exactly (L7).
+- Later sign-in silently links every local record via client UUIDs — no data loss, no duplicates, no merge conflict on a fresh account.
+- Profile clearly shows "Local profile — sign in to back up"; the banner never blocks any flow (L4/L6).
 
 ---
 
@@ -243,12 +267,26 @@ Dead prototypes in the RN archive (`TrainScreen`, `TodayScreen`, `history/Progre
   - *Network error:* toast/alert with retry.
   - *Guest mode:* everything works offline; sign-in offered later from Profile (§13.1).
 
+#### Acceptance Criteria:
+- Login works fully offline-degraded: invalid phone validates locally, guest link bypasses network entirely and lands on Home (L2).
+- 10-digit Indian validation is instant and inline; invalid input never navigates and never crashes (L6).
+- Network errors surface a retry toast with in-flight state — no silent failure, no blank screen.
+- Guest → sign-in later links all local SQLite data (write-through survived, L7); no data loss across the auth transition.
+- Privacy Policy + Terms links load (or offline-cache); Continue → OTP within <1s on budget hardware.
+
 ### 6.2 OTP Verification `[P0]`
 **Purpose:** Verify the phone number with a 6-digit OTP.
 
 - **Elements:** 6-cell OTP input (auto-advance), SMS Retriever autofill (no permission), paste support, resend timer (30s countdown), change-number link.
 - **Interactions:** auto-submit when 6 digits filled; resend; edit phone number.
 - **States:** *verifying* (spinner), *invalid code* (shake + clear + error), *expired* (prompt resend), *success* → silently merge guest data into the account → Home.
+
+#### Acceptance Criteria:
+- SMS Retriever autofill works with no SMS permission granted; manual entry of all 6 digits is always available as fallback (L2).
+- Auto-submit fires exactly once when 6 digits are filled; invalid code → shake + clear + inline error, never a crash (L6).
+- Expired code prompts resend with the 30s timer enforced; resend never double-merges guest data (idempotent, L7).
+- On success, guest→account merge completes silently with zero data loss (client UUIDs; verified against local SQLite count before/after).
+- Every state (verifying / invalid / expired / success) is a designed screen — no blank or dead-end state (L6).
 
 ---
 
@@ -273,6 +311,13 @@ Bottom tab bar: **Home · Workouts · Progress · Nutrition** — pitch-black ba
   6. **Recent Logs:** last 10 completed workouts — name, relative date ("2d ago"), exercise list preview, `sets · volume · duration`, PR-count chip when any. Tap → Past Workout Detail (§8.8).
 - **States:** *first-run empty* (welcome state driving to first workout — the 60s goal), *no recent workouts* ("Your history will appear here").
 - **Polish:** no pull-to-refresh needed (local data is instant); any tap that starts a session must respond <100ms with a screen transition.
+
+#### Acceptance Criteria:
+- All Home sections (glance stats, recent logs, resume banner) render from local SQLite in <2s cold start — zero network dependency (L2).
+- Resume banner appears within 1s of returning to Home whenever a session is active, restoring the exact in-progress state after any app kill (L7).
+- START NEW SESSION and routine-start taps transition <100ms; tap → Active Workout with no jank on a ₹9,000 phone.
+- Glance stats and week-over-week deltas are computed from real local data (never mocks); PR chips reflect actual local PR detection.
+- First-run empty state and "no recent workouts" state are designed and drive to the <60s first workout (L6); calories-remaining card is hidden when no goals are set (L4).
 
 ---
 
@@ -338,8 +383,21 @@ The heart of the app: create a session, add exercises, log sets set-by-set. Offl
 - **Discard workout:** confirm dialog ("Discard session? This can't be undone") `[PROPOSED: explicit discard UX]`.
 - **States:** *empty session* ("Add your first exercise" + shortcut to favourites), *restored session* banner ("Workout resumed"), *saving* spinner on Finish, *save error* with retry (data stays local, always recoverable).
 
+#### Acceptance Criteria:
+- Every confirmed set writes through to SQLite synchronously before UI feedback (<3s per set total, L1/L7); force-kill at any moment restores exercises, sets, elapsed/paused time exactly (epoch math, L8).
+- Ghost prefill renders in <100ms from the last local performance with no network; ✓ commit → row lock + rest timer start + haptic in one fluid gesture.
+- Lock-screen 1-tap logger (when enabled) commits the ghost set to SQLite from the notification, mirrors new state live, and never allows a stale/duplicate log after Finish (L7).
+- One-session rule enforced: starting a second session always offers Resume / Save / Discard-confirm — never silently discards data (L7).
+- All listed states (empty, restored, saving, save-error-with-retry) are designed; save failure keeps data local and recoverable — no set is ever lost (L6/L7).
+
 ### 8.2 Exercise Picker (in-session) `[P0]`
 The Exercise Directory opened in workout mode (§10.1): tapping any exercise adds it to the session and returns. Multi-select `[P1][PROPOSED]` to add several at once (also the future entry point for superset grouping). **Recents + Favourites pinned at top** — most users repeat ~15 exercises.
+
+#### Acceptance Criteria:
+- Tapping an exercise adds it to the active session and returns to Active Workout in <100ms, fully offline (L2).
+- Adding an exercise never interrupts or mutates in-progress sets: session state and SQLite write-through are untouched (L7).
+- Recents + favourites are pinned and render from local data — zero network; the picker works in airplane mode (L2).
+- Back navigation without a selection never creates a session artifact or loses the current session (L7).
 
 ### 8.3 Rest Timer `[P0]`
 - Completing a set auto-starts a **90-second countdown**, rendered as a slim bar under the header (never blocks the screen).
@@ -349,11 +407,25 @@ The Exercise Directory opened in workout mode (§10.1): tapping any exercise add
 - **Per-exercise defaults `[P1][PROPOSED]`:** routine target rest overrides global default; muscle-tier fallback (compounds ~180s, isolation ~60–90s). Auto-suggested from the exercise's primary muscle + equipment when unknown.
 - **Rest primer `[P1][PROPOSED]`:** optional 10s "get set" countdown when starting from a routine.
 
+#### Acceptance Criteria:
+- Rest countdown is epoch-based — zero CPU polling; it survives process death, Doze, and lock screen via the foreground service (L8).
+- Lock-screen countdown displays with a +15s action without unlocking; completion (sound/vibration) respects Settings defaults (L5).
+- Logging the next set (in-app or from the lock-screen logger) auto-cancels the countdown instantly — no double state (mutually exclusive rest/lift).
+- Timer never blocks content (slim bar); dismissing/restarting is one tap; manual start is available from the header without any prior set (L1).
+- Rest timer works 100% offline and with notifications denied (in-app bar still functions — denial never breaks the flow, L2).
+
 ### 8.4 Plate Calculator `[P1][PROPOSED]`
 - Tapping the KG field on any barbell exercise offers a bottom sheet: enter target weight → **per-side plate breakdown**, using the user's **gym plate inventory** (Settings: which of 0.5/1.25/2.5/5/10/15/20/25 kg plates exist; bar weight, default 20 kg).
 - **Interactive tactile barbell visualizer `[P1][PROPOSED]`:** not a text list — a rendered side-view Olympic barbell diagram loaded with real-to-scale plates drawn from the user's **gym plate inventory** (25/20/15/10/5/2.5/1.25/0.5 kg; bumper vs iron visual styles, color-coded per IPF/IWF convention). Per-side breakdown as physically loaded (heaviest inward); tap any plate to inspect/adjust; inventory-aware alternatives shown when a plate is missing ("No 10s — 2×5 instead"). Per-side total always shown in tabular numerals. Handles uneven loads and converts lb plates if needed.
 - Pure offline local rendering (Canvas/CustomPaint) — zero network, zero extra battery draw beyond a static layout pass (L2, L8).
 - Rationale: named in the competitor analysis as a missing must-have (Hevy gap).
+
+#### Acceptance Criteria:
+- Breakdown + barbell visualizer render instantly from local plate inventory — pure offline CustomPaint, zero network, no measurable battery cost (L2/L8).
+- Per-side plates follow heaviest-inward order, use only plates marked as owned in inventory, and total exactly the target weight (or show the closest achievable with inventory-aware alternatives).
+- Missing-plate cases surface a clear alternative ("No 10s — 2×5 instead") rather than an error; uneven/lb cases handled without crash (L6).
+- Sheet opens from the KG field in one tap without dismissing in-progress set entry — current ghost values and SQLite state untouched (L7).
+- Render ≤16ms/frame on a ₹9,000 phone; tabular numerals align per-side totals.
 
 ### 8.5 Workout Summary `[P0]`
 Shown immediately after finishing (replaces the workout screen). This is the dopamine moment — make it feel earned.
@@ -367,6 +439,13 @@ Shown immediately after finishing (replaces the workout screen). This is the dop
 - **"Save as routine" `[P1][PROPOSED]`:** convert this session into a reusable routine (one tap → Routine Editor pre-filled).
 - **Error UX (preserve):** workout-not-found → clear state with a way back; never blank/crashed (L6).
 
+#### Acceptance Criteria:
+- Summary renders immediately after Finish from already-persisted SQLite data — no re-fetch, no network; stats (volume, sets, duration, PRs) match logged data exactly, warm-ups excluded (L2/L7).
+- Streak badge and PR celebration compute locally and incrementally; celebration is haptic + brief flash only — no sounds, no confetti (L5).
+- Inline rename persists via write-through; blank submit falls back to "Workout"; rename survives app kill (L7).
+- Share-as-image renders 100% offline on-device; no login or connectivity required (L2).
+- Workout-not-found / save-error states show a designed recovery path — never blank or crashed (L6).
+
 ### 8.6 Workout History `[P0]` + Calendar `[PROPOSED]`
 **Purpose:** Browse every past workout. (Home shows only 10 — this is the full list.)
 
@@ -374,12 +453,26 @@ Shown immediately after finishing (replaces the workout screen). This is the dop
 - **Calendar view `[PROPOSED]`:** month grid with workout-day dots + streak visualization; tap a day → that day's workouts.
 - **Filter/search `[PROPOSED]`:** by name, date range, exercise performed.
 
+#### Acceptance Criteria:
+- Full history renders from local SQLite with list virtualization — smooth scroll across years of data, zero network (L2).
+- Every completed workout appears exactly once (no duplicates/missing rows vs. DB); row metrics (duration, volume, sets, PR chip) match the persisted session data (L7).
+- Calendar dots + streak visualization derive from real workout dates; tapping a day opens that day's workouts offline.
+- Filter/search returns correct results from local data in <300ms on a ₹9,000 phone; empty-result states are designed (L6).
+- Deleting a workout requires confirmation and removes it (and only it) from list, calendar, and stats consistently (L7).
+
 ### 8.7 Past Workout Detail `[P0]` `[PROPOSED]`
 **Purpose:** Read-only view of a finished workout. (Not built in RN — Home "Recent Logs" items went nowhere.)
 
 - Same layout as Workout Summary minus celebrations.
 - Actions: **Repeat this workout** (starts a new session pre-loaded with these exercises/sets), **Save as routine** `[P1][PROPOSED]`, rename, delete (confirm).
 - **Compare-with-last `[V1.1][PROPOSED]`:** when repeating, show per-set deltas vs the previous occurrence ("+2.5 kg on squat").
+
+#### Acceptance Criteria:
+- Detail renders the exact persisted sets (weight × reps, warm-up flags) from local SQLite — identical to what was logged, fully offline (L2/L7).
+- "Repeat this workout" pre-loads a new session with these exercises/sets as ghost/target values in <1s, without mutating the original record (L7).
+- Delete requires confirmation and cascades correctly (workout + sets + PR recomputation) — no orphaned rows or stale stats (L7).
+- Rename via write-through survives app kill; invalid/blank names fall back safely (L7/L6).
+- Missing record opens a designed not-found state with a way back — never blank/crashed (L6).
 
 ### 8.8 Routine Editor `[P0]`
 Three sub-pages designed in RN (builder was never wired — build for Flutter with this schema of intent), plus proposals:
@@ -390,20 +483,53 @@ Three sub-pages designed in RN (builder was never wired — build for Flutter wi
 - **Folders `[P1][PROPOSED]`:** group routines (e.g. "PPL", "Home"); simple expand/collapse, from the archived UI plan.
 - **Duplicate `[P0][PROPOSED]`:** copy any routine as a starting point.
 
+#### Acceptance Criteria:
+- Routines list renders from local SQLite instantly, fully offline, with unlimited routines (no caps ever, L3).
+- START creates a pre-named session pre-loaded with the routine's exercises/targets in <1s — original routine remains untouched (L7).
+- Duplicate produces an independent copy with all exercises/sets; edits to the copy never affect the source (L7).
+- Empty state guides to creation or starter templates (§9.6) — designed, never blank (L6).
+- Create/edit/delete/duplicate all persist via write-through and survive app kill; delete requires confirm (L7).
+
 #### 8.8.2 Routine Detail `[P0]`
 - Full routine preview: ordered exercises, per-exercise target sets, weight/reps/RPE targets, rest durations, est. session duration.
 - Actions: START, Edit, Duplicate, Delete (confirm).
 
+#### Acceptance Criteria:
+- Full preview (ordered exercises, targets, rest, est. duration) renders from local SQLite offline in <1s (L2).
+- Est. session duration is computed from real targets (sets × rest + per-set allowance), not a hardcoded mock.
+- START/Edit/Duplicate work offline; Delete requires confirmation and removes only this routine — sessions already logged from it are preserved (L7).
+- All edits write through immediately; process death at any point loses nothing (L7).
+- Not-found routine (deleted elsewhere/rare race) shows a designed state with a way back (L6).
+
 #### 8.8.3 Routine Metadata `[P0]`
 - Name, description, (cover color/icon `[PROPOSED]`). Saves back to list.
+
+#### Acceptance Criteria:
+- Save persists via write-through and reflects on the Routines list immediately (back-navigation shows updated data, L7).
+- Empty/whitespace name is blocked or defaulted safely — never a blank row in the list (L6).
+- Metadata edits survive app kill and are visible after process restore (L7).
+- Works 100% offline; no account or network precondition (L2).
 
 #### 8.8.4 Routine Exercise Editor `[P0]`
 - Ordered exercise list: add (→ Directory in picker mode), remove, reorder (drag), per-exercise editor: target sets, target weight/reps, RPE, rest seconds.
 - **Per-exercise set schemes `[P1][PROPOSED]`:** e.g. "3×8–10" with a rep *range*, so later sessions can suggest within range.
 
+#### Acceptance Criteria:
+- Add (→ Directory picker), remove, and drag-reorder update the persisted order immediately; order survives app kill and session start (L7).
+- Per-exercise targets (sets, weight/reps, RPE, rest) save via write-through; later sessions prefill ghosts from these targets verifiably.
+- Removing an exercise never deletes historical logged data for it — history and PRs remain intact (L7).
+- Editor is fully offline; custom exercises created in §9.3 are selectable here (L2).
+- Invalid target values (negative/empty) are blocked inline with feedback — never silently dropped (L6).
+
 #### 8.8.5 Weekly Schedule `[P1][PROPOSED]`
 - Map routines to weekdays (Push Mon / Pull Wed / Legs Fri); drives the Home "suggested routine" card and the weekly-goal progress ("on track: Push today").
 - Calendar sync is out of scope; this is an in-app plan only.
+
+#### Acceptance Criteria:
+- Routine→weekday mapping persists via write-through and drives the Home suggested-routine card after app restart (L7).
+- "On track: Push today" progress derives from real local session history — no mocks, fully offline (L2).
+- Unassigning/removing a scheduled routine degrades gracefully (no dangling reference, no crash; designed empty slot state, L6).
+- Schedule is purely in-app — no OS calendar permissions, no external sync surface (L8).
 
 ### 8.9 Starter Routine Templates `[P0][PROPOSED]`
 - Ship with 4–6 quality templates: Full Body 3×, Push/Pull/Legs, Upper/Lower 4×, Dumbbell-Only Home, Bodyweight Beginner, 5×5.
@@ -419,6 +545,13 @@ Three sub-pages designed in RN (builder was never wired — build for Flutter wi
 - **Context-aware tap:** during an active workout → adds it to the session; otherwise → Exercise Detail.
 - **Local-first library:** the 200+ exercise set ships inside the APK/asset bundle so search works with zero network (L2); server library updates are a sync-era enhancement.
 
+#### Acceptance Criteria:
+- Directory + search load from the bundled local library — search works in airplane mode from first launch, zero network (L2).
+- Context-aware tap verified in both modes: during an active session → added to session and returned (<100ms, session state preserved, L7); otherwise → Exercise Detail.
+- Equipment filter chips filter correctly across the full local library with results <300ms on a ₹9,000 phone (L1 spirit).
+- Favourites + recents float to top of picker mode and persist via write-through across app restarts (L7).
+- Empty search results and unfiltered states are designed — never blank (L6).
+
 ### 9.2 Exercise Detail `[P0]`
 - Name, muscle group(s) (primary/secondary), equipment, instructions/notes.
 - **Exercise History `[PROPOSED]`:** last performances (date, best set, volume) + mini e1RM/volume trend — the data that powers ghost suggestions. This is where "what did I do last time" lives.
@@ -426,9 +559,23 @@ Three sub-pages designed in RN (builder was never wired — build for Flutter wi
 - **Alternatives/substitutions `[V1.1][PROPOSED]`:** same-muscle, same-equipment swaps ("Shoulder hurts on OHP → landmine press").
 - Actions: add to current session (if one is active), favourite `[P0][PROPOSED]`, edit (custom exercises), delete (custom only, confirm + re-assign logged data).
 
+#### Acceptance Criteria:
+- Detail renders name/muscles/equipment/instructions from the bundled library offline — zero network on first open (L2).
+- Exercise History (when built) computes from local SQLite only: last performances + e1RM/volume trend match logged data; the same data powers ghost prefill (§8.1) (L7).
+- Demo media (when built) uses compressed looped WebP/GIF within the APK-size budget; no autoplay with sound (L5); missing/failed media shows a designed fallback, not a broken view (L6).
+- Custom-exercise delete requires confirmation and re-assigns or preserves logged data — historical sets/PRs are never orphaned or silently destroyed (L7).
+- Add-to-session works mid-workout without disturbing in-progress rows or SQLite state (<100ms return, L7/L1).
+
 ### 9.3 Create Custom Exercise `[P0]`
 - Name (required, unique), muscle group(s), equipment type, notes, (optional: mark as time-based/cardio `[P1][PROPOSED]` to unlock those entry modes).
 - Lands on its Detail.
+
+#### Acceptance Criteria:
+- Creation persists via write-through and lands on its Detail offline — the new exercise is immediately searchable and addable to sessions/routines (L2/L7).
+- Name uniqueness is enforced locally with an inline error; required-field validation never silently drops input (L6).
+- Duplicate-name attempts (including against the built-in library) are blocked or disambiguated — no ambiguous logging targets.
+- Custom exercises survive app kill/process death immediately after save and are included in recents/favourites flows (L7).
+- Edit/delete of custom exercises keeps all previously logged sets intact (delete only via confirm + re-assign, L7).
 
 ---
 
@@ -442,12 +589,26 @@ Three real-calculation sections for Flutter (RN showed mocks) + calendar:
 4. **Workout Calendar `[PROPOSED]`:** streak/consistency heatmap on the dashboard.
 5. **Time-range selector `[P1][PROPOSED]:** 7D / 30D / 3M / 6M / 1Y / ALL across cards (from the archived UI plan).
 
+#### Acceptance Criteria:
+- All sections compute from local SQLite only (PRs, weight, e1RM, calendar dots) — zero network, zero mocks (L2); values match persisted sessions exactly (L7).
+- Dashboard renders in <2s cold start on a ₹9,000 phone; time-range switching (when built) recalculates offline in <300ms.
+- All framing is informational: week-over-week deltas and streaks are facts, never verdicts — no shaming copy anywhere (L4).
+- Each section has a designed empty state that explains how the data is earned (no PRs yet, no weight logged) — never blank (L6).
+- Every card survives app kill and restores identical values after process death (L7).
+
 ### 10.2 PR Vault `[P0]`
 Personal-record trophy room.
 - **PR detection** = new max weight, estimated 1RM (Epley), max reps at a weight, and volume PRs per exercise `[PROPOSED: PR type breakdown]`; also all-time bodyweight-milestone badges ("Bodyweight Bench") `[V1.1][PROPOSED]`.
 - Each entry: exercise, record type, value, date achieved. Filter by exercise; sort by date/value.
 - Empty state explains how PRs are earned (L6).
 - PRs are computed locally and incrementally at set-save time; warm-up sets never count.
+
+#### Acceptance Criteria:
+- PR detection runs on-device at set-save time (incremental, no recalculation sweep, no network) — warm-up-flagged sets are provably excluded (L2/L7).
+- All four PR types (max weight, Epley e1RM, max reps at weight, volume) verify against recomputed-from-scratch values on sampled exercises (detection = recompute).
+- Deleting/editing a set or workout re-derives affected PRs correctly — no stale records, no orphans (L7).
+- Filter/sort over a full history renders <300ms on a ₹9,000 phone; empty state explains PR earning (L6).
+- Celebrations stay haptic + visual only; no sounds, no punitive framing for plateaus (L4/L5).
 
 ### 10.3 Body Weight History `[P1]`
 - Current weight, trend chart (7/30/90-day ranges), quick-add today's weight, edit/delete entries.
@@ -456,13 +617,33 @@ Personal-record trophy room.
 - **Measurements beyond weight `[P1][PROPOSED]:** waist, chest, arms, thighs, hips, body-fat % — same log/chart pattern (schema `body_measurements` already anticipates this). Named in the competitor analysis as a must-have Hevy/Strong gap.
 - **Smart-scale import `[V2][PROPOSED]:** via Health Connect (§16.2).
 
+#### Acceptance Criteria:
+- Entries persist via write-through; chart + trend recompute locally offline; app kill never loses a logged weigh-in (L2/L7).
+- Headline number is always the 7-day rolling average — raw daily values are secondary detail, never the headline (L4).
+- Goal weight line (if enabled) is neutral text ("3.2 kg to go") — zero red/green judgment colors, zero alarms (L4).
+- Edit/delete of an entry updates trend + chart atomically; deleted entries never ghost back after restart (L7).
+- Quick-add takes <3s (open → type → save) with the numeric keypad focused by default (L1).
+
 ### 10.4 Progress Photos `[V1.1]` (roadmap #18)
 - Monthly photo log per pose (front/side/back), stored **locally and encrypted at rest**; never uploaded without explicit action (L9).
 - **Compare tool:** pick two dates → side-by-side, synchronized zoom; optional overlay blend.
 - Tied to weight trend so users can see "scale says +1 kg, photo says leaner" — the antidote to scale-only shaming (L4).
 
+#### Acceptance Criteria:
+- Photos are encrypted at rest on-device; zero upload without an explicit user action — verifiable by network inspection (L9/L2).
+- Compare tool (two dates → side-by-side + synchronized zoom + optional overlay) renders fully offline from local storage (L2).
+- Deleting a photo requires confirmation and removes only that photo — encrypted file + DB row together, no orphans (L7).
+- Photo trend card frames "scale says +1 kg, photo says leaner" neutrally — never judges direction of change (L4).
+- Missing/corrupt photo files surface a designed placeholder, not a crash (L6).
+
 ### 10.5 1RM Chart (per exercise) `[V1.1]`
 - Exercise picker → estimated-1RM trend over time from set history (Epley formula), configurable range; overlay of actual top-set weight.
+
+#### Acceptance Criteria:
+- e1RM series is computed on-device from local set history (Epley) — zero network; values match the PR Vault's e1RM records for the same exercise (L2/L7).
+- Warm-up sets are excluded from the trend, consistent with §10.2 PR rules (L7).
+- Configurable range + top-set overlay recompute in <300ms offline on a ₹9,000 phone.
+- Exercises with insufficient history show a designed explanatory empty state — never a blank/broken chart (L6).
 
 ### 10.6 Muscle Volume Distribution `[V1.1]`
 - Volume by muscle group over a selected period — bar/pie "heatmap" view; informs weak-point training.
@@ -474,13 +655,33 @@ Personal-record trophy room.
   Tap a muscle group → the sessions that fatigued it. Purely informational — frames today's smart choice ("push is fresh, legs still recovering"), never guilt (L4); recovery bands follow common hypertrophy guidance, not medical advice.
 - **Performance budget (locked):** vector SVGs/CustomPainter, **<50KB asset footprint**, zero images; 60fps on a ₹9,000 phone; zero battery cost when idle (L8). Adapts the existing dark-glass visual language.
 
+#### Acceptance Criteria:
+- Recovery bands (🟢/🟡/🔴) compute purely from local set history epoch math over the past 24–72h — zero network, zero polling (L2/L8).
+- Asset footprint <50KB vector, 60fps pan/zoom on a ₹9,000 phone, zero battery draw when idle (verified against the locked budget).
+- Tap on a muscle group opens the exact sessions that fatigued it, derived from logged data (L7).
+- Copy is purely informational ("push is fresh, legs still recovering") — never guilt, never medical advice framing (L4).
+- No logged sessions → all-fresh neutral state with explanation, never blank (L6).
+
 ### 10.7 Advanced Analytics `[V1.1]`
 - Custom date ranges across all analytics; muscle heatmap (roadmap #15).
 - **Weekly Report `[V1.1][PROPOSED]:** auto-generated weekly/monthly training recap — sessions, volume, top PRs, consistency % — shown in Progress and (later) shareable (from competitor analysis "training reports").
 
+#### Acceptance Criteria:
+- All custom date-range analytics recompute from local SQLite offline in <500ms for 1 year of data on a ₹9,000 phone (L2).
+- Muscle heatmap aggregates match the per-exercise logged volumes exactly (recompute = incremental check) (L7).
+- Weekly Report generation is local-only; consistency % uses the forgiving weekly-goal math (§17), never a punishing framing (L4).
+- Report rendering has designed empty/error states for weeks with no data (L6).
+
 ### 10.8 Achievements & Badges `[V1.1][PROPOSED]`
 - Milestone trophies: 100 Workouts, 1,000-Tonne Club (lifetime volume), Bodyweight Bench, 2× Bodyweight Deadlift, Perfect Week (hits weekly goal), Streak 30, First PR…
 - Delivered with the same restraint as PR celebrations: haptic + card, no sounds, no confetti spam (L5). Viewable trophy room; zero notifications for badges.
+
+#### Acceptance Criteria:
+- Badge detection runs locally at set-save/session-finish (incremental) — zero network; milestone math (1,000-Tonne Club, Bodyweight Bench) verifies against recomputed lifetime stats (L2/L7).
+- Zero notifications for badges — delivery is haptic + trophy card only, on interaction surfaces (L5).
+- Restraint rule enforced: no sounds, no confetti, no streak-loss messaging — trophies flatter effort, never judge gaps (L4).
+- Trophy room renders fully offline with designed empty state ("First PR awaits") (L6/L2).
+- Badge state survives app kill; un-earning (via set edits/deletes) re-derives correctly without duplicates (L7).
 
 ---
 
@@ -500,9 +701,22 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - **Saved Meals `[P1][PROPOSED]:** save a full meal combo ("My breakfast: 4 egg whites + 2 roti + curd") as a one-tap template.
 - Goal editing (calorie + macro targets) lives on first-run onboarding or settings `[PROPOSED: onboarding quiz]`.
 
+#### Acceptance Criteria:
+- Dashboard totals compute from local food-log SQLite — zero network; day navigation renders previous days offline (L2/L7).
+- All bars use cyan-on-grey flat fills — no red/green judgment colors, no over-target alarms anywhere (L4).
+- Fasting ring (when built) is off by default, informational text only ("14h 30m / 16h elapsed"), no behind/ahead colors, max one optional notification at window end (L4).
+- Calories-remaining card is hidden entirely when no goals are set — never a nag (L4).
+- Every food add/edit/remove persists via write-through with instant macro recalculation; app kill loses nothing (L7).
+
 ### 11.2 Meal Logging (per-meal view) `[P0]`
 - Opens from a meal section: that meal's foods for the day, serving edit, remove item, add food → Food Database Search.
 - Inline quantity adjust with instant macro recalculation.
+
+#### Acceptance Criteria:
+- Quantity adjustments recalculate macros locally in <100ms per keystroke/stepper tap — no network, no spinner (L2/L1).
+- Every add/edit/remove writes through to SQLite immediately; force-kill mid-edit never loses a logged item (L7).
+- Remove item requires no confirmation only if undo is offered, else confirms — data never silently vanishes (L7 spirit).
+- Empty meal state shows a designed "add first food" affordance, never blank (L6).
 
 ### 11.3 Food Database Search `[P0]`
 - Search ~5,000 curated Indian food entries (roadmap #8 — paneer, roti, dal, idli, poha, etc.) **with household servings** ("1 katori", "2 roti", "1 ladle", "1 glass").
@@ -511,30 +725,76 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - **Recent/frequent foods at top `[PROPOSED]`;** recents are the fastest path (logging is repetition).
 - **No unmoderated crowd-sourcing:** user customs are private by default; public sharing of food entries (if ever) requires curation (anti-MFP law, from the analysis "What to AVOID").
 
+#### Acceptance Criteria:
+- ~5,000-entry food DB ships in the APK; search works in airplane mode from first launch — zero network (L2).
+- Search over 5,000 entries returns in <300ms on a ₹9,000 phone; household servings ("1 katori", "2 roti") are first-class searchable units (L1).
+- Recents/frequents float to top and persist across restarts via write-through (L7).
+- Veg indicator (FSSAI 🟢/🔴) renders from data, never guessed; user customs stay private-local by default (L9).
+- Zero-result queries show a designed state with create-custom affordance — never blank (L6).
+
 ### 11.4 Food Item Detail `[P0]`
 - Full nutrition panel (kcal, protein, carbs, fat, fiber `[PROPOSED]`), serving-size selector (household units + grams), quantity stepper, meal selection, Add.
 - **Cooking-style modifiers `[V1.1][PROPOSED]:** ghee/oil toggles ("Ghee on roti: none / light / generous"), curry style (home-style / restaurant-rich) — captures the hidden calories Western DBs miss (from the analysis).
 
+#### Acceptance Criteria:
+- Full panel + serving selector (household units + grams) renders offline from the local DB; gram↔household conversion is exact per-entry (L2).
+- Add-to-meal persists via write-through and lands the item in the chosen meal with correct scaled macros — verified vs entry math (L7).
+- Quantity stepper recalcs macros <100ms per tap (L1).
+- Cooking-style modifiers (when built) apply additive kcal deltas computed locally — neutral options, no "bad choice" framing (L4).
+- Missing nutrition sub-values show "—" placeholders, never zeros or errors (L6).
+
 ### 11.5 Create Custom Food `[P1]` `[PROPOSED]`
 - Homemade recipes: name, serving definition, per-serving macros → searchable like database items.
 - **Recipe builder `[P1][PROPOSED]:** compose a dish from other foods (the "family recipe" case: total pot → servings → per-serving macros). Complements the "family cooking calculator" idea from the analysis.
+
+#### Acceptance Criteria:
+- Custom food saves via write-through and is immediately searchable alongside DB items — offline (L2/L7).
+- Recipe builder computes per-serving macros locally from component foods; math verifies against component totals ÷ servings (L2).
+- Per-serving definition is required/validated — zero-division and empty fields blocked inline (L6).
+- Editing a recipe's components updates every future log of it; already-logged days keep their historical values (L7).
+- Custom foods remain private-local (no crowd-sourcing) (L9).
 
 ### 11.6 Barcode Scanner `[P1]` (roadmap #9)
 - Scan packaged food → product lookup → same add-to-meal flow.
 - **Indian brand coverage** prioritized: Amul, Mother Dairy, Haldiram's, MTR, Tata, Nestlé India, etc.
 - Offline fallback: scan requires connectivity for lookup (remote DB), but **recently scanned items cache locally**; manual entry always available (L2).
 
+#### Acceptance Criteria:
+- Camera permission is primed in context (first scan, §5.3); denial never blocks the add-food flow — manual entry always reachable (L2/L4).
+- Recently scanned items serve from local cache in airplane mode; cache persists across restarts (L2/L7).
+- Lookup failures (unknown barcode/no network) show a designed state with manual-entry fallback — never a dead end (L6).
+- Scan → item on screen <2s on a ₹9,000 phone (L1).
+
 ### 11.7 Day Nutrition History `[P1]` `[PROPOSED]`
 - Browse previous days (calendar or list), per-day macro totals; tap a day → read-only dashboard clone with "copy to today" action.
+
+#### Acceptance Criteria:
+- Past days render read-only from local SQLite offline; per-day totals match the sum of that day's logged items exactly (L2/L7).
+- "Copy to today" clones all meals in one transaction — partial copies impossible; repeat copies don't duplicate (idempotent per action, L7).
+- Copied day respects current goal/targets display without rewriting history (L4/L7).
+- Days with no logs show a designed empty state, not a blank clone (L6).
 
 ### 11.8 Thali Quick-Log `[V1.1][PROPOSED]`
 - The multi-component meal killer: tap a "Thali" template → check off components (2 roti ✓, dal ✓, rice ✓, curd ✓) → one entry.
 - Regional thali presets (North/South/Gujarati...) with editable components. From the competitor analysis — a genuinely novel differentiator.
 
+#### Acceptance Criteria:
+- Thali check-off (2 roti ✓, dal ✓, rice ✓, curd ✓) commits as one entry with summed macros, computed locally offline (L2).
+- Logging a thali takes <5s from tap to logged — the multi-component meal killer verified for speed (L1).
+- Component edits recompute totals instantly; the logged entry persists via write-through (L7).
+- Regional presets are editable and persist; no preset is forced or assumed by region (L4).
+
 ### 11.9 Vegetarian Protein Intelligence `[V1.1]` (roadmap #16)
 - **Protein-gap insight:** "You're 25 g short today. Try: 200 g paneer tikka (36 g) or 2 scoops whey (50 g)." Neutral, practical framing (L4).
 - **Pairing engine:** complementary protein suggestions (dal + roti, rajma + rice) with simple quality context (PDCAAS/DIAAS-informed, not academic).
 - **Veg-first suggestions everywhere:** when the app suggests foods/recipes, veg options lead (30–40% of the market; also most non-veg users eat veg most days).
+
+#### Acceptance Criteria:
+- Protein-gap insight computes locally from the day's log ("25 g short") — zero network; the gap number matches logged-vs-target math exactly (L2/L7).
+- Suggestions are practical and neutral ("Try: 200 g paneer tikka (36 g)") — never deficit-as-failure framing, no red flags (L4).
+- Pairing engine (dal + roti, rajma + rice) runs on-device from curated data; suggestions are veg-first in every surface (L2/L4).
+- All suggestion taps deep-link into an actionable add-flow, not a dead-end info card (L1).
+- No logged foods → designed empty state explaining the feature, never blank (L6).
 
 ### 11.10 Vrat/Fasting Mode `[V1.1]` (roadmap #14)
 - Festival-calendar aware (Navratri, Shravan, Ramadan, Ekadashi, Karwa Chauth) with user opt-in and region/tradition toggle (never assumes, L4).
@@ -544,6 +804,13 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
   - **Streak freeze:** fasting days count as "active rest" — never break a streak (retention × culture fit).
   - Training guidance tone-shift ("lighter volume is fine today") — suggestion, not command.
 - Fasting calendar data ships as an annually refreshed asset.
+
+#### Acceptance Criteria:
+- Festival calendar ships as a bundled/offline asset — Vrat Mode functions with zero network (L2).
+- Opt-in and region/tradition toggles are explicit user choices — the app never assumes a fast from date/location (L4).
+- Satvik search switch filters the local food DB (sabudana, kuttu, makhana) offline; adjusted targets apply only during the user-confirmed window (L2/L7).
+- Streak freeze provably preserves the weekly streak on fasting days — retention math matches §17 (L7).
+- Tone-shift copy ("lighter volume is fine today") is suggestion-framed — never a command or guilt message (L4).
 
 ### 11.11 Dynamic Energy Expenditure (Adaptive TDEE) `[V1.1][PROPOSED]`
 **Purpose:** the MacroFactor promise, offline and free: stop guessing calorie targets. **Promoted from V2** — this is core nutrition intelligence, not AI-era garnish (roadmap #20 moves with it).
@@ -555,6 +822,13 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - **Edge cases handled:** sick weeks, travel, deliberate bulk/cut overrides (user-set target wins until released), eating days logged honestly regardless of size (no judgment on logging fidelity, L4).
 - **Home for the numbers:** a small goal-settings page (current target, computed TDEE, trend weight, confidence state) under Nutrition/Profile; honest empty state while EMA warms up (L6).
 - **Synergy:** pairs with Body Weight History (§10.3) and the micronutrient card (§11.1); guest mode works fully offline; sync-era just carries the same numbers across devices.
+
+#### Acceptance Criteria:
+- EMA trend + TDEE computation run entirely on-device from local weight/intake history — zero cloud round-trip, zero battery cost (L2/L8); the computed TDEE reproduces from the same inputs deterministically.
+- Recalibration fires only weekly, only with sufficient confidence + fresh data; targets never change mid-day without user-set overrides being honored (user target wins until released, L7/L4).
+- Zero alarming surfaces: no "you gained" screens, no red deltas — the only visible change is the target number (plus optional calm Progress entry) (L4).
+- EMA warm-up shows an honest empty/confidence state — never a fake confident number (L6).
+- Works identically in guest mode (local-only math); edge cases (sick weeks, travel, bulk/cut override) verify per spec (L2).
 
 ## 12. Account, Profile & Settings
 
@@ -574,12 +848,26 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - **Data Import — Hevy/Strong CSV `[P1][PROPOSED]`:** migration engine (§12.4).
 - **About/licenses/open-source notices `[PROPOSED]`.**
 
+#### Acceptance Criteria:
+- Every setting persists via write-through and applies immediately (units conversion, theme, rest defaults) — no restart, no network (L2/L7).
+- Units kg↔lb is display-only conversion; stored data stays kg — verified by export round-trip (L7).
+- Battery-optimization guide deep-links per OEM (MIUI/ColorOS/FuntouchOS/One UI) with a designed fallback path when a deep link fails (L6/L8).
+- Rolling local backups (when built) run nightly without user action and restore on fresh-install detection — restore verified vs. pre-wipe DB (L7).
+- All toggles default tasteful/off (L5); settings changes never interrupt or mutate an active session's SQLite state (L7).
+
 ### 12.3 Auth & Multi-Device Sync `[V1.1]` (roadmap #12)
 - Offline-first invariant: all features work with no account/connection; local SQLite is the primary store.
 - **Background sync:** when signed in + online, push local changes, pull from other devices, conflict-safe (last-writer-wins per entity + operation queue pattern from the dev plan; workouts are largely append-only which minimizes conflicts).
 - Client-generated UUIDs, `sync_status` flags, `sync_queue` table (schema per `DEVELOPMENT_PLAN.md` Step 1.4).
 - Sync runs on WorkManager: network-constrained, battery-friendly, exponential backoff (L8).
 - Sync status (last synced, pending count) + sign-out surfaced in Settings.
+
+#### Acceptance Criteria:
+- All features work with no account/connection — sync is strictly additive; killing sync never degrades local flows (L2).
+- `sync_queue` drains via WorkManager (network-constrained, exponential backoff) — no CPU polling; pending count matches queue depth verifiably (L8/L7).
+- Local SQLite remains source of truth: every write commits locally first, sync failures never block or roll back user actions (L7).
+- Conflicts resolve per contract (last-writer-wins per entity; append-only workouts) — a two-device edit scenario produces no duplicate/lost sets (L7).
+- Sync status (last synced, pending) renders in Settings offline from local state (L6).
 
 ### 12.4 Data Import — Hevy & Strong 1-Tap CSV Migration `[P1][PROPOSED]` (Trojan Horse)
 **Purpose:** the acquisition wedge. A lifter switching from Strong or Hevy migrates 3+ years of workout logs and PR history in **<5 seconds** — removing the single biggest switching cost in this category and turning "new app risk" into a no-brainer trial.
@@ -594,6 +882,13 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - **Imports:** workouts (date, duration, notes), sets (weight × reps, order; RPE where exported), warm-up flags preserved where the source marks them (§8.1 `is_warmup`), PR history (recomputed locally at import — §10.2 incremental detection runs against imported history).
 - **Idempotent + safe:** import runs in a single transaction; cancel before commit leaves SQLite untouched; duplicate re-imports are detected (source-ID check) and skipped — never double-logged (L7).
 - **Success state:** "Imported 412 workouts · 9,873 sets · 31 PRs" → land on Progress so the user immediately sees their whole history rendered in Aven Fit.
+
+#### Acceptance Criteria:
+- Parsing is 100% on-device — verifiable zero network traffic during import; guest mode can import (L2/L9).
+- Import commits in a single SQLite transaction: cancel-before-commit leaves the DB byte-identical; success imports all-or-nothing (L7).
+- Duplicate re-imports are detected via source-ID and skipped — running the import twice never double-logs (L7).
+- PR history recomputes locally from imported sets; sampled exercises verify §10.2 detection parity post-import (L7).
+- Low-confidence exercise matches become pre-filled custom-exercise offers — zero rows silently dropped; success state lands on Progress showing real imported history (L6).
 
 ---
 
@@ -611,6 +906,13 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 | Private Squads & Challenges | `[V2]` | Cooperative 3–8 person challenges ("Squad goal: 1,00,000 kg this month") (roadmap #22); cooperative > competitive per the analysis (3× retention) |
 | Trainer/Client Mode | `[V2]` | Trainers assign routines, view client logs (roadmap #23) |
 
+#### Acceptance Criteria:
+- Social is opt-in and skippable: declining never blocks or degrades any core flow; the feed is an entry, never a tab takeover (L4).
+- Notifications are frequency-capped with body-serenity rules — no "come back!" nags, no streak-loss pushes (L4/L5).
+- Routine sharing (QR/deep link) requires zero backend: the routine payload rides in the QR/deep link and clones into the receiver's local library fully offline — verified in airplane mode on both ends (L2/L7).
+- Trainer QR ("Gym Bhaiya") is poster-printable high-contrast; a client scan clones the 4–6 day split instantly with no account, no sign-up friction (L2/L3).
+- Cloned routines are independent local copies — edits by either party never propagate or corrupt the other's data (L7).
+
 ---
 
 ## 14. AI & Intelligence `[V2]`
@@ -627,6 +929,13 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 | Cycle-Aware Training | Menstrual cycle-aware recommendations (roadmap #29); opt-in, private, neutral framing |
 | Deload Suggestions | Auto-detect accumulated fatigue from volume/e1RM stagnation trends → suggest a lighter week (from analysis AI section) `[V2][PROPOSED]` |
 | Quick-Commerce Rewards | Fitness coins → Blinkit/Zepto/Swiggy Instamart discounts (roadmap #30) |
+
+#### Acceptance Criteria:
+- AI Workout Generator output lands in the normal routine system (editable Routine Editor format, L3); generation limits match the free-tier plan verifiably.
+- Voice Logging (Hinglish) parses the demo line — *"do roti aur ek katori moong dal khayi with thoda sa ghee"* — before ship; failures fall back to manual entry without data loss (L6/L7).
+- AI Photo Meal Recognition shows confidence + user-correction on every estimate — no silent AI numbers entering the log (L4, data quality).
+- Any AI failure (no network, model timeout) degrades to designed manual flows — core logging is never AI-dependent (L2/L6).
+- Smart Substitutions pair with §9.2 alternatives data; suggestions are neutral swaps, never "you're doing it wrong" framing (L4).
 
 ---
 
@@ -653,15 +962,34 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - Rest countdown continues on lock screen without unlocking (roadmap #4). Silent channel; sound/vibration only on completion if enabled.
 - No service when no session is active (battery law).
 
+#### Acceptance Criteria:
+- Foreground service runs only during active sessions — no session → no service, verified via `dumpsys` (L8).
+- Notification shows live elapsed time + rest countdown updated on state change only — zero polling loops, zero extra wakelocks (L8).
+- 1-tap logger commits the ghost set via SQLite write-through before UI feedback, advances ghost, restarts rest countdown — all mirrored on the lock-screen notification (L7/L1).
+- Actions never go stale: after Finish/Discard the log-set action is removed; a duplicate tap cannot double-log a set (L7).
+- In-app undo remains functional for lock-screen-logged sets; notification-denial (permission off) never breaks in-app logging (L2).
+
 ### 16.2 Data Safety `[P0/P1][PROPOSED]`
 - Write-through SQLite per set (P0) — crash-safe by construction.
 - **Rolling local backups `[P1][PROPOSED]:** nightly export of the DB to app-storage (7-day window); fresh-install detection offers restore.
 - **Auto-sync to cloud `[V1.1]:** once accounts exist, WorkManager sync becomes the disaster-recovery layer (§12.3).
 - Export-anytime CSV/JSON (L9). Import is the mirror image: the offline CSV migration engine (§12.4) parses everything on-device, in one transaction, with duplicate detection — external data becomes local data safely or not at all.
 
+#### Acceptance Criteria:
+- Per-set write-through is synchronous before UI lock — a force-kill immediately after ✓ never loses that set (L7).
+- Nightly rolling backup (7-day window) runs without user action and survives OEM background kills; fresh-install detection offers restore with a designed prompt (L6/L7).
+- Restore replays the backup into an identical DB state — set counts and PRs match the backup snapshot (L7).
+- Export-anytime works offline and produces CSV/JSON readable outside the app (L9/L2).
+
 ### 16.3 OEM Battery Survival `[P1][PROPOSED]`
 - In-app guided setup per OEM (MIUI/ColorOS/FuntouchOS/One UI/VoltageOS-grade forks): unrestricted battery, auto-launch, lock-task whitelist for sessions.
 - Detect aggressive background kills (e.g. session timer jump after process death) and surface the guide contextually, once, politely.
+
+#### Acceptance Criteria:
+- OEM detection (MIUI/ColorOS/FuntouchOS/One UI) identifies the vendor and shows only the relevant walkthrough — no generic instructions (L8).
+- Kill detection (session timer jump after process death) surfaces the guide contextually, once — never nagged repeatedly, never mid-workout (L4/L8).
+- Guide dismissal persists; re-prompting requires a new kill event, not app restarts (L4).
+- With unrestricted battery set, a 60-min locked-screen session completes without the service being killed on tested OEM ROMs (L8/L7).
 
 ### 16.4 Home-Screen Widget `[P1][PROPOSED]`
 - Quick-start widget: "START WORKOUT" + current streak + resume state (if session active).

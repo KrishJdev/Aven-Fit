@@ -196,3 +196,72 @@ Do not optimize for:
 - Number of files changed
 - Artificial complexity
 - "Looks finished"
+
+---
+
+## E2E Testing Strategy & Quality Matrix
+
+Automated E2E journeys are the executable form of the Quality Standard. Each journey walks a real user path across Flutter UI → SQLite → (where applicable) Spring Boot → PostgreSQL, and is a pass/fail gate in the Definition of Done for slices in its phase. Steps run on an emulator with airplane-mode toggling where specified; SQLite/PostgreSQL state is asserted via direct DB queries, not UI reads alone.
+
+### Quality Matrix
+
+| # | Journey | Phase | Laws Verified | Gate |
+|:--|:---|:---|:---|:---|
+| J1 | Core Offline Workout | `[P0]` | L1, L2, L7, L8 | Merge gate: workout-engine slices |
+| J2 | Routine Creation & Schedule | `[P0]` | L2, L3, L7 | Merge gate: routine slices |
+| J3 | Offline Indian Nutrition | `[P0]` | L2, L4, L10 | Merge gate: nutrition slices |
+| J4 | Trojan Horse Migration | `[P1]` | L2, L7, L9 | Merge gate: import engine |
+| J5 | Cultural & Metabolic | `[V1.1]` | L2, L4, L10 | Merge gate: Vrat/TDEE slices |
+| J6 | Multi-Device Sync Pipeline | `[V1.1]` | L2, L7, L8 | Merge gate: sync slices |
+
+### Journey Definitions
+
+**J1 — Core Offline Workout Journey `[P0]`**
+1. Launch as guest, airplane mode ON → assert Home renders from SQLite in <2s; no account/permission wall (L2).
+2. Search "bench" → assert results served from the bundled local exercise library (zero network).
+3. Log set with ghost prefill → assert ghost values from last local performance; ✓ commits write-through to SQLite before UI lock, full interaction <3s (L1/L7).
+4. Rest timer on lock screen → assert foreground-service notification countdown with +15s action; state changes render on event, zero polling (L8).
+5. Force-kill mid-session → relaunch → assert exact restore (exercises, sets, elapsed/paused time via epoch math).
+6. Finish → assert Workout Summary totals match SQLite exactly; PR badge fires for a beaten record; warm-up sets excluded.
+
+**J2 — Routine Creation & Schedule Journey `[P0]`**
+1. Build a PPL routine (3 days, ordered exercises, target sets/weight/reps) → assert write-through survives app kill.
+2. START from the routine → assert pre-named session created in <1s; original routine row unmutated (L7).
+3. Verify target prefills: ghost hints show routine targets ("Target: 80 × 8"), not historical values (§8.1).
+4. Edit routine metadata + reorder exercises mid-flow → assert persisted order reflected on session start and restart.
+5. Assert unlimited routine creation — no cap logic anywhere in the flow (L3).
+
+**J3 — Offline Indian Nutrition Journey `[P0]`**
+1. Search "dal" in airplane mode → assert results from the bundled ~5k-entry Indian food DB (L2/L10).
+2. Select household unit "1 katori" → assert exact gram-equivalent macros for the entry.
+3. Log to Lunch → assert write-through + macro recalculation <100ms.
+4. Assert dashboard totals equal the sum of logged items; rendering is adherence-neutral — cyan/grey bars, no judgment colors (L4).
+5. Assert no-goals state hides the calories-remaining card (never a nag, L4).
+
+**J4 — Trojan Horse Migration Journey `[P1]`**
+1. Import a 3-year Hevy/Strong CSV via system file picker → assert parsing is 100% on-device (network inspection: zero traffic), guest mode allowed (L2/L9).
+2. Fuzzy match → assert high-confidence auto-maps, medium-confidence batch review screen, low-confidence rows become pre-filled custom-exercise offers — zero rows silently dropped (L7).
+3. Cancel before commit → assert SQLite byte-identical; commit → assert single-transaction all-or-nothing ingestion.
+4. Re-import the same CSV → assert source-ID duplicate detection skips every row (never double-logged).
+5. Assert PRs recomputed locally (§10.2 parity) and the success state ("Imported N workouts · M sets · K PRs") lands on Progress with real data.
+
+**J5 — Cultural & Metabolic Journey `[V1.1]`**
+1. Enable Vrat Mode via explicit opt-in + region/tradition toggle → assert festival calendar loads from bundled offline asset (never assumed from date/location, L4).
+2. Satvik filter check → assert food search restricted to the satvik set (sabudana, kuttu, singhara, makhana) in airplane mode (L2).
+3. Assert streak freeze holds: fasting days count as active rest in the forgiving weekly streak (§17).
+4. Log weight + intake over 2–3 simulated weeks → assert offline EMA TDEE recalibration fires weekly, silently, and honors user-set bulk/cut override targets (L2/L4).
+5. Assert every surface in the journey is adherence-neutral — no red flags, no verdicts, no nags (L4).
+
+**J6 — Multi-Device Sync Pipeline `[V1.1]`**
+1. Sign in, go offline → log sets → assert local SQLite commits first and `sync_queue` grows (local stays source of truth, L2/L7).
+2. Restore network → assert WorkManager drains the queue; inject failure → assert exponential backoff, no CPU polling (L8).
+3. Push to Spring Boot `POST /api/v1/sync/push` → assert 2xx and payload matches the local `sync_queue` ingestion schema (Sync Contract, § Development Strategy).
+4. Verify PostgreSQL rows by integration query — client-generated UUIDs preserved, no duplicates/lost sets after last-writer-wins conflict injection.
+5. Kill sync mid-flight → assert user actions never block or roll back; Settings pending count matches queue depth (L7).
+
+### Execution Rules
+
+- **Tooling:** Flutter `integration_test` for UI journeys; direct `sqflite`/`sqlite3` assertions for DB state; `./gradlew test` + PostgreSQL integration tests for J6 backend steps (steps 3–5).
+- **Device profile:** journeys run on the budget-phone emulator profile (₹9,000-class) to honor the performance quality bar above.
+- **Gating:** a failing journey blocks merge to `dev` for any slice touching its domain and must be recorded in `HANDOFF.md` (known issues).
+- **Extensibility:** new user journeys must extend this matrix — no parallel test-strategy documents.
