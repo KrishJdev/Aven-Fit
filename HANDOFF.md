@@ -34,7 +34,8 @@
 
 ## Branching & Workflow
 
-- **Active Branch:** `feature/flutter-migration` (branch off `dev`, merge back to `dev`)
-- **Stable Branch:** `main` | **Integration Branch:** `dev`
+- **Active Development Branch:** `dev` (Flutter codebase & active Spring Boot backend)
+- **Archive Branch:** `archive/react-native` (legacy React Native code preserved for reference)
+- **Stable Branch:** `main` | **Feature Branches:** `feature/*` (branched from `dev`, merged back to `dev`)
 - **Rules:** Never use destructive git commands; follow conventional commits.
 
