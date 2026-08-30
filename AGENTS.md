@@ -63,6 +63,10 @@ Every agent MUST perform these checks before starting significant work:
 6. Inspect current code      (do not assume prior understanding is current)
 ```
 
+> [!IMPORTANT]
+> **Archive Quarantine Rule:**  
+> Files in `docs/archive/` and `archive/` are strictly historical archives. Agents must **NEVER read, reference, cite, or base any implementation on files in `docs/archive/` or `archive/`** unless the user explicitly requests historical context. Active development relies solely on `FEATURES.md`, `AGENTS.md`, `HANDOFF.md`, and `README.md`.
+
 **Never assume your previous context is still accurate.**
 
 ---
@@ -109,6 +113,7 @@ git push --force
 - Modify files outside the scope of your current task
 - Overwrite another agent's uncommitted work
 - Force-push over another agent's commits
+- Access or load files from `docs/archive/` or `archive/` unless explicitly requested by the user
 
 ---
 

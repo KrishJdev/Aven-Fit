@@ -10,7 +10,7 @@
 - **Project:** Aven Fit (Offline-first Gym & Nutrition Tracker for Android)
 - **Mobile:** Flutter + Dart in `mobile/` (State: Riverpod, Local DB: `sqflite`)
 - **Backend:** Spring Boot 3.3 + Java 21 in `backend/` (Server DB: PostgreSQL 16)
-- **Archived RN Codebase:** `archive/react-native-frontend/` (reference UX/intent only)
+- **Archive Policy:** `docs/archive/` and `archive/` are quarantined; never access unless explicitly instructed.
 
 ---
 
