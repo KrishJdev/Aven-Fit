@@ -23,12 +23,15 @@
 
 ---
 
-## Current Milestone: MVP P0 Flutter Scaffolding & Backend DB Alignment
+## Development Strategy & Milestones (Vertical Slices)
 
-| Component | Status | Next Actions |
-|:---|:---|:---|
-| **Mobile (`mobile/`)** | ⬜ Ready to scaffold | Initialize Flutter project, establish Glassmorphism theme & SQLite schema |
-| **Backend (`backend/`)** | ✅ Scaffolded | Align JPA entities and PostgreSQL migrations with `FEATURES.md` |
+| Slice | Focus | Status | Scope |
+|:---|:---|:---:|:---|
+| **Slice 1** | Scaffolding & Foundation | 🔵 Active | Flutter setup in `mobile/`, Glassmorphism theme, SQLite helper, Backend health |
+| **Slice 2** | Exercises & Routines | ⬜ Queued | Local SQLite exercise cache + Flutter UI + `/api/v1/exercises` & `/routines` |
+| **Slice 3** | Active Workout Engine | ⬜ Queued | Live session UI, rest timer math, SQLite write-through + `/api/v1/workouts` |
+| **Slice 4** | Indian Nutrition Engine | ⬜ Queued | Local 5,000 foods search, household units + `/api/v1/nutrition` |
+| **Slice 5** | Auth & Cloud Sync | ⬜ Queued | Phone OTP/Google login, Spring Security + `/api/v1/sync` queue |
 
 ---
 
