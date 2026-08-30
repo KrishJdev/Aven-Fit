@@ -19,7 +19,7 @@ Visual identity: dark "Sharp Glassmorphism" — pitch-black (OLED) surfaces, tra
 
 | Requirement | Target |
 |:---|:---|
-| APK size | <30MB |
+| APK / App size | Aggressively optimized & minimized (as small as feasible for budget Android devices via AAB, ProGuard, tree-shaking & asset compression) |
 | Set logging speed | <3s per set |
 | Offline reliability | 100% for core workout flow — no network needed |
 | First workout | <60s from install to first logged set |
