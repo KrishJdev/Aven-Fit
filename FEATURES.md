@@ -112,7 +112,7 @@ WORKOUT
 │  ├─ Superset/dropset grouping                      [V1.1]
 │  └─ Timed/bodyweight/cardio entry modes            [P1][PROPOSED]
 ├─ Workout Summary                                   [P0]
-│  └─ Share-as-image card                            [P1][PROPOSED]
+│  └─ Wrapped-style share card (9:16)                [P1][PROPOSED]
 ├─ Workout History list + calendar                   [P0][PROPOSED: calendar]
 │  └─ Past Workout Detail                            [P0][PROPOSED]
 │     └─ Compare-with-last diff                      [V1.1][PROPOSED]
@@ -139,6 +139,7 @@ PROGRESS
 │  ├─ Progress Photos + compare                      [V1.1]
 │  ├─ 1RM Chart per exercise                         [V1.1]
 │  ├─ Muscle Volume Distribution                     [V1.1]
+│  │  └─ Recovery/fatigue muscle map                 [V1.1][PROPOSED]
 │  ├─ Workout Calendar (heatmap)                     [P0][PROPOSED]
 │  ├─ Weekly Report card                             [V1.1][PROPOSED]
 │  └─ Achievements / Badges                          [V1.1][PROPOSED]
@@ -153,7 +154,10 @@ NUTRITION
 │  │  ├─ Barcode Scanner                             [P1]
 │  │  ├─ Copy yesterday / last week                  [P1][PROPOSED]
 │  │  └─ Saved Meals (templates)                     [P1][PROPOSED]
+│  ├─ Fasting progress ring (16:8/14:10)             [P1][PROPOSED]
+│  ├─ Micronutrient & fiber health card              [P1][PROPOSED]
 │  └─ Day Nutrition History                          [P1][PROPOSED]
+├─ Dynamic Energy Expenditure (adaptive TDEE)        [V1.1][PROPOSED]
 ├─ Thali quick-log + cooking modifiers               [V1.1][PROPOSED]
 ├─ Vrat/Fasting Mode                                 [V1.1]
 ├─ Vegetarian Protein Intelligence                   [V1.1]
@@ -179,6 +183,7 @@ SOCIAL [V1.1]
 │  ├─ Friend Search / Follow                         [V1.1]
 │  └─ Notifications                                  [V1.1]
 ├─ Routine sharing (QR / deep link)                  [V1.1][PROPOSED]
+│  └─ Trainer QR dispatcher ("Gym Bhaiya")           [V1.1][PROPOSED]
 ├─ Private Squads & Challenges                       [V2]
 └─ Trainer/Client Mode                               [V2]
 
@@ -354,6 +359,7 @@ Shown immediately after finishing (replaces the workout screen). This is the dop
 - **Workout breakdown:** one card per exercise, each completed set as `weight × reps`.
 - **Inline rename:** pencil on title; saves on submit/blur; blank → "Workout".
 - **Actions:** Done (→ Home) · Share `[V1.1 with social]`; `[P1][PROPOSED: share-as-image]` — renders a branded summary card image (dark, glass, cyan accent) shareable to WhatsApp/Instagram; no login required (L2).
+  - **Wrapped-style share card `[P1][PROPOSED]`:** the share image is a sleek **9:16 vertical** dark-glassmorphism card built for Instagram Stories / WhatsApp Status (safe zones respected; tabular numerals). Contains visual workout stats, PR badges, and **fun cultural volume benchmarks** ("12,500 kg — equivalent to lifting 3 auto-rickshaws 🛺"), plus lifetime milestone badges ("1,000-Tonne Club" §10.8). Rendered offline on-device (no network, L2); the cultural benchmark copy is the viral hook — see §17.
 - **"Save as routine" `[P1][PROPOSED]`:** convert this session into a reusable routine (one tap → Routine Editor pre-filled).
 - **Error UX (preserve):** workout-not-found → clear state with a way back; never blank/crashed (L6).
 
@@ -457,6 +463,12 @@ Personal-record trophy room.
 ### 10.6 Muscle Volume Distribution `[V1.1]`
 - Volume by muscle group over a selected period — bar/pie "heatmap" view; informs weak-point training.
 - Weekly sets-per-muscle table with a 10–20 set guideline band `[V1.1][PROPOSED]` (evidence-based, never scolding, L4).
+- **2D interactive recovery & fatigue muscle map `[V1.1][PROPOSED]`:** a lightweight **vector anatomical body model** (front/back) on the Progress dashboard and as a Home glance card. Muscle groups color-code by **physiological recovery** computed from volume logged in the past 24–72h:
+  - 🟢 Fresh / Ready — >72h since last trained
+  - 🟡 Stimulated / Recovering — 24–48h
+  - 🔴 High Fatigue / Rest Needed — <24h
+  Tap a muscle group → the sessions that fatigued it. Purely informational — frames today's smart choice ("push is fresh, legs still recovering"), never guilt (L4); recovery bands follow common hypertrophy guidance, not medical advice.
+- **Performance budget (locked):** vector SVGs/CustomPainter, **<50KB asset footprint**, zero images; 60fps on a ₹9,000 phone; zero battery cost when idle (L8). Adapts the existing dark-glass visual language.
 
 ### 10.7 Advanced Analytics `[V1.1]`
 - Custom date ranges across all analytics; muscle heatmap (roadmap #15).
@@ -476,6 +488,8 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 - **Calories remaining vs. goal** (primary visual), **macro targets** — protein / carbs / fat consumed vs. target, as flat bars (no radius, no judgment colors — cyan fill on grey track).
 - **Protein emphasized:** protein bar visually first-class (the #1 macro for this audience; see Protein Intelligence §11.9).
 - **Water row `[P1][PROPOSED]:** `0.0 / 2.7 L` + quick-add buttons (+250 ml / +500 ml glass presets); from the archived UI plan; reminder optional, default off (L4).
+- **Fasting progress ring `[P1][PROPOSED]:** a thin, subtle circular ring at the top of the dashboard for time-restricted eating (16:8 / 14:10 — user-chosen schedule in Settings, off by default). Text is informational only: *"Fasting Window: 14h 30m / 16h elapsed"*. Never blocks the calorie headline; no colors that read as behind/ahead; **no alarm nags** — window end is at most one optional, tasteful notification (L4). Common practice among Indian fitness enthusiasts; the ring simply makes it visible.
+- **Vegetarian micronutrient & fiber health card `[P1][PROPOSED]:** a calm card at the bottom of the daily food log — **dietary fiber (g)** vs. a gentle daily reference, plus practical awareness for the common Indian vegetarian gaps: **Vitamin B12, Vitamin D3, Iron**. Neutral facts with practical nudges ("Most Indian vegetarians get little B12 — consider fortified foods or a supplement after consulting a doctor"), never deficits-as-failures; no red flags, no shaming (L4). Computed locally from logged foods (fiber) and curated knowledge cards (micronutrients); offline (L2).
 - **Four meal sections:** Breakfast / Lunch / Dinner / Snacks — each lists logged foods (name, serving, kcal, protein) with quick-add. (+ Pre/Post-Workout meal types exist in schema `[P1][PROPOSED]` to surface them.)
 - **Day navigation `[PROPOSED]`:** swipe/date-picker to view previous days (RN was today-only).
 - **Copy yesterday / copy last `[P1][PROPOSED]:** one tap clones a previous day's meals into today — the single biggest daily-logging accelerator for repetitive Indian diets.
@@ -527,6 +541,17 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
   - Training guidance tone-shift ("lighter volume is fine today") — suggestion, not command.
 - Fasting calendar data ships as an annually refreshed asset.
 
+### 11.11 Dynamic Energy Expenditure (Adaptive TDEE) `[V1.1][PROPOSED]`
+**Purpose:** the MacroFactor promise, offline and free: stop guessing calorie targets. **Promoted from V2** — this is core nutrition intelligence, not AI-era garnish (roadmap #20 moves with it).
+
+- **The problem:** static Mifflin-St Jeor targets drift from reality by hundreds of kcal; manual "adjust weekly" flows (if available at all) are guesswork or paywalled.
+- **The algorithm — fully offline (L2):** a rolling **Exponential Moving Average (EMA)** of daily scale weight smooths water/salt/whoosh noise into a trustworthy trend; correlating trend slope against logged daily intake over 2–3 weeks yields the user's **true real-world TDEE** (energy expenditure). Math is trivial, private, and runs on-device — no cloud round-trip, no battery cost (L8).
+- **Recalibration loop:** computed TDEE quietly updates calorie/macro targets **weekly** (only when confidence is sufficient and weight data is fresh). The user just sees targets that are always roughly right.
+- **Adherence-neutral by law (L4):** recalibration is silent — no red alarms, no "you gained" screens, no verdicts. The only surface is the target number itself changing (plus an optional, calm "TDEE updated · 2,430 kcal" entry in Progress). Trend lines, never raw swings (same philosophy as §10.3).
+- **Edge cases handled:** sick weeks, travel, deliberate bulk/cut overrides (user-set target wins until released), eating days logged honestly regardless of size (no judgment on logging fidelity, L4).
+- **Home for the numbers:** a small goal-settings page (current target, computed TDEE, trend weight, confidence state) under Nutrition/Profile; honest empty state while EMA warms up (L6).
+- **Synergy:** pairs with Body Weight History (§10.3) and the micronutrient card (§11.1); guest mode works fully offline; sync-era just carries the same numbers across devices.
+
 ## 12. Account, Profile & Settings
 
 ### 12.1 Profile `[P0]`
@@ -577,7 +602,8 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 | Post Detail | `[V1.1]` | Kudos, comments |
 | People Search / Follow | `[V1.1]` | Find friends, follow/unfollow, profile view |
 | Notifications | `[V1.1]` | Kudos, comments, follows, streak milestones. **Frequency-capped**; body-serenity rules (L5) — no "come back!" nags (analysis anti-pattern #1 for permission loss) |
-| Routine sharing (QR / deep link) | `[V1.1]` `[PROPOSED]` | 1-click share a routine via QR code shown on screen or deep link — friend scans → routine cloned into their library. Organic growth loop from the analysis; cheap to build on top of routines |
+| Routine sharing (QR / deep link) | `[V1.1]` `[PROPOSED]` | 1-click share a routine via QR code shown on screen or deep link — friend scans → routine cloned into their library. Organic growth loop from the analysis; cheap to build on top of routines. **Trainer dispatcher:** see next row |
+| Trainer QR dispatcher ("Gym Bhaiya") | `[V1.1]` `[PROPOSED]` | Enriches routine sharing for local trainers: design a 4–6 day split in the normal Routine Editor → generate a **high-contrast "Trainer QR Code"** (poster-printable). Client scans with their phone camera → entire plan clones into their local library instantly, free, zero account friction (L2, L3). Zero backend: the routine payload rides inside the QR/deep link — works in basement gyms with no signal. The offline acquisition wedge for the trainer→client channel |
 | Private Squads & Challenges | `[V2]` | Cooperative 3–8 person challenges ("Squad goal: 1,00,000 kg this month") (roadmap #22); cooperative > competitive per the analysis (3× retention) |
 | Trainer/Client Mode | `[V2]` | Trainers assign routines, view client logs (roadmap #23) |
 
@@ -587,7 +613,7 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 
 | Feature | Detail |
 |:---|:---|
-| Adaptive TDEE Engine | Dynamic calorie/macro targets from weight trend + logging (roadmap #20) — MacroFactor-style, **no static BMR formula as headline**; adds a goal-settings page. Remains adherence-neutral (L4): targets adjust silently, never scold |
+| Dynamic Energy Expenditure (Adaptive TDEE) `[V1.1][PROPOSED]` | **Promoted from V2** — now a core nutrition feature (§11.11), not AI-era garnish: offline EMA weight-trend × intake → real-world TDEE, targets recalibrate quietly weekly. MacroFactor-style, **no static BMR formula as headline**; goal settings page. Adherence-neutral by design (L4): silent recalibration, never scolds. Details: §11.11 |
 | AI Workout Generator | Goal/experience/equipment/time → generated routine, saved into the normal routine system (roadmap #21); free tier gets limited generations/month per monetization plan |
 | Smart Exercise Substitutions | Pain/shortage-aware swaps ("Shoulder hurts → landmine press") (roadmap-adjacent, from analysis); pairs with §9.2 alternatives |
 | Voice Logging (Hinglish) | Log sets/meals by voice (roadmap #24); the demo line from the analysis — *"do roti aur ek katori moong dal khayi with thoda sa ghee"* — must parse |
@@ -645,6 +671,7 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 
 - **Forgiving weekly streak `[P0]`:** the headline streak is "workouts this week vs. goal (3–6)", not a daily chain (§7.1). Daily-chain streak exists as a secondary stat with **streak freezes** for rest/fasting days `[V1.1][PROPOSED]`.
 - **PR celebrations `[P0]`:** haptic + micro-animation at row level (§8.1) and on Summary (§8.5). No sounds by default (L5).
+- **Cultural volume benchmarks `[P1][PROPOSED]:** lifetime/session volume translated into vivid Indian reference units — "3 auto-rickshaws 🛺", "1,000-Tonne Club" (§10.8) — inside Wrapped-style share cards (§8.5) and trophy entries. Delight copy, never judgment; benchmarks scale with the number so the card always flatters the effort (L4). This is the viral hook: every share advertises the app's personality, not just stats.
 - **Achievements/badges `[V1.1][PROPOSED]:** §10.8.
 - **No punitive mechanics, ever:** no shame screens, no loss-aversion pushes, no "friends out-lifted you!" (L4, analysis gamification table).
 
@@ -737,6 +764,12 @@ Every `[PROPOSED]` item in one table for review/approval. Approving one = add to
 | 42 | 1-tap auto warm-up pyramid generator | P0 | §8.1 | L1 for the warm-up ritual: ⚡ generates 4 flagged `is_warmup` rows (empty bar → 50% → 70% → 85%); excluded from volume/PRs |
 | 43 | Interactive tactile Olympic plate visualizer | P1 | §8.4 | Real-to-scale barbell diagram from the user's gym plate inventory; tap-to-inspect; offline Canvas render (L2/L8) |
 | 44 | Hevy & Strong 1-tap CSV migration engine | P1 | §12.4/§4/§16.2 | Trojan horse: 3+ years of logs/PRs migrated offline in <5s; fuzzy matching + confidence review; no data leaves the device |
+| 45 | Dynamic Energy Expenditure (Adaptive TDEE) — promoted V2 → V1.1 | V1.1 (was V2) | §11.11/§14 | Offline EMA weight-trend × logged intake → true metabolic burn (MacroFactor-style); targets recalibrate silently weekly; L4-clean |
+| 46 | Intermittent fasting ring (16:8 / 14:10) | P1 | §11.1 | Subtle, informational progress ring for time-restricted eating; no nags (L4); common among Indian lifters |
+| 47 | Vegetarian micronutrient & fiber health card | P1 | §11.1 | Fiber + B12/D3/iron awareness for Indian veg diets; neutral facts, never deficits-as-failures (L4) |
+| 48 | 2D interactive muscle recovery/fatigue map | V1.1 | §10.6 | Vector body model (front/back), 🟢🟡🔴 recovery bands from 24–72h volume; <50KB, 60fps on ₹9,000 phones (L8); informational, L4-clean |
+| 49 | Wrapped-style 9:16 share card + cultural volume benchmarks | P1 | §8.5/§17 | Instagram Stories/WhatsApp-ready dark glass card; PR badges + "3 auto-rickshaws" benchmarks; offline render (L2); viral growth |
+| 50 | Trainer QR dispatcher ("Gym Bhaiya") | V1.1 | §13 | Trainers ship 4–6 day splits via high-contrast poster QR; client clones plan free, no account (L2/L3); zero backend |
 
 ---
 
