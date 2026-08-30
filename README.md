@@ -1,7 +1,7 @@
 # Aven Fit ⚡
 
 > **High-Performance, Offline-First Workout Tracker & Nutrition Engine**  
-> Engineered for speed, precision, and brutalist clarity on Android.
+> Engineered for speed, precision, and sharp glassmorphism clarity on Android.
 
 ---
 
@@ -52,7 +52,7 @@
 
 | Layer | Technology | Description |
 |:---|:---|:---|
-| **Mobile Client** | Flutter + Dart | High-performance Android application with 0px brutalist styling |
+| **Mobile Client** | Flutter + Dart | High-performance Android application with Sharp Glassmorphism UI |
 | **State Management** | Riverpod | Reactive state management and dependency injection |
 | **Local Database** | SQLite (`sqflite`) | High-speed native bindings for offline persistence |
 | **Backend API** | Spring Boot 3.3 + Java 21 | Modular REST architecture with clean domain separation |
@@ -74,7 +74,7 @@ aven-fit/
 │   │   ├── screens/             # Today, Train, Workout, Nutrition, Progress
 │   │   ├── services/            # API clients & background SyncEngine
 │   │   ├── providers/           # Riverpod state providers
-│   │   └── theme/               # Brutalist design system, typography & palette
+│   │   └── theme/               # Sharp Glassmorphism design system, typography & palette
 │   └── main.dart                # Application entry & initialization
 │
 └── backend/                     # Spring Boot application
@@ -87,7 +87,7 @@ aven-fit/
     │   ├── analytics/           # PR tracking & volume summaries
     │   └── sync/                # Push/pull synchronization controllers
     └── src/main/resources/
-        └── db/migration/        # Flyway schema migrations (V1–V8)
+        └── db/migration/        # Flyway schema migrations (V1–V10)
 ```
 
 ---
@@ -152,10 +152,10 @@ aven-fit/
 
 ## 🎨 Design Philosophy
 
-Aven Fit adheres to a strict **editorial brutalist** design language:
-- **Sharp Geometry:** `0px` border radii across all cards, buttons, inputs, and sheets.
-- **High-Contrast Palette:** Zinc Dark background (`#09090B`) with Burnt Orange (`#E85D04`) and Volt Green (`#E2F835`) accents.
-- **Dense, Technical Typography:** Tabular numerical alignment and bold editorial hierarchy.
+Aven Fit adheres to a **Sharp Glassmorphism** design language:
+- **OLED Surface & Translucency:** Pitch-black background with translucent glass cards and crisp, precise edges.
+- **High-Contrast Palette:** Neon Cyan (`#00F0FF`) primary accent, Volt Green (`#E2F835`) for PRs/deltas, and Burnt Orange (`#E85D04`) for warnings/destructive actions.
+- **Dense, Technical Typography:** Monospaced tabular numerical alignment for effortless set scanning.
 
 ---
 

@@ -75,11 +75,11 @@ Every feature/screen is tagged with its roadmap phase. Build order = phase order
 | `[P1]` | MVP P1 | Build after P0 is stable |
 | `[V1.1]` | V1.1 — "Delight" | Build after MVP is released |
 | `[V2]` | V2.0 — "Dominate" | Only when explicitly authorized |
-| `[PROPOSED]` | — | New proposal not yet in `PRODUCT_ROADMAP.md`; needs user approval before building. Always paired with a suggested phase, e.g. `[P1][PROPOSED]` |
+| `[PROPOSED]` | — | New proposal needing user approval before building. Always paired with a suggested phase, e.g. `[P1][PROPOSED]` |
 
 Within each phase, screens inherit the phase of their feature. A `[P0]` screen may contain `[P1]`-tagged sub-sections.
 
-> **Promotion rule:** when the user approves a `[PROPOSED]` item, it gets added to `PRODUCT_ROADMAP.md` and loses its `[PROPOSED]` tag. This doc never promotes itself. A full ledger of proposals lives in §20.
+> **Promotion rule:** When the user approves a `[PROPOSED]` item, it is promoted directly within `FEATURES.md` by stripping its `[PROPOSED]` tag and activating it in its target phase. This doc is the single source of truth for features and phase planning. A full ledger of proposals lives in §20.
 
 ---
 
@@ -695,7 +695,7 @@ Nutrition design law: **adherence-neutral** (L4). The dashboard shows facts, nev
 | 12 | Advanced analytics + social + routine sharing + vrat mode + protein intelligence + Hindi | `[V1.1]` |
 | 13 | AI + squads + trainer mode + widgets polish | `[V2]` |
 
-*(Final sequencing authority: `PRODUCT_ROADMAP.md`.)*
+*(Final sequencing authority: `FEATURES.md`.)*
 
 ---
 
@@ -716,7 +716,7 @@ Carried from the analysis "What to AVOID" and scope boundaries — recorded so f
 
 ## 20. Proposal Ledger
 
-Every `[PROPOSED]` item in one table for review/approval. Approving one = add to `PRODUCT_ROADMAP.md` + strip the tag here.
+Every `[PROPOSED]` item in one table for review/approval. Approving one = strip the `[PROPOSED]` tag in this document and activate for that phase.
 
 | # | Proposal | Suggested phase | Where | Rationale |
 |:--|:---|:---|:---|:---|
@@ -773,5 +773,5 @@ Every `[PROPOSED]` item in one table for review/approval. Approving one = add to
 
 ---
 
-*(Final authority: `PRODUCT_ROADMAP.md` for sequencing; `AGENTS.md` for stack laws; archived RN code for UX intent.)*
+*(Final authority: `FEATURES.md` for sequencing & features; `AGENTS.md` for stack laws & architecture; archived RN code for UX intent.)*
 
