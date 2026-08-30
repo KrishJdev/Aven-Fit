@@ -53,8 +53,11 @@
 | Layer | Technology | Description |
 |:---|:---|:---|
 | **Mobile Client** | Flutter + Dart | High-performance Android application with Sharp Glassmorphism UI |
-| **State Management** | Riverpod | Reactive state management and dependency injection |
-| **Local Database** | SQLite (`sqflite`) | High-speed native bindings for offline persistence |
+| **State Management** | Riverpod 2.x | Notifiers/Stores with unidirectional state and dependency injection |
+| **Navigation** | GoRouter | Declarative routing with deep links and shell routes |
+| **Local Database** | SQLite via **Drift** (`drift_flutter` + `sqlite3_flutter_libs`) | Reactive, compile-safe queries for offline-first persistence |
+| **Networking** | Dio | Typed HTTP client for the Spring Boot API |
+| **Domain Models** | Freezed + JsonSerializable | Immutable models with JSON codegen |
 | **Backend API** | Spring Boot 3.3 + Java 21 | Modular REST architecture with clean domain separation |
 | **Security & Auth** | Spring Security + JWT | Phone OTP and OAuth token rotation |
 | **Server Database** | PostgreSQL 16 + Flyway | Scalable relational storage with version-controlled migrations |
@@ -68,15 +71,23 @@ aven-fit/
 ├── mobile/                      # Flutter Android application
 │   ├── android/                 # Native Android project files
 │   ├── lib/
-│   │   ├── components/          # Reusable UI primitives & feature components
-│   │   ├── database/            # SQLite schema, migrations & local repositories
-│   │   ├── navigation/          # Router and navigation setup
-│   │   ├── screens/             # Today, Train, Workout, Nutrition, Progress
-│   │   ├── services/            # API clients & background SyncEngine
-│   │   ├── providers/           # Riverpod state providers
-│   │   └── theme/               # Sharp Glassmorphism design system, typography & palette
-│   └── main.dart                # Application entry & initialization
-│
+│   │   ├── core/                # Shared primitives (feature-agnostic)
+│   │   │   ├── database/        # Drift database, tables, DAOs & migrations
+│   │   │   ├── network/         # Dio client, interceptors & API endpoints
+│   │   │   ├── router/          # GoRouter configuration (deep links, shell routes)
+│   │   │   └── theme/           # Sharp Glassmorphism design system, typography & palette
+│   │   ├── features/            # Feature-first vertical slices
+│   │   │   ├── workout/         # Active session, set logging, rest timer
+│   │   │   │   ├── domain/      # Freezed immutable models
+│   │   │   │   ├── data/        # Drift DAOs, data sources & repository impl
+│   │   │   │   └── presentation/# Riverpod notifiers/stores + ConsumerWidget UI
+│   │   │   ├── routine/         # Routine builder, templates & scheduling
+│   │   │   ├── exercise/        # Directory, detail & custom exercises
+│   │   │   ├── nutrition/       # Indian food DB, meal logging & macros
+│   │   │   ├── progress/        # PR vault, analytics & body metrics
+│   │   │   └── auth/            # OTP login, guest mode & sync identity
+│   │   └── main.dart            # Application entry & initialization
+│   │
 └── backend/                     # Spring Boot application
     ├── src/main/java/com/avenfit/
     │   ├── auth/                # Security, JWT & OTP services

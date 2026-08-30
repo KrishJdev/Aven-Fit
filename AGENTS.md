@@ -2,7 +2,7 @@
 
 > **Project:** Aven Fit (Gym Tracker)
 > **Repository:** Source of truth. Neither agent owns it.
-> **Last updated:** 2026-08-30
+> **Last updated:** 2026-08-31
 
 ---
 
@@ -21,7 +21,7 @@ Both agents are equal collaborators across the entire project. Agent selection f
 
 Responsibilities are **flexible and collaborative across both agents** rather than rigid silos. Either agent may be tasked with:
 
-- **Frontend (Flutter + Dart):** UI/UX, Glassmorphism design system, screens, Riverpod state management, and SQLite local persistence (`sqflite`).
+- **Frontend (Flutter + Dart):** UI/UX, Glassmorphism design system, screens, Riverpod state management, and local SQLite persistence via **Drift** (reactive, compile-safe queries).
 - **Backend (Spring Boot 3.3 + Java 21):** JPA entities, services, controllers, Flyway migrations, and PostgreSQL schemas.
 - **Product & Architecture:** Feature interpretation against `FEATURES.md`, system design, sync strategy, and security.
 - **Review & Quality:** Reviewing work, writing tests, refactoring, and maintaining documentation.
@@ -39,8 +39,12 @@ To avoid schema drift and detached APIs, the project follows a strict **Vertical
 2. **Offline-First Contract:**
    - **Local SQLite (`mobile/`):** Primary source of truth during live usage (Law L2). Must support instantaneous reads/writes (<3s set logging).
    - **Spring Boot API (`backend/`):** Serves as the authentication authority, cloud backup, and sync hub.
-3. **Slice Anatomy:**
-   - **Flutter Client:** Screen UI, Glassmorphism components, Riverpod state provider, and SQLite queries.
+3. **Slice Anatomy (Feature-First Clean Architecture):**
+   - **Flutter Client — `lib/features/<feature>/`:** each feature is self-contained in three layers:
+     - `domain/`: Freezed immutable models (entities, value objects).
+     - `data/`: Drift DAOs, data sources, and the Repository implementation.
+     - `presentation/`: Riverpod Notifiers/Stores (unidirectional state) and `ConsumerWidget` UI.
+     - Shared primitives (database, network, router, theme) live in `lib/core/` — features never reach into each other's internals.
    - **Backend Service:** Corresponding Spring Boot REST controller, DTO validation, and PostgreSQL entity/migration.
    - **Sync Contract:** Local `sync_queue` payload matches server ingestion schema.
 4. **Definition of Done for a Slice:**
@@ -162,11 +166,27 @@ The following stack decisions are **locked** and must not be changed without exp
 |:---|:---|:---|
 | Platform | Android-first | **Locked** |
 | Mobile Framework | Flutter + Dart | **Locked** |
-| Local Database | SQLite | **Locked** |
+| Local Database | SQLite via **Drift** (`drift_flutter` + `sqlite3_flutter_libs`) — reactive, compile-safe queries | **Locked** |
 | Backend | Spring Boot + Java | **Locked** |
 | Server Database | PostgreSQL | **Locked** |
 | API Style | REST | **Locked** |
 | Auth | Spring Security | **Locked** |
+
+### Key Tooling (Locked)
+
+| Tool | Role |
+|:---|:---|
+| Riverpod 3.x | State management — Notifiers/Stores, unidirectional state |
+| GoRouter 18 | Declarative navigation (deep links, shell routes) |
+| Freezed 4 + JsonSerializable | Immutable domain models & JSON codegen |
+| Dio | HTTP client for Spring Boot API |
+| WorkManager 0.10+ | Background sync queue draining (network-constrained, backoff) |
+| Patrol 4.9+ | Native-aware E2E/integration tests (notifications, permissions) |
+| Mocktail | Unit-test mocking for repositories/stores |
+| lucide_icons_flutter | Icon set (Lucide); replaces `lucide_icons`, which cannot compile on Flutter 3.47 (final `IconData`) |
+
+> [!NOTE]
+> **Ratified 2026-08-31:** The version upgrades above (Riverpod 3.4.2, GoRouter 18, Drift 2.34.x, Freezed 4 / freezed_annotation 3.1, WorkManager 0.10.9, Patrol 4.9, build_runner 2.16, flutter_lints 6) and the `lucide_icons` → `lucide_icons_flutter` swap were approved by the user. The original Riverpod 2.x codegen stack is pinned to `analyzer ^7`, which cannot parse Dart 3.10+ framework sources, making the upgrade mandatory on the Dart 3.13 / Flutter 3.47 toolchain.
 
 ### Explicitly Rejected
 
@@ -261,7 +281,7 @@ Automated E2E journeys are the executable form of the Quality Standard. Each jou
 
 ### Execution Rules
 
-- **Tooling:** Flutter `integration_test` for UI journeys; direct `sqflite`/`sqlite3` assertions for DB state; `./gradlew test` + PostgreSQL integration tests for J6 backend steps (steps 3–5).
+- **Tooling:** Flutter `integration_test` + Patrol for UI journeys; direct Drift/`sqlite3` assertions for DB state; `./gradlew test` + PostgreSQL integration tests for J6 backend steps (steps 3–5).
 - **Device profile:** journeys run on the budget-phone emulator profile (₹9,000-class) to honor the performance quality bar above.
 - **Gating:** a failing journey blocks merge to `dev` for any slice touching its domain and must be recorded in `HANDOFF.md` (known issues).
 - **Extensibility:** new user journeys must extend this matrix — no parallel test-strategy documents.
