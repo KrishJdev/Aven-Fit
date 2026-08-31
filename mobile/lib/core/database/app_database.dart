@@ -3,6 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 import '../../features/exercise/data/exercise_local_source.dart';
 import '../../features/exercise/data/exercise_tables.dart';
+import '../../features/history/data/history_local_source.dart';
 import '../../features/progress/data/pr_local_source.dart';
 import '../../features/progress/data/pr_tables.dart';
 import '../../features/routine/data/routine_local_source.dart';
@@ -30,7 +31,7 @@ part 'app_database.g.dart';
     RoutineSets,
     PersonalRecords,
   ],
-  daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao],
+  daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao, HistoryDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])

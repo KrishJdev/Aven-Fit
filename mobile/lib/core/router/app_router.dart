@@ -1,7 +1,9 @@
 import 'package:aven_fit/features/exercise/presentation/create_custom_exercise_screen.dart';
 import 'package:aven_fit/features/exercise/presentation/exercise_detail_screen.dart';
 import 'package:aven_fit/features/exercise/presentation/exercise_list_screen.dart';
+import 'package:aven_fit/features/history/presentation/history_list_screen.dart';
 import 'package:aven_fit/features/history/presentation/progress_screen.dart';
+import 'package:aven_fit/features/history/presentation/workout_detail_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_detail_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_editor_screen.dart';
@@ -49,6 +51,16 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/workout/summary/:id',
       builder: (context, state) => WorkoutSummaryScreen(
+        sessionId: state.pathParameters['id']!,
+      ),
+    ),
+    GoRoute(
+      path: '/history',
+      builder: (context, state) => const HistoryListScreen(),
+    ),
+    GoRoute(
+      path: '/history/:id',
+      builder: (context, state) => WorkoutDetailScreen(
         sessionId: state.pathParameters['id']!,
       ),
     ),
