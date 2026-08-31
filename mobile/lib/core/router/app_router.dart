@@ -7,6 +7,7 @@ import 'package:aven_fit/features/routine/presentation/routine_detail_screen.dar
 import 'package:aven_fit/features/routine/presentation/routine_editor_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routines_screen.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_screen.dart';
+import 'package:aven_fit/features/workout/presentation/exercise_picker_screen.dart';
 import 'package:aven_fit/features/workout/presentation/home_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -43,6 +44,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/workout/active',
       builder: (context, state) => const ActiveWorkoutScreen(),
+    ),
+    GoRoute(
+      path: '/workout/picker',
+      builder: (context, state) => const ExercisePickerScreen(),
     ),
     GoRoute(
       path: '/exercises',

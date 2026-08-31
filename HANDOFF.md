@@ -171,8 +171,19 @@
       - Includes batch resolution `resolveGhostSetsForExercise` for instant exercise block rendering.
   - **Verification & Tests (`test/features/workout/` & `backend/`):**
     - Created `ghost_prefill_test.dart` (7 comprehensive unit tests) covering domain value object formatting/serialization, all 5 resolution branches, and batch resolution.
-    - `dart run build_runner build` (114 outputs), `flutter analyze` (0 issues), `flutter test` (**67/67 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
-  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.3: Exercise Picker (In-Session Mode)** (`exercise_picker_controller.dart`, `exercise_picker_screen.dart` with recent 10 exercises from session history, favourites, and catalog search integration).
+- **2026-08-31 (session 19):** Implemented **Slice 3 WU-3.3: Exercise Picker (In-Session Mode)**:
+  - **Data Layer & Repository (`features/workout/data/`):**
+    - `workout_local_source.dart` & `workout_repository.dart`: Added `getRecentExercises(limit: 10)` to query distinct exercises used across completed workout history in SQLite.
+  - **Presentation Layer (`features/workout/presentation/` & `core/router/`):**
+    - `exercise_picker_state.dart`: Freezed state `ExercisePickerState` (`searchQuery`, `selectedMuscleGroupId`, `selectedEquipment`, `favouritesOnly`, `showRecentOnly`, `recentExercises`, `allExercises`, `muscleGroups`, with computed `filteredExercises` and `hasActiveFilters`).
+    - `exercise_picker_controller.dart`: Auto-dispose Riverpod controller managing search filtering, filter chips toggling, recent history query, and optimistic favourites toggling with SQLite persistence.
+    - `exercise_picker_screen.dart`: Full-screen Sharp Glassmorphism modal (`/workout/picker`) with `ExerciseSearchBar`, horizontal chip filter bar (`⚡ Recent (N)`, `★ Favourites`, muscle groups, equipment), count badge, `ExerciseListTile` items, callback/active session selection handling, and designed empty states (Law L6) with "CREATE CUSTOM" CTA.
+    - `app_router.dart`: Registered `/workout/picker` route.
+  - **Verification & Tests (`test/features/workout/` & `backend/`):**
+    - Created `exercise_picker_test.dart` (8 comprehensive unit & widget tests) verifying search query filtering (<300ms latency), filter combinations, controller recent history SQLite queries, optimistic favourites toggles, and modal tap-to-add callbacks.
+    - `dart run build_runner build` (120 outputs), `flutter analyze` (0 issues), `flutter test` (**75/75 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
+  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.4: Active Workout Screen Rebuild** (Live session UI, auto-named header, dynamic exercise blocks, set table with PREV ghost columns, quick steppers +/−2.5kg, warm-up pyramid generator, swipe-to-delete, and rest timer integration).
+
 
 
 
