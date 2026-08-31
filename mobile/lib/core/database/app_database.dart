@@ -1,6 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import '../../features/exercise/data/exercise_local_source.dart';
+import '../../features/exercise/data/exercise_tables.dart';
+import '../../features/routine/data/routine_local_source.dart';
+import '../../features/routine/data/routine_tables.dart';
 import '../../features/workout/data/workout_local_source.dart';
 import '../../features/workout/data/workout_tables.dart';
 
@@ -12,15 +16,24 @@ part 'app_database.g.dart';
 /// Runs in a background isolate via `drift_flutter` so queries never
 /// block the UI thread on budget devices.
 @DriftDatabase(
-  tables: [WorkoutSessions, WorkoutSets],
-  daos: [WorkoutDao],
+  tables: [
+    WorkoutSessions,
+    WorkoutSets,
+    MuscleGroups,
+    Exercises,
+    ExerciseMuscleGroups,
+    Routines,
+    RoutineExercises,
+    RoutineSets,
+  ],
+  daos: [WorkoutDao, ExerciseDao, RoutineDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -28,7 +41,19 @@ class AppDatabase extends _$AppDatabase {
           await m.createAll();
         },
         onUpgrade: (m, from, to) async {
-          // Future migrations go here — never destructive by default.
+          if (from < 2) {
+            await m.createTable(muscleGroups);
+            await m.createTable(exercises);
+            await m.createTable(exerciseMuscleGroups);
+          }
+          if (from < 3) {
+            await m.createTable(routines);
+            await m.createTable(routineExercises);
+            await m.createTable(routineSets);
+          }
+        },
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON;');
         },
       );
 }

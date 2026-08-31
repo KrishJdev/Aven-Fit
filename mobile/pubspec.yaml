@@ -96,6 +96,8 @@ flutter:
     # Bundled google_fonts files (SHA-256 pinned by the google_fonts
     # package). Guarantees offline-first font loading with zero network.
     - assets/fonts/
+    # Bundled seed databases (exercises, muscle groups, nutrition) for zero-network first-run
+    - assets/data/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -1,0 +1,972 @@
+[
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000001",
+    "name": "Barbell Bench Press",
+    "description": "Classic flat bench press with a barbell. Primary compound pressing movement for the chest.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000002",
+    "name": "Incline Barbell Bench Press",
+    "description": "Barbell press on an incline bench, emphasizing the upper chest.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000003",
+    "name": "Dumbbell Bench Press",
+    "description": "Flat dumbbell press allowing a greater range of motion than the barbell.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000004",
+    "name": "Incline Dumbbell Bench Press",
+    "description": "Incline dumbbell press targeting the upper chest fibers.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000005",
+    "name": "Dumbbell Fly",
+    "description": "Isolation movement stretching and contracting the chest.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000006",
+    "name": "Cable Crossover",
+    "description": "Cable fly variation providing constant tension across the chest.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000007",
+    "name": "Push-Up",
+    "description": "Bodyweight chest staple; scalable via elevation or added load.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000008",
+    "name": "Chest Dip",
+    "description": "Parallel bar dip leaning forward to bias the chest.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000009",
+    "name": "Barbell Row (Bent-Over)",
+    "description": "Heavy horizontal pull building mid-back thickness.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000010",
+    "name": "Deadlift",
+    "description": "Full-body posterior chain lift from the floor.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440008",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440014",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000011",
+    "name": "Pull-Up",
+    "description": "Overhand bodyweight vertical pull for the lats.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440013",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000012",
+    "name": "Lat Pulldown",
+    "description": "Cable vertical pull; scalable pull-up alternative.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440013",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000013",
+    "name": "Seated Cable Row",
+    "description": "Seated horizontal cable row for mid-back density.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440013",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000014",
+    "name": "Dumbbell Row (One-Arm)",
+    "description": "Single-arm row with knee and hand braced on a bench.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440013",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000015",
+    "name": "T-Bar Row",
+    "description": "Chest-supported or straddled barbell row variant.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440012",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000016",
+    "name": "Face Pull",
+    "description": "Rope pull to the face for rear delts and upper back health.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440012",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000017",
+    "name": "Overhead Press (Barbell)",
+    "description": "Standing strict barbell press overhead.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000018",
+    "name": "Dumbbell Shoulder Press",
+    "description": "Seated or standing dumbbell press overhead.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000019",
+    "name": "Lateral Raise (Dumbbell)",
+    "description": "Isolation raise to the side for medial delt width.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000020",
+    "name": "Front Raise (Dumbbell)",
+    "description": "Anterior delt isolation raise.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000021",
+    "name": "Reverse Fly (Dumbbell)",
+    "description": "Bent-over rear delt isolation.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440002",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000022",
+    "name": "Arnold Press",
+    "description": "Rotational dumbbell press popularized by Arnold Schwarzenegger.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000023",
+    "name": "Barbell Curl",
+    "description": "Standing two-arm barbell curl.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000024",
+    "name": "Dumbbell Curl",
+    "description": "Standard alternating or simultaneous dumbbell curl.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000025",
+    "name": "Hammer Curl",
+    "description": "Neutral-grip curl hitting the brachialis.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000026",
+    "name": "Preacher Curl",
+    "description": "Angled-pad curl removing momentum from the equation.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000027",
+    "name": "Concentration Curl",
+    "description": "Seated single-arm curl with elbow braced on the thigh.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000028",
+    "name": "Cable Curl",
+    "description": "Cable curl providing constant tension through the ROM.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440004",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000029",
+    "name": "Tricep Pushdown (Cable)",
+    "description": "Cable pushdown with rope or bar attachment.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000030",
+    "name": "Overhead Tricep Extension (Dumbbell)",
+    "description": "Overhead extension stretching the long head of the triceps.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000031",
+    "name": "Skull Crusher (Barbell)",
+    "description": "Lying tricep extension lowering the bar toward the forehead.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000032",
+    "name": "Close-Grip Bench Press",
+    "description": "Narrow-grip bench press shifting load to the triceps.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440001",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000033",
+    "name": "Tricep Dip",
+    "description": "Upright-torso dip biasing the triceps.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440005",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440003",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000034",
+    "name": "Barbell Squat (Back)",
+    "description": "King of lower-body lifts; barbell held across the upper back.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440007",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440008",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440014",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000035",
+    "name": "Front Squat",
+    "description": "Bar racked at the shoulders; quad-dominant squat variant.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440007",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000036",
+    "name": "Leg Press (Machine)",
+    "description": "Machine pressing movement for heavy, supported leg work.",
+    "category": "MACHINE",
+    "equipment": "MACHINE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440007",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000037",
+    "name": "Romanian Deadlift",
+    "description": "Hip-hinge deadlift emphasizing the hamstrings.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440008",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440014",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000038",
+    "name": "Leg Curl (Machine)",
+    "description": "Knee-flexion machine isolating the hamstrings.",
+    "category": "MACHINE",
+    "equipment": "MACHINE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440008",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000039",
+    "name": "Leg Extension (Machine)",
+    "description": "Knee-extension machine isolating the quadriceps.",
+    "category": "MACHINE",
+    "equipment": "MACHINE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440007",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000040",
+    "name": "Bulgarian Split Squat",
+    "description": "Rear-foot-elevated split squat; brutal single-leg builder.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440007",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000041",
+    "name": "Calf Raise (Machine)",
+    "description": "Loaded calf raise on a standing machine.",
+    "category": "MACHINE",
+    "equipment": "MACHINE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440010",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000042",
+    "name": "Walking Lunge",
+    "description": "Forward-stepping lunge, loaded or bodyweight.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440007",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000043",
+    "name": "Crunch",
+    "description": "Spinal-flexion core basic.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440011",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000044",
+    "name": "Hanging Leg Raise",
+    "description": "Hanging flexion raise for lower abs and grip.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440011",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000045",
+    "name": "Cable Crunch",
+    "description": "Kneeling weighted crunch on the cable stack.",
+    "category": "CABLE",
+    "equipment": "CABLE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440011",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000046",
+    "name": "Plank",
+    "description": "Isometric anti-extension hold.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440011",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440014",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000047",
+    "name": "Russian Twist",
+    "description": "Rotational core movement, seated.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440011",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000048",
+    "name": "Barbell Hip Thrust",
+    "description": "Hip-extension powerhouse for glute strength and size.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440008",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000049",
+    "name": "Standing Calf Raise",
+    "description": "Straight-knee calf raise for the gastrocnemius.",
+    "category": "MACHINE",
+    "equipment": "MACHINE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440010",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000050",
+    "name": "Seated Calf Raise",
+    "description": "Bent-knee calf raise biasing the soleus.",
+    "category": "MACHINE",
+    "equipment": "MACHINE",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440010",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000051",
+    "name": "Barbell Shrug",
+    "description": "Vertical trap-builder with a barbell.",
+    "category": "BARBELL",
+    "equipment": "BARBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440012",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000052",
+    "name": "Dumbbell Shrug",
+    "description": "Trap shrug with dumbbells at the sides.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440012",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000053",
+    "name": "Back Extension",
+    "description": "Hyperextension bench movement for spinal erectors and glutes.",
+    "category": "BODYWEIGHT",
+    "equipment": "BODYWEIGHT",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440014",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440009",
+        "role": "SECONDARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000054",
+    "name": "Wrist Curl",
+    "description": "Forearm flexion isolation seated with dumbbells.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "PRIMARY"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4-0000-4000-8000-000000000055",
+    "name": "Farmer's Walk",
+    "description": "Loaded carry for forearms, traps, and total-body stability.",
+    "category": "DUMBBELL",
+    "equipment": "DUMBBELL",
+    "isCustom": false,
+    "muscleGroups": [
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440006",
+        "role": "PRIMARY"
+      },
+      {
+        "muscleGroupId": "550e8400-e29b-41d4-a716-446655440012",
+        "role": "SECONDARY"
+      }
+    ]
+  }
+]

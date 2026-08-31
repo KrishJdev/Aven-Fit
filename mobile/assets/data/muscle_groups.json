@@ -1,0 +1,16 @@
+[
+  {"id": "550e8400-e29b-41d4-a716-446655440001", "name": "Chest", "displayOrder": 1},
+  {"id": "550e8400-e29b-41d4-a716-446655440002", "name": "Back", "displayOrder": 2},
+  {"id": "550e8400-e29b-41d4-a716-446655440003", "name": "Shoulders", "displayOrder": 3},
+  {"id": "550e8400-e29b-41d4-a716-446655440004", "name": "Biceps", "displayOrder": 4},
+  {"id": "550e8400-e29b-41d4-a716-446655440005", "name": "Triceps", "displayOrder": 5},
+  {"id": "550e8400-e29b-41d4-a716-446655440006", "name": "Forearms", "displayOrder": 6},
+  {"id": "550e8400-e29b-41d4-a716-446655440007", "name": "Quadriceps", "displayOrder": 7},
+  {"id": "550e8400-e29b-41d4-a716-446655440008", "name": "Hamstrings", "displayOrder": 8},
+  {"id": "550e8400-e29b-41d4-a716-446655440009", "name": "Glutes", "displayOrder": 9},
+  {"id": "550e8400-e29b-41d4-a716-446655440010", "name": "Calves", "displayOrder": 10},
+  {"id": "550e8400-e29b-41d4-a716-446655440011", "name": "Abs", "displayOrder": 11},
+  {"id": "550e8400-e29b-41d4-a716-446655440012", "name": "Traps", "displayOrder": 12},
+  {"id": "550e8400-e29b-41d4-a716-446655440013", "name": "Lats", "displayOrder": 13},
+  {"id": "550e8400-e29b-41d4-a716-446655440014", "name": "Lower Back", "displayOrder": 14}
+]
