@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/notifications/notification_service.dart';
+import '../../../core/services/workout_foreground_service.dart';
+import '../../workout/data/workout_repository.dart';
 import 'rest_timer_state.dart';
 
 part 'rest_timer_controller.g.dart';
@@ -19,6 +21,12 @@ part 'rest_timer_controller.g.dart';
 /// replaces any live one, [cancel] clears it instantly, and warm-up sets
 /// never trigger rest. Keep-alive so the countdown survives navigation to
 /// the exercise picker or other tabs while the session stays active.
+///
+/// WU-3.10: the controller also owns the foreground-service notification
+/// actions (it is the keep-alive session-scope component): "+15s" adjusts
+/// the countdown, "Finish Workout" completes the active session
+/// (write-through, L7) and stops the service. Rest deadlines are pushed to
+/// the service on every change so the lock-screen notification stays live.
 @Riverpod(keepAlive: true)
 class RestTimerController extends _$RestTimerController {
   /// Default rest duration — completing a set auto-starts a 90s countdown.
@@ -36,7 +44,37 @@ class RestTimerController extends _$RestTimerController {
     final notifications = ref.watch(notificationServiceProvider);
     notifications.actionHandler = _onNotificationAction;
     ref.onDispose(() => notifications.actionHandler = null);
+
+    // Foreground-service notification actions (WU-3.10): the service is the
+    // lock-screen surface; this controller stays authoritative for both.
+    // The provider is a keep-alive singleton, so this controller is its only
+    // ever owner — disposal clears the hooks unconditionally.
+    final foreground = ref.watch(workoutForegroundServiceProvider);
+    foreground.onAdd15 = () => addTime(15);
+    foreground.onFinish = _finishFromNotification;
+    ref.onDispose(() {
+      foreground.onAdd15 = null;
+      foreground.onFinish = null;
+    });
     return const RestTimerState();
+  }
+
+  /// "Finish Workout" from the foreground-service notification (§8.1):
+  /// completes the active session write-through so a lock-screen tap never
+  /// risks losing the workout, stops the service, and clears notifications.
+  Future<void> _finishFromNotification() async {
+    final repository = ref.read(workoutRepositoryProvider);
+    final active = await repository.getActiveSession();
+    if (active == null) {
+      await ref.read(workoutForegroundServiceProvider).stop();
+      return;
+    }
+    cancel();
+    await repository.finishWorkout(
+      active.id,
+      durationSeconds: active.elapsedSecondsNow(),
+    );
+    await ref.read(workoutForegroundServiceProvider).stop();
   }
 
   /// Starts a fresh countdown, replacing any live one (§8.3 auto-cancel rule:
@@ -88,6 +126,7 @@ class RestTimerController extends _$RestTimerController {
       remainingSeconds: newRemaining,
     );
     _syncNotification();
+    _syncForegroundRest(state.endsAtEpochMs);
   }
 
   /// Stops the countdown and clears its notification instantly (§8.3: no
@@ -95,6 +134,7 @@ class RestTimerController extends _$RestTimerController {
   void cancel() {
     _stopTicking();
     unawaited(ref.read(notificationServiceProvider).cancelRestNotification());
+    _syncForegroundRest(null);
     state = RestTimerState(needsPermissionPrimer: state.needsPermissionPrimer);
   }
 
@@ -134,6 +174,7 @@ class RestTimerController extends _$RestTimerController {
 
     // UI/notification refresh ticks only — values come from the epoch deadline.
     _tickSub = Stream<void>.periodic(const Duration(seconds: 1)).listen((_) => _onTick());
+    _syncForegroundRest(state.endsAtEpochMs);
     unawaited(_maybePrimeNotifications());
   }
 
@@ -163,6 +204,7 @@ class RestTimerController extends _$RestTimerController {
     final notifications = ref.read(notificationServiceProvider);
     unawaited(notifications.cancelRestNotification());
     unawaited(notifications.showRestComplete());
+    _syncForegroundRest(null);
     state = RestTimerState(needsPermissionPrimer: state.needsPermissionPrimer);
   }
 
@@ -172,6 +214,12 @@ class RestTimerController extends _$RestTimerController {
     final remainingMs = endsAt - clock().millisecondsSinceEpoch;
     if (remainingMs <= 0) return 0;
     return (remainingMs / 1000).ceil();
+  }
+
+  /// Mirrors the live rest deadline onto the foreground-service notification
+  /// (WU-3.10) — re-render on state change only, no extra loops (L8).
+  void _syncForegroundRest(int? endsAtEpochMs) {
+    unawaited(ref.read(workoutForegroundServiceProvider).updateRest(endsAtEpochMs));
   }
 
   /// Just-in-time priming (FEATURES.md §3): while the permission decision is

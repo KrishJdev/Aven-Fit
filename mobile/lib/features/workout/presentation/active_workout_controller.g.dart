@@ -12,6 +12,11 @@ part of 'active_workout_controller.dart';
 ///
 /// Disallows legacy ChangeNotifier and two-way binding. Every state mutation produces
 /// an immutable new state and initiates asynchronous write-through to SQLite.
+///
+/// WU-3.10: the session lifecycle is mirrored onto the Android foreground
+/// service — started/restored when a session becomes active, updated on
+/// pause/resume/rename, stopped on finish/discard — so the lock-screen
+/// notification always mirrors app state (L7/L8).
 
 @ProviderFor(ActiveWorkoutController)
 final activeWorkoutControllerProvider = ActiveWorkoutControllerProvider._();
@@ -20,6 +25,11 @@ final activeWorkoutControllerProvider = ActiveWorkoutControllerProvider._();
 ///
 /// Disallows legacy ChangeNotifier and two-way binding. Every state mutation produces
 /// an immutable new state and initiates asynchronous write-through to SQLite.
+///
+/// WU-3.10: the session lifecycle is mirrored onto the Android foreground
+/// service — started/restored when a session becomes active, updated on
+/// pause/resume/rename, stopped on finish/discard — so the lock-screen
+/// notification always mirrors app state (L7/L8).
 final class ActiveWorkoutControllerProvider
     extends
         $AsyncNotifierProvider<ActiveWorkoutController, ActiveWorkoutState> {
@@ -27,6 +37,11 @@ final class ActiveWorkoutControllerProvider
   ///
   /// Disallows legacy ChangeNotifier and two-way binding. Every state mutation produces
   /// an immutable new state and initiates asynchronous write-through to SQLite.
+  ///
+  /// WU-3.10: the session lifecycle is mirrored onto the Android foreground
+  /// service — started/restored when a session becomes active, updated on
+  /// pause/resume/rename, stopped on finish/discard — so the lock-screen
+  /// notification always mirrors app state (L7/L8).
   ActiveWorkoutControllerProvider._()
     : super(
         from: null,
@@ -47,12 +62,17 @@ final class ActiveWorkoutControllerProvider
 }
 
 String _$activeWorkoutControllerHash() =>
-    r'bf9c4637e18b6838d3319cc35e8001e3274c37ac';
+    r'bd35d84168c03b2d86ec0fb1796dbb5dc616990f';
 
 /// Riverpod AsyncNotifier managing the unidirectional state updates for an active workout.
 ///
 /// Disallows legacy ChangeNotifier and two-way binding. Every state mutation produces
 /// an immutable new state and initiates asynchronous write-through to SQLite.
+///
+/// WU-3.10: the session lifecycle is mirrored onto the Android foreground
+/// service — started/restored when a session becomes active, updated on
+/// pause/resume/rename, stopped on finish/discard — so the lock-screen
+/// notification always mirrors app state (L7/L8).
 
 abstract class _$ActiveWorkoutController
     extends $AsyncNotifier<ActiveWorkoutState> {

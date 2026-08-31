@@ -19,6 +19,12 @@ part of 'rest_timer_controller.dart';
 /// replaces any live one, [cancel] clears it instantly, and warm-up sets
 /// never trigger rest. Keep-alive so the countdown survives navigation to
 /// the exercise picker or other tabs while the session stays active.
+///
+/// WU-3.10: the controller also owns the foreground-service notification
+/// actions (it is the keep-alive session-scope component): "+15s" adjusts
+/// the countdown, "Finish Workout" completes the active session
+/// (write-through, L7) and stops the service. Rest deadlines are pushed to
+/// the service on every change so the lock-screen notification stays live.
 
 @ProviderFor(RestTimerController)
 final restTimerControllerProvider = RestTimerControllerProvider._();
@@ -34,6 +40,12 @@ final restTimerControllerProvider = RestTimerControllerProvider._();
 /// replaces any live one, [cancel] clears it instantly, and warm-up sets
 /// never trigger rest. Keep-alive so the countdown survives navigation to
 /// the exercise picker or other tabs while the session stays active.
+///
+/// WU-3.10: the controller also owns the foreground-service notification
+/// actions (it is the keep-alive session-scope component): "+15s" adjusts
+/// the countdown, "Finish Workout" completes the active session
+/// (write-through, L7) and stops the service. Rest deadlines are pushed to
+/// the service on every change so the lock-screen notification stays live.
 final class RestTimerControllerProvider
     extends $NotifierProvider<RestTimerController, RestTimerState> {
   /// Epoch-based rest countdown controller (WU-3.5, FEATURES.md §8.3).
@@ -47,6 +59,12 @@ final class RestTimerControllerProvider
   /// replaces any live one, [cancel] clears it instantly, and warm-up sets
   /// never trigger rest. Keep-alive so the countdown survives navigation to
   /// the exercise picker or other tabs while the session stays active.
+  ///
+  /// WU-3.10: the controller also owns the foreground-service notification
+  /// actions (it is the keep-alive session-scope component): "+15s" adjusts
+  /// the countdown, "Finish Workout" completes the active session
+  /// (write-through, L7) and stops the service. Rest deadlines are pushed to
+  /// the service on every change so the lock-screen notification stays live.
   RestTimerControllerProvider._()
     : super(
         from: null,
@@ -75,7 +93,7 @@ final class RestTimerControllerProvider
 }
 
 String _$restTimerControllerHash() =>
-    r'd6574c85700b200abd60fe0771206ab0dc900ebc';
+    r'04188416fea20deddd3469238f606905f073a996';
 
 /// Epoch-based rest countdown controller (WU-3.5, FEATURES.md §8.3).
 ///
@@ -88,6 +106,12 @@ String _$restTimerControllerHash() =>
 /// replaces any live one, [cancel] clears it instantly, and warm-up sets
 /// never trigger rest. Keep-alive so the countdown survives navigation to
 /// the exercise picker or other tabs while the session stays active.
+///
+/// WU-3.10: the controller also owns the foreground-service notification
+/// actions (it is the keep-alive session-scope component): "+15s" adjusts
+/// the countdown, "Finish Workout" completes the active session
+/// (write-through, L7) and stops the service. Rest deadlines are pushed to
+/// the service on every change so the lock-screen notification stays live.
 
 abstract class _$RestTimerController extends $Notifier<RestTimerState> {
   RestTimerState build();

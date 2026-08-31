@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/services/workout_foreground_service.dart';
 import '../../progress/data/pr_repository.dart';
 import '../data/workout_repository.dart';
 import '../domain/session_exercise.dart';
+import '../domain/workout_session.dart';
 import '../domain/workout_set.dart';
 import 'active_workout_state.dart';
 import 'rest_timer_controller.dart';
@@ -15,6 +17,11 @@ part 'active_workout_controller.g.dart';
 ///
 /// Disallows legacy ChangeNotifier and two-way binding. Every state mutation produces
 /// an immutable new state and initiates asynchronous write-through to SQLite.
+///
+/// WU-3.10: the session lifecycle is mirrored onto the Android foreground
+/// service — started/restored when a session becomes active, updated on
+/// pause/resume/rename, stopped on finish/discard — so the lock-screen
+/// notification always mirrors app state (L7/L8).
 @riverpod
 class ActiveWorkoutController extends _$ActiveWorkoutController {
   static int _setCounter = 0;
@@ -29,13 +36,15 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
       // from SQLite, so a force-kill mid-session loses nothing.
       final exercises = await repository.getSessionExercises(activeSession.id);
       final flatSets = exercises.expand((e) => e.sets).toList();
-      return ActiveWorkoutState(
+      final state = ActiveWorkoutState(
         session: activeSession,
         exercises: exercises,
         sets: flatSets,
         elapsedSeconds: activeSession.elapsedSecondsNow(),
         wasRestored: true,
       );
+      _syncForegroundStart(activeSession);
+      return state;
     }
 
     return const ActiveWorkoutState(session: null);
@@ -53,6 +62,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
         name: name,
         routineId: routineId,
       );
+      _syncForegroundStart(newSession);
       return ActiveWorkoutState(
         session: newSession,
         exercises: const [],
@@ -325,6 +335,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
     final repository = ref.read(workoutRepositoryProvider);
     await repository.renameSession(current.session!.id, trimmed);
+    _syncForegroundSession(updatedSession);
   }
 
   /// Pauses the session timer (§8.1): freezes elapsed time at the pause
@@ -342,6 +353,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
       session: updatedSession,
       elapsedSeconds: updatedSession.elapsedSecondsNow(),
     ));
+    _syncForegroundSession(updatedSession);
   }
 
   /// Resumes the session timer (§8.1): folds the pause span into
@@ -358,6 +370,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
       session: updatedSession,
       elapsedSeconds: updatedSession.elapsedSecondsNow(),
     ));
+    _syncForegroundSession(updatedSession);
   }
 
   /// Dismisses the "Workout resumed" restore banner (§8.1 states).
@@ -460,6 +473,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     state = await AsyncValue.guard(() async {
       final repository = ref.read(workoutRepositoryProvider);
       await repository.finishWorkout(sessionId, durationSeconds: elapsedSeconds);
+      unawaited(ref.read(workoutForegroundServiceProvider).stop());
       return const ActiveWorkoutState(
         session: null,
         exercises: [],
@@ -479,11 +493,36 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     state = await AsyncValue.guard(() async {
       final repository = ref.read(workoutRepositoryProvider);
       await repository.cancelWorkout(current.session!.id);
+      unawaited(ref.read(workoutForegroundServiceProvider).stop());
       return const ActiveWorkoutState(
         session: null,
         exercises: [],
         sets: [],
       );
     });
+  }
+
+  /// Starts (or re-syncs) the foreground-service notification for a session
+  /// that just became active — creation or launch-time restore (WU-3.10).
+  void _syncForegroundStart(WorkoutSession session) {
+    unawaited(ref.read(workoutForegroundServiceProvider).startSession(
+          workoutName: session.name,
+          startedAtMs: session.startedAt.millisecondsSinceEpoch,
+          isPaused: session.isPaused,
+          pausedDurationMs: session.pausedDurationSeconds * 1000,
+          lastResumedAtMs: session.lastResumedAt?.millisecondsSinceEpoch ?? 0,
+        ));
+  }
+
+  /// Mirrors pause/resume/rename state changes onto the service
+  /// (absent rest fields keep the live countdown untouched).
+  void _syncForegroundSession(WorkoutSession session) {
+    unawaited(ref.read(workoutForegroundServiceProvider).updateSession(
+          workoutName: session.name,
+          startedAtMs: session.startedAt.millisecondsSinceEpoch,
+          isPaused: session.isPaused,
+          pausedDurationMs: session.pausedDurationSeconds * 1000,
+          lastResumedAtMs: session.lastResumedAt?.millisecondsSinceEpoch ?? 0,
+        ));
   }
 }
