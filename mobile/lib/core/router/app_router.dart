@@ -9,6 +9,7 @@ import 'package:aven_fit/features/routine/presentation/routines_screen.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_screen.dart';
 import 'package:aven_fit/features/workout/presentation/exercise_picker_screen.dart';
 import 'package:aven_fit/features/workout/presentation/home_screen.dart';
+import 'package:aven_fit/features/workout/presentation/workout_summary_screen.dart';
 import 'package:go_router/go_router.dart';
 
 /// Declarative navigation (GoRouter). The shell hosts the four main
@@ -44,6 +45,12 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/workout/active',
       builder: (context, state) => const ActiveWorkoutScreen(),
+    ),
+    GoRoute(
+      path: '/workout/summary/:id',
+      builder: (context, state) => WorkoutSummaryScreen(
+        sessionId: state.pathParameters['id']!,
+      ),
     ),
     GoRoute(
       path: '/workout/picker',

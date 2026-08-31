@@ -288,20 +288,19 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     await repository.deleteSet(setId);
   }
 
-  /// Updates the name of the active workout session.
+  /// Updates the name of the active workout session with SQLite write-through (L7).
   Future<void> updateWorkoutName(String newName) async {
     final current = state.value;
     if (current == null || current.session == null) return;
 
-    final updatedSession = current.session!.copyWith(name: newName);
+    final trimmed = newName.trim();
+    if (trimmed.isEmpty) return;
+
+    final updatedSession = current.session!.copyWith(name: trimmed);
     state = AsyncValue.data(current.copyWith(session: updatedSession));
 
     final repository = ref.read(workoutRepositoryProvider);
-    // Persist to SQLite
-    final active = await repository.getActiveSession();
-    if (active != null) {
-      await (repository as dynamic); // Update via repository if supported or direct state sync
-    }
+    await repository.renameSession(current.session!.id, trimmed);
   }
 
   /// Updates set values (weight, reps, rpe, type) with instant write-through.
@@ -381,22 +380,26 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     }
   }
 
-  /// Finishes the active workout session.
-  Future<void> finishWorkout() async {
+  /// Finishes the active workout session and returns its id so the screen can
+  /// navigate to the Workout Summary (§8.5). Returns null when there was
+  /// nothing to finish or the write-through failed.
+  Future<String?> finishWorkout() async {
     final current = state.value;
-    if (current == null || current.session == null) return;
+    if (current == null || current.session == null) return null;
 
+    final sessionId = current.session!.id;
     ref.read(restTimerControllerProvider.notifier).cancel();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repository = ref.read(workoutRepositoryProvider);
-      await repository.finishWorkout(current.session!.id);
+      await repository.finishWorkout(sessionId);
       return const ActiveWorkoutState(
         session: null,
         exercises: [],
         sets: [],
       );
     });
+    return state.hasValue ? sessionId : null;
   }
 
   /// Discards/cancels the active workout session.

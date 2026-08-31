@@ -46,6 +46,8 @@ abstract class WorkoutRepository {
     int? durationSeconds,
     String? notes,
   });
+  Future<void> renameSession(String sessionId, String name);
+  Future<int> getCompletedWorkoutCountSince(DateTime since);
   Future<void> cancelWorkout(String sessionId);
 }
 
@@ -266,6 +268,16 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
   @override
   Future<void> cancelWorkout(String sessionId) async {
     await _dao.discardSession(sessionId);
+  }
+
+  @override
+  Future<void> renameSession(String sessionId, String name) {
+    return _dao.renameSession(sessionId, name);
+  }
+
+  @override
+  Future<int> getCompletedWorkoutCountSince(DateTime since) {
+    return _dao.getCompletedSessionCountSince(since);
   }
 
   WorkoutSession _mapRowToSession(WorkoutSessionRow row) {

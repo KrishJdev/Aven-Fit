@@ -275,6 +275,28 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
     );
   }
 
+  /// Renames a session in place (inline rename write-through, Law L7).
+  Future<int> renameSession(String id, String name) {
+    return (update(workoutSessions)..where((tbl) => tbl.id.equals(id))).write(
+      WorkoutSessionsCompanion(
+        name: Value(name),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Counts completed workouts started on or after [since] — the basis of the
+  /// forgiving weekly streak badge (FEATURES.md §10 / §17).
+  Future<int> getCompletedSessionCountSince(DateTime since) async {
+    final countExp = countAll();
+    final query = selectOnly(workoutSessions)
+      ..addColumns([countExp])
+      ..where(workoutSessions.status.equals('completed') &
+          workoutSessions.startedAt.isBiggerOrEqualValue(since));
+    final row = await query.getSingle();
+    return row.read(countExp) ?? 0;
+  }
+
   /// Adds an exercise to an active session.
   Future<void> addExerciseToSession({
     required String id,

@@ -527,9 +527,12 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             child: const Text('RESUME', style: TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
-              controller.finishWorkout();
+              final finishedSessionId = await controller.finishWorkout();
+              if (finishedSessionId != null && context.mounted) {
+                context.go('/workout/summary/$finishedSessionId');
+              }
             },
             style: FilledButton.styleFrom(backgroundColor: AppTheme.voltGreen, foregroundColor: Colors.black),
             child: const Text('FINISH & SAVE'),
