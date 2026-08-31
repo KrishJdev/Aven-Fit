@@ -56,17 +56,19 @@ To avoid schema drift and detached APIs, the project follows a strict **Vertical
 
 ## Before Every Task
 
-Every agent MUST perform these checks before starting significant work:
+Every agent MUST perform these baseline checks before starting work:
 
 ```
-1. Read AGENTS.md           (this file — check for protocol updates)
-2. Read HANDOFF.md          (understand current sprint, milestone & active tasks)
-3. Read FEATURES.md         (understand product specs, screen maps & phase priorities)
-4. Read ARCHITECTURE.md     (understand layer anatomy, code patterns & conventions)
-5. Run: git status           (check for uncommitted work)
-6. Run: git log --oneline -5 (understand recent commits)
-7. Inspect current code      (do not assume prior understanding is current)
+1. Read AGENTS.md           (check protocol updates & stack laws)
+2. Read HANDOFF.md          (understand current sprint, active milestone & next tasks)
+3. Run: git status           (check for uncommitted work)
+4. Run: git log --oneline -5 (understand recent commits)
+5. Inspect current code      (do not assume prior understanding is current)
 ```
+
+**Context Documents (Consult As Needed):**
+- **`ARCHITECTURE.md`:** Consult when starting new feature slices, implementing layers (`domain`/`data`/`presentation`), adding Drift tables/DAOs, creating Riverpod stores, or building backend APIs. Skip for isolated bug fixes or minor tweaks to conserve tokens.
+- **`FEATURES.md`:** Consult for feature specifications, screen UX layouts, and phase priorities (`[P0]`, `[P1]`, `[V1.1]`).
 
 > [!IMPORTANT]
 > **Archive Quarantine Rule:**  
