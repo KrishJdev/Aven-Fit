@@ -21,6 +21,13 @@
 
 ---
 
+## 📚 Documentation & Architecture
+
+- [**`ARCHITECTURE.md`**](ARCHITECTURE.md) — Feature-First Clean Architecture blueprint, layer contracts, data flow diagrams & implementation templates.
+- [**`FEATURES.md`**](FEATURES.md) — Detailed feature specifications, screen layouts, and Phase build priorities (`[P0]` $\rightarrow$ `[P1]` $\rightarrow$ `[V1.1]`).
+- [**`AGENTS.md`**](AGENTS.md) — Multi-agent collaboration protocol, 10 Stack Laws, and coding guardrails.
+- [**`HANDOFF.md`**](HANDOFF.md) — Active session memory, vertical slice milestones, and real-time sprint state.
+
 ## ✨ Key Features
 
 ### 🏋️‍♂️ 1. Workout & Routine Logging

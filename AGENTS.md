@@ -62,14 +62,15 @@ Every agent MUST perform these checks before starting significant work:
 1. Read AGENTS.md           (this file — check for protocol updates)
 2. Read HANDOFF.md          (understand current sprint, milestone & active tasks)
 3. Read FEATURES.md         (understand product specs, screen maps & phase priorities)
-4. Run: git status           (check for uncommitted work)
-5. Run: git log --oneline -5 (understand recent commits)
-6. Inspect current code      (do not assume prior understanding is current)
+4. Read ARCHITECTURE.md     (understand layer anatomy, code patterns & conventions)
+5. Run: git status           (check for uncommitted work)
+6. Run: git log --oneline -5 (understand recent commits)
+7. Inspect current code      (do not assume prior understanding is current)
 ```
 
 > [!IMPORTANT]
 > **Archive Quarantine Rule:**  
-> Files in `docs/archive/` and `archive/` are strictly historical archives. Agents must **NEVER read, reference, cite, or base any implementation on files in `docs/archive/` or `archive/`** unless the user explicitly requests historical context. Active development relies solely on `FEATURES.md`, `AGENTS.md`, `HANDOFF.md`, and `README.md`.
+> Files in `docs/archive/` and `archive/` are strictly historical archives. Agents must **NEVER read, reference, cite, or base any implementation on files in `docs/archive/` or `archive/`** unless the user explicitly requests historical context. Active development relies solely on `FEATURES.md`, `ARCHITECTURE.md`, `AGENTS.md`, `HANDOFF.md`, and `README.md`.
 
 **Never assume your previous context is still accurate.**
 
@@ -148,6 +149,7 @@ Agents communicate through the repository:
 |:---|:---|
 | `HANDOFF.md` | Session memory, status updates, decisions, known issues |
 | `AGENTS.md` | Protocol updates & architecture rules (this file) |
+| `ARCHITECTURE.md` | System design, layer anatomy, data flow diagrams & code patterns |
 | `FEATURES.md` | Feature specifications, screen maps, and phase alignment |
 | Git commit messages | Change documentation |
 | Code comments | Implementation context |
