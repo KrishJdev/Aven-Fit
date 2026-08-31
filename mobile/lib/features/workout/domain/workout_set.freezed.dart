@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutSet {
 
- String get id; String get sessionId; String get exerciseId; int get setNumber; double get weightKg; int get reps; bool get isCompleted; SetType get type; double? get rpe;
+ String get id; String get sessionId; String get sessionExerciseId; String? get exerciseId; int get setNumber; double get weightKg; int get reps; bool get isCompleted; SetType get type; double? get rpe; DateTime? get completedAt; bool get isPr; String? get notes; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of WorkoutSet
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $WorkoutSetCopyWith<WorkoutSet> get copyWith => _$WorkoutSetCopyWithImpl<Workout
 @override
 bool operator ==(Object other) {
   final _this = this as WorkoutSet;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutSet&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.sessionId, _this.sessionId) || other.sessionId == _this.sessionId)&&(identical(other.exerciseId, _this.exerciseId) || other.exerciseId == _this.exerciseId)&&(identical(other.setNumber, _this.setNumber) || other.setNumber == _this.setNumber)&&(identical(other.weightKg, _this.weightKg) || other.weightKg == _this.weightKg)&&(identical(other.reps, _this.reps) || other.reps == _this.reps)&&(identical(other.isCompleted, _this.isCompleted) || other.isCompleted == _this.isCompleted)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.rpe, _this.rpe) || other.rpe == _this.rpe));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutSet&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.sessionId, _this.sessionId) || other.sessionId == _this.sessionId)&&(identical(other.sessionExerciseId, _this.sessionExerciseId) || other.sessionExerciseId == _this.sessionExerciseId)&&(identical(other.exerciseId, _this.exerciseId) || other.exerciseId == _this.exerciseId)&&(identical(other.setNumber, _this.setNumber) || other.setNumber == _this.setNumber)&&(identical(other.weightKg, _this.weightKg) || other.weightKg == _this.weightKg)&&(identical(other.reps, _this.reps) || other.reps == _this.reps)&&(identical(other.isCompleted, _this.isCompleted) || other.isCompleted == _this.isCompleted)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.rpe, _this.rpe) || other.rpe == _this.rpe)&&(identical(other.completedAt, _this.completedAt) || other.completedAt == _this.completedAt)&&(identical(other.isPr, _this.isPr) || other.isPr == _this.isPr)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as WorkoutSet;
-  return Object.hash(runtimeType,_this.id,_this.sessionId,_this.exerciseId,_this.setNumber,_this.weightKg,_this.reps,_this.isCompleted,_this.type,_this.rpe);
+  return Object.hash(runtimeType,_this.id,_this.sessionId,_this.sessionExerciseId,_this.exerciseId,_this.setNumber,_this.weightKg,_this.reps,_this.isCompleted,_this.type,_this.rpe,_this.completedAt,_this.isPr,_this.notes,_this.createdAt,_this.updatedAt);
 }
 
 @override
 String toString() {
   final _this = this as WorkoutSet;
-  return 'WorkoutSet(id: ${_this.id}, sessionId: ${_this.sessionId}, exerciseId: ${_this.exerciseId}, setNumber: ${_this.setNumber}, weightKg: ${_this.weightKg}, reps: ${_this.reps}, isCompleted: ${_this.isCompleted}, type: ${_this.type}, rpe: ${_this.rpe})';
+  return 'WorkoutSet(id: ${_this.id}, sessionId: ${_this.sessionId}, sessionExerciseId: ${_this.sessionExerciseId}, exerciseId: ${_this.exerciseId}, setNumber: ${_this.setNumber}, weightKg: ${_this.weightKg}, reps: ${_this.reps}, isCompleted: ${_this.isCompleted}, type: ${_this.type}, rpe: ${_this.rpe}, completedAt: ${_this.completedAt}, isPr: ${_this.isPr}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $WorkoutSetCopyWith<$Res>  {
   factory $WorkoutSetCopyWith(WorkoutSet value, $Res Function(WorkoutSet) _then) = _$WorkoutSetCopyWithImpl;
 @useResult
 $Res call({
- String id, String sessionId, String exerciseId, int setNumber, double weightKg, int reps, bool isCompleted, SetType type, double? rpe
+ String id, String sessionId, String sessionExerciseId, String? exerciseId, int setNumber, double weightKg, int reps, bool isCompleted, SetType type, double? rpe, DateTime? completedAt, bool isPr, String? notes, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -71,18 +71,24 @@ class _$WorkoutSetCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutSet
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sessionId = null,Object? exerciseId = null,Object? setNumber = null,Object? weightKg = null,Object? reps = null,Object? isCompleted = null,Object? type = null,Object? rpe = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? sessionId = null,Object? sessionExerciseId = null,Object? exerciseId = freezed,Object? setNumber = null,Object? weightKg = null,Object? reps = null,Object? isCompleted = null,Object? type = null,Object? rpe = freezed,Object? completedAt = freezed,Object? isPr = null,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(WorkoutSet(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sessionId: null == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
-as String,exerciseId: null == exerciseId ? _self.exerciseId : exerciseId // ignore: cast_nullable_to_non_nullable
-as String,setNumber: null == setNumber ? _self.setNumber : setNumber // ignore: cast_nullable_to_non_nullable
+as String,sessionExerciseId: null == sessionExerciseId ? _self.sessionExerciseId : sessionExerciseId // ignore: cast_nullable_to_non_nullable
+as String,exerciseId: freezed == exerciseId ? _self.exerciseId : exerciseId // ignore: cast_nullable_to_non_nullable
+as String?,setNumber: null == setNumber ? _self.setNumber : setNumber // ignore: cast_nullable_to_non_nullable
 as int,weightKg: null == weightKg ? _self.weightKg : weightKg // ignore: cast_nullable_to_non_nullable
 as double,reps: null == reps ? _self.reps : reps // ignore: cast_nullable_to_non_nullable
 as int,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
 as bool,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as SetType,rpe: freezed == rpe ? _self.rpe : rpe // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,isPr: null == isPr ? _self.isPr : isPr // ignore: cast_nullable_to_non_nullable
+as bool,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -167,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String sessionId,  String exerciseId,  int setNumber,  double weightKg,  int reps,  bool isCompleted,  SetType type,  double? rpe)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String sessionId,  String sessionExerciseId,  String? exerciseId,  int setNumber,  double weightKg,  int reps,  bool isCompleted,  SetType type,  double? rpe,  DateTime? completedAt,  bool isPr,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutSet() when $default != null:
-return $default(_that.id,_that.sessionId,_that.exerciseId,_that.setNumber,_that.weightKg,_that.reps,_that.isCompleted,_that.type,_that.rpe);case _:
+return $default(_that.id,_that.sessionId,_that.sessionExerciseId,_that.exerciseId,_that.setNumber,_that.weightKg,_that.reps,_that.isCompleted,_that.type,_that.rpe,_that.completedAt,_that.isPr,_that.notes,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -188,10 +194,10 @@ return $default(_that.id,_that.sessionId,_that.exerciseId,_that.setNumber,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String sessionId,  String exerciseId,  int setNumber,  double weightKg,  int reps,  bool isCompleted,  SetType type,  double? rpe)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String sessionId,  String sessionExerciseId,  String? exerciseId,  int setNumber,  double weightKg,  int reps,  bool isCompleted,  SetType type,  double? rpe,  DateTime? completedAt,  bool isPr,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutSet():
-return $default(_that.id,_that.sessionId,_that.exerciseId,_that.setNumber,_that.weightKg,_that.reps,_that.isCompleted,_that.type,_that.rpe);case _:
+return $default(_that.id,_that.sessionId,_that.sessionExerciseId,_that.exerciseId,_that.setNumber,_that.weightKg,_that.reps,_that.isCompleted,_that.type,_that.rpe,_that.completedAt,_that.isPr,_that.notes,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -208,10 +214,10 @@ return $default(_that.id,_that.sessionId,_that.exerciseId,_that.setNumber,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String sessionId,  String exerciseId,  int setNumber,  double weightKg,  int reps,  bool isCompleted,  SetType type,  double? rpe)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String sessionId,  String sessionExerciseId,  String? exerciseId,  int setNumber,  double weightKg,  int reps,  bool isCompleted,  SetType type,  double? rpe,  DateTime? completedAt,  bool isPr,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutSet() when $default != null:
-return $default(_that.id,_that.sessionId,_that.exerciseId,_that.setNumber,_that.weightKg,_that.reps,_that.isCompleted,_that.type,_that.rpe);case _:
+return $default(_that.id,_that.sessionId,_that.sessionExerciseId,_that.exerciseId,_that.setNumber,_that.weightKg,_that.reps,_that.isCompleted,_that.type,_that.rpe,_that.completedAt,_that.isPr,_that.notes,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -223,18 +229,24 @@ return $default(_that.id,_that.sessionId,_that.exerciseId,_that.setNumber,_that.
 @JsonSerializable()
 
 class _WorkoutSet implements WorkoutSet {
-  const _WorkoutSet({required this.id, required this.sessionId, required this.exerciseId, required this.setNumber, required this.weightKg, required this.reps, this.isCompleted = false, this.type = SetType.normal, this.rpe});
+  const _WorkoutSet({required this.id, required this.sessionId, required this.sessionExerciseId, this.exerciseId, required this.setNumber, required this.weightKg, required this.reps, this.isCompleted = false, this.type = SetType.normal, this.rpe, this.completedAt, this.isPr = false, this.notes, this.createdAt, this.updatedAt});
   factory _WorkoutSet.fromJson(Map<String, dynamic> json) => _$WorkoutSetFromJson(json);
 
 @override final  String id;
 @override final  String sessionId;
-@override final  String exerciseId;
+@override final  String sessionExerciseId;
+@override final  String? exerciseId;
 @override final  int setNumber;
 @override final  double weightKg;
 @override final  int reps;
 @override@JsonKey() final  bool isCompleted;
 @override@JsonKey() final  SetType type;
 @override final  double? rpe;
+@override final  DateTime? completedAt;
+@override@JsonKey() final  bool isPr;
+@override final  String? notes;
+@override final  DateTime? createdAt;
+@override final  DateTime? updatedAt;
 
 /// Create a copy of WorkoutSet
 /// with the given fields replaced by the non-null parameter values.
@@ -249,18 +261,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutSet&&(identical(other.id, id) || other.id == id)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.exerciseId, exerciseId) || other.exerciseId == exerciseId)&&(identical(other.setNumber, setNumber) || other.setNumber == setNumber)&&(identical(other.weightKg, weightKg) || other.weightKg == weightKg)&&(identical(other.reps, reps) || other.reps == reps)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted)&&(identical(other.type, type) || other.type == type)&&(identical(other.rpe, rpe) || other.rpe == rpe));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutSet&&(identical(other.id, id) || other.id == id)&&(identical(other.sessionId, sessionId) || other.sessionId == sessionId)&&(identical(other.sessionExerciseId, sessionExerciseId) || other.sessionExerciseId == sessionExerciseId)&&(identical(other.exerciseId, exerciseId) || other.exerciseId == exerciseId)&&(identical(other.setNumber, setNumber) || other.setNumber == setNumber)&&(identical(other.weightKg, weightKg) || other.weightKg == weightKg)&&(identical(other.reps, reps) || other.reps == reps)&&(identical(other.isCompleted, isCompleted) || other.isCompleted == isCompleted)&&(identical(other.type, type) || other.type == type)&&(identical(other.rpe, rpe) || other.rpe == rpe)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt)&&(identical(other.isPr, isPr) || other.isPr == isPr)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,sessionId,exerciseId,setNumber,weightKg,reps,isCompleted,type,rpe);
+    return Object.hash(runtimeType,id,sessionId,sessionExerciseId,exerciseId,setNumber,weightKg,reps,isCompleted,type,rpe,completedAt,isPr,notes,createdAt,updatedAt);
 }
 
 @override
 String toString() {
-    return 'WorkoutSet(id: $id, sessionId: $sessionId, exerciseId: $exerciseId, setNumber: $setNumber, weightKg: $weightKg, reps: $reps, isCompleted: $isCompleted, type: $type, rpe: $rpe)';
+    return 'WorkoutSet(id: $id, sessionId: $sessionId, sessionExerciseId: $sessionExerciseId, exerciseId: $exerciseId, setNumber: $setNumber, weightKg: $weightKg, reps: $reps, isCompleted: $isCompleted, type: $type, rpe: $rpe, completedAt: $completedAt, isPr: $isPr, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -271,7 +283,7 @@ abstract mixin class _$WorkoutSetCopyWith<$Res> implements $WorkoutSetCopyWith<$
   factory _$WorkoutSetCopyWith(_WorkoutSet value, $Res Function(_WorkoutSet) _then) = __$WorkoutSetCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String sessionId, String exerciseId, int setNumber, double weightKg, int reps, bool isCompleted, SetType type, double? rpe
+ String id, String sessionId, String sessionExerciseId, String? exerciseId, int setNumber, double weightKg, int reps, bool isCompleted, SetType type, double? rpe, DateTime? completedAt, bool isPr, String? notes, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -288,18 +300,24 @@ class __$WorkoutSetCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutSet
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sessionId = null,Object? exerciseId = null,Object? setNumber = null,Object? weightKg = null,Object? reps = null,Object? isCompleted = null,Object? type = null,Object? rpe = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? sessionId = null,Object? sessionExerciseId = null,Object? exerciseId = freezed,Object? setNumber = null,Object? weightKg = null,Object? reps = null,Object? isCompleted = null,Object? type = null,Object? rpe = freezed,Object? completedAt = freezed,Object? isPr = null,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_WorkoutSet(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,sessionId: null == sessionId ? _self.sessionId : sessionId // ignore: cast_nullable_to_non_nullable
-as String,exerciseId: null == exerciseId ? _self.exerciseId : exerciseId // ignore: cast_nullable_to_non_nullable
-as String,setNumber: null == setNumber ? _self.setNumber : setNumber // ignore: cast_nullable_to_non_nullable
+as String,sessionExerciseId: null == sessionExerciseId ? _self.sessionExerciseId : sessionExerciseId // ignore: cast_nullable_to_non_nullable
+as String,exerciseId: freezed == exerciseId ? _self.exerciseId : exerciseId // ignore: cast_nullable_to_non_nullable
+as String?,setNumber: null == setNumber ? _self.setNumber : setNumber // ignore: cast_nullable_to_non_nullable
 as int,weightKg: null == weightKg ? _self.weightKg : weightKg // ignore: cast_nullable_to_non_nullable
 as double,reps: null == reps ? _self.reps : reps // ignore: cast_nullable_to_non_nullable
 as int,isCompleted: null == isCompleted ? _self.isCompleted : isCompleted // ignore: cast_nullable_to_non_nullable
 as bool,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as SetType,rpe: freezed == rpe ? _self.rpe : rpe // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,isPr: null == isPr ? _self.isPr : isPr // ignore: cast_nullable_to_non_nullable
+as bool,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

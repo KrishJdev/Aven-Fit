@@ -18,6 +18,7 @@ part 'app_database.g.dart';
 @DriftDatabase(
   tables: [
     WorkoutSessions,
+    SessionExercises,
     WorkoutSets,
     MuscleGroups,
     Exercises,
@@ -33,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -50,6 +51,9 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(routines);
             await m.createTable(routineExercises);
             await m.createTable(routineSets);
+          }
+          if (from < 4) {
+            await m.createTable(sessionExercises);
           }
         },
         beforeOpen: (details) async {

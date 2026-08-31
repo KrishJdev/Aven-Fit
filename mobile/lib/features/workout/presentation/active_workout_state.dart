@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../domain/session_exercise.dart';
 import '../domain/workout_session.dart';
 import '../domain/workout_set.dart';
 
@@ -12,6 +13,7 @@ part 'active_workout_state.freezed.dart';
 abstract class ActiveWorkoutState with _$ActiveWorkoutState {
   const factory ActiveWorkoutState({
     required WorkoutSession? session,
+    @Default(<SessionExercise>[]) List<SessionExercise> exercises,
     @Default(<WorkoutSet>[]) List<WorkoutSet> sets,
     @Default(0) int elapsedSeconds,
     @Default(false) bool isRestTimerRunning,
@@ -28,10 +30,17 @@ abstract class ActiveWorkoutState with _$ActiveWorkoutState {
       session != null && session?.status == WorkoutStatus.active;
 
   /// Count of completed sets in the active session.
-  int get completedSetsCount => sets.where((s) => s.isCompleted).length;
+  int get completedSetsCount => sets.isNotEmpty
+      ? sets.where((s) => s.isCompleted).length
+      : exercises.fold<int>(0, (sum, e) => sum + e.completedSetsCount);
 
   /// Total working volume lifted in kg (excluding warmup sets per Law L1).
-  double get totalVolumeKg => sets
-      .where((s) => s.isCompleted && s.type != SetType.warmup)
-      .fold<double>(0.0, (sum, s) => sum + (s.weightKg * s.reps));
+  double get totalVolumeKg => sets.isNotEmpty
+      ? sets
+          .where((s) => s.isCompleted && s.type != SetType.warmup)
+          .fold<double>(0.0, (sum, s) => sum + (s.weightKg * s.reps))
+      : exercises.fold<double>(0.0, (sum, e) => sum + e.totalVolumeKg);
+
+  /// Total number of exercises in the active session.
+  int get exerciseCount => exercises.length;
 }

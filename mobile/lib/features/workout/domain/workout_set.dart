@@ -19,13 +19,19 @@ abstract class WorkoutSet with _$WorkoutSet {
   const factory WorkoutSet({
     required String id,
     required String sessionId,
-    required String exerciseId,
+    required String sessionExerciseId,
+    String? exerciseId,
     required int setNumber,
     required double weightKg,
     required int reps,
     @Default(false) bool isCompleted,
     @Default(SetType.normal) SetType type,
     double? rpe,
+    DateTime? completedAt,
+    @Default(false) bool isPr,
+    String? notes,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) = _WorkoutSet;
 
   factory WorkoutSet.fromJson(Map<String, dynamic> json) =>

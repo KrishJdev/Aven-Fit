@@ -141,9 +141,25 @@
     - Updated `/routines/:id` route to `RoutineDetailScreen(routineId: ...)`.
   - **Verification & Tests (`test/features/routine/` & `backend/`):**
     - Created `routine_detail_test.dart` (4 comprehensive unit & widget tests): verifying start-workout session creation, immutability of source routine (Law L7), duplicate/delete operations, and UI table rendering.
-    - `dart run build_runner build` (76 outputs), `flutter analyze` (0 issues), `flutter test` (**53/53 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
   - **Slice 2 Status:** ✅ **100% COMPLETE** across full vertical stack (Exercise Catalog, Custom Exercises, Favourites, Routine Tables, DAO, Repository, Routine List, Routine Builder/Editor, and Routine Detail/Start Workout).
-  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.1: Session-Exercise Data Layer** (`SessionExercises` Drift table, live workout session state, and SQLite write-through logging engine).
+- **2026-08-31 (session 17):** Implemented **Slice 3 WU-3.1: Session-Exercise Data Layer**:
+  - **Domain Layer (`features/workout/domain/`):**
+    - `session_exercise.dart`: Freezed entity `SessionExercise` (`id`, `sessionId`, `exerciseId`, `exercise`, `exerciseName`, `orderIndex`, `restSeconds`, `notes`, `sets`, convenience getters: `position`, `setsCount`, `completedSetsCount`, `totalVolumeKg`, JSON serialization).
+    - `workout_set.dart` & `workout_session.dart`: Updated to include `sessionExerciseId`, set metadata (`completedAt`, `isPr`, `notes`), and aggregate calculations (`totalSetsCount`, `completedSetsCount`, `totalVolumeKg`).
+  - **Data Layer & Database Schema (`features/workout/data/` & `core/database/`):**
+    - `workout_tables.dart`: Added `SessionExercises` table (`SessionExerciseRow` with foreign key cascade delete on session and exercise, and unique `(sessionId, orderIndex)`) and updated `WorkoutSessions` and `WorkoutSets` tables (`WorkoutSetRow` with foreign key on `sessionExerciseId` and unique `(sessionExerciseId, setNumber)`).
+    - `app_database.dart`: Registered `SessionExercises` table in `@DriftDatabase`, bumped `schemaVersion` to 4, and added v4 migration step.
+    - `workout_local_source.dart`: Updated `WorkoutDao` with joined reactive queries (`watchSessionExercisesWithSets`, `watchSessionWithExercises`), carrier models (`SessionWithExercises`, `SessionExerciseWithSets`), transactional two-pass collision-safe reordering (`reorderSessionExercises`), and cascade deletion.
+    - `workout_repository.dart`: Updated `WorkoutRepository` interface and `WorkoutRepositoryImpl` with domain entity mapping and Riverpod provider.
+  - **Presentation Layer Updates (`features/workout/presentation/` & `features/routine/presentation/`):**
+    - `active_workout_state.dart` & `active_workout_controller.dart`: Updated state and controller with optimistic `SessionExercise` updates and write-through persistence.
+    - `routine_detail_controller.dart` & `routine_list_controller.dart`: Updated `startWorkout` to create `SessionExercises` and link target sets via `sessionExerciseId`.
+  - **Verification & Tests (`test/features/workout/` & `backend/`):**
+    - Created `session_exercise_test.dart` (5 comprehensive unit & DAO tests): testing domain immutability/volume math, JSON serialization, in-memory Drift SQLite session exercises CRUD, two-pass reordering, cascade set deletion, and routine startup.
+    - Updated `workout_reference_slice_test.dart` with `sessionExerciseId` and SQLite setup.
+    - `dart run build_runner build` (181 outputs), `flutter analyze` (0 issues), `flutter test` (**59/59 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
+  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.2: Ghost Prefill Logic** (`ghost_set.dart` Freezed value object, `ghost_prefill_service.dart` with 4-branch history/routine/set prefill resolution, unit tests).
+
 
 ---
 

@@ -64,7 +64,7 @@ final class RoutineDetailControllerProvider
 }
 
 String _$routineDetailControllerHash() =>
-    r'a0e96725bf83f890fee1bfd4a0382aac70a2079f';
+    r'd0eb6d135b3b0bc5ad5e1f77ae96b0904d531f0c';
 
 /// Riverpod controller managing a specific routine's detail state and live session startup.
 ///

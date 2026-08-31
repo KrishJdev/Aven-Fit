@@ -46,7 +46,7 @@ final class RoutineListControllerProvider
 }
 
 String _$routineListControllerHash() =>
-    r'14c0c26676fff736800d323c153d05a17719e6d8';
+    r'e0dad7f7432507ebfd1d9b562f42cb686787abf4';
 
 /// Riverpod controller managing the routines list state and actions.
 ///

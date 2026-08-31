@@ -1,9 +1,11 @@
 import 'package:aven_fit/core/database/app_database.dart';
 import 'package:aven_fit/features/workout/data/workout_repository.dart';
+import 'package:aven_fit/features/workout/domain/session_exercise.dart';
 import 'package:aven_fit/features/workout/domain/workout_session.dart';
 import 'package:aven_fit/features/workout/domain/workout_set.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_controller.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_state.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,6 +16,7 @@ void main() {
       const set = WorkoutSet(
         id: 's1',
         sessionId: 'ws1',
+        sessionExerciseId: 'se1',
         exerciseId: 'ex1',
         setNumber: 1,
         weightKg: 80.0,
@@ -27,23 +30,33 @@ void main() {
       expect(set.isCompleted, isFalse);
       expect(completedSet.isCompleted, isTrue);
       expect(completedSet.weightKg, 80.0);
+      expect(completedSet.sessionExerciseId, 'se1');
     });
 
-    test('WorkoutSession JSON serialization round-trip', () {
+    test('SessionExercise and WorkoutSession JSON serialization round-trip', () {
       final session = WorkoutSession(
         id: 'ws_test',
         name: 'Push Day',
         startedAt: DateTime.parse('2026-08-31T05:00:00Z'),
         status: WorkoutStatus.active,
-        sets: const [
-          WorkoutSet(
-            id: 's1',
+        exercises: const [
+          SessionExercise(
+            id: 'se1',
             sessionId: 'ws_test',
             exerciseId: 'bench',
-            setNumber: 1,
-            weightKg: 100.0,
-            reps: 5,
-            isCompleted: true,
+            orderIndex: 0,
+            sets: [
+              WorkoutSet(
+                id: 's1',
+                sessionId: 'ws_test',
+                sessionExerciseId: 'se1',
+                exerciseId: 'bench',
+                setNumber: 1,
+                weightKg: 100.0,
+                reps: 5,
+                isCompleted: true,
+              ),
+            ],
           ),
         ],
       );
@@ -53,8 +66,11 @@ void main() {
 
       expect(deserialized.id, session.id);
       expect(deserialized.name, 'Push Day');
-      expect(deserialized.sets.length, 1);
-      expect(deserialized.sets.first.weightKg, 100.0);
+      expect(deserialized.exercises.length, 1);
+      expect(deserialized.exercises.first.sets.first.weightKg, 100.0);
+      expect(deserialized.totalSetsCount, 1);
+      expect(deserialized.completedSetsCount, 1);
+      expect(deserialized.totalVolumeKg, 500.0);
     });
 
     test('ActiveWorkoutState volume calculation excludes warmup sets', () {
@@ -64,6 +80,7 @@ void main() {
           WorkoutSet(
             id: 's1',
             sessionId: 'ws1',
+            sessionExerciseId: 'se1',
             exerciseId: 'bench',
             setNumber: 1,
             weightKg: 40.0,
@@ -74,6 +91,7 @@ void main() {
           WorkoutSet(
             id: 's2',
             sessionId: 'ws1',
+            sessionExerciseId: 'se1',
             exerciseId: 'bench',
             setNumber: 2,
             weightKg: 80.0,
@@ -84,6 +102,7 @@ void main() {
           WorkoutSet(
             id: 's3',
             sessionId: 'ws1',
+            sessionExerciseId: 'se1',
             exerciseId: 'bench',
             setNumber: 3,
             weightKg: 80.0,
@@ -103,9 +122,21 @@ void main() {
     late AppDatabase db;
     late WorkoutRepository repository;
 
-    setUp(() {
+    setUp(() async {
       db = AppDatabase(NativeDatabase.memory());
       repository = WorkoutRepositoryImpl(db.workoutDao);
+      await db.into(db.exercises).insert(
+            const ExercisesCompanion(
+              id: drift.Value('squat'),
+              name: drift.Value('Barbell Back Squat'),
+            ),
+          );
+      await db.into(db.exercises).insert(
+            const ExercisesCompanion(
+              id: drift.Value('ex_bench'),
+              name: drift.Value('Barbell Bench Press'),
+            ),
+          );
     });
 
     tearDown(() async {
@@ -128,10 +159,15 @@ void main() {
 
     test('logSet, updateSet, and deleteSet modify sets reactively', () async {
       final session = await repository.startWorkout(name: 'Leg Day');
+      final sessionEx = await repository.addExerciseToSession(
+        sessionId: session.id,
+        exerciseId: 'squat',
+      );
 
-      const newSet = WorkoutSet(
+      final newSet = WorkoutSet(
         id: 'set_1',
-        sessionId: 'ws_placeholder',
+        sessionId: session.id,
+        sessionExerciseId: sessionEx.id,
         exerciseId: 'squat',
         setNumber: 1,
         weightKg: 100.0,
@@ -139,15 +175,14 @@ void main() {
         isCompleted: false,
       );
 
-      final setWithSession = newSet.copyWith(sessionId: session.id);
-      await repository.logSet(setWithSession);
+      await repository.logSet(newSet);
 
       var sets = await repository.getSetsForSession(session.id);
       expect(sets.length, 1);
       expect(sets.first.isCompleted, isFalse);
 
       // Toggle complete
-      await repository.updateSet(setWithSession.copyWith(isCompleted: true));
+      await repository.updateSet(newSet.copyWith(isCompleted: true));
       sets = await repository.getSetsForSession(session.id);
       expect(sets.first.isCompleted, isTrue);
 
@@ -179,9 +214,15 @@ void main() {
     late WorkoutRepository repository;
     late ProviderContainer container;
 
-    setUp(() {
+    setUp(() async {
       db = AppDatabase(NativeDatabase.memory());
       repository = WorkoutRepositoryImpl(db.workoutDao);
+      await db.into(db.exercises).insert(
+            const ExercisesCompanion(
+              id: drift.Value('ex_bench'),
+              name: drift.Value('Barbell Bench Press'),
+            ),
+          );
       container = ProviderContainer(
         overrides: [
           workoutRepositoryProvider.overrideWithValue(repository),
@@ -194,7 +235,7 @@ void main() {
       await db.close();
     });
 
-    test('startWorkout and addSet update controller state immutably', () async {
+    test('startWorkout, addExercise, and addSet update controller state immutably', () async {
       final controller = container.read(activeWorkoutControllerProvider.notifier);
 
       // Initially no session
@@ -207,8 +248,16 @@ void main() {
       expect(state.hasActiveSession, isTrue);
       expect(state.session!.name, 'Upper Body A');
 
+      // Add exercise
+      final ex = await controller.addExercise('ex_bench');
+      expect(ex, isNotNull);
+      state = await container.read(activeWorkoutControllerProvider.future);
+      expect(state.exercises.length, 1);
+      expect(state.exerciseCount, 1);
+
       // Add set
       await controller.addSet(
+        sessionExerciseId: ex!.id,
         exerciseId: 'ex_bench',
         weightKg: 80.0,
         reps: 8,

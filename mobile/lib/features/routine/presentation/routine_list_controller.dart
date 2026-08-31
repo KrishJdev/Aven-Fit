@@ -36,15 +36,26 @@ class RoutineListController extends _$RoutineListController {
   /// Original routine remains unmutated (Law L7).
   Future<WorkoutSession> startWorkoutFromRoutine(Routine routine) async {
     final workoutRepo = ref.read(workoutRepositoryProvider);
-    final session = await workoutRepo.startWorkout(name: routine.name);
+    final session = await workoutRepo.startWorkout(
+      name: routine.name,
+      routineId: routine.id,
+    );
 
     for (final ex in routine.exercises) {
+      final sessionEx = await workoutRepo.addExerciseToSession(
+        sessionId: session.id,
+        exerciseId: ex.exerciseId,
+        restSeconds: ex.restSeconds,
+        notes: ex.notes,
+      );
+
       if (ex.sets.isNotEmpty) {
         for (final s in ex.sets) {
           await workoutRepo.logSet(
             WorkoutSet(
               id: 'ws_${DateTime.now().microsecondsSinceEpoch}_${s.position}',
               sessionId: session.id,
+              sessionExerciseId: sessionEx.id,
               exerciseId: ex.exerciseId,
               setNumber: s.position,
               weightKg: s.targetWeightKg ?? ex.targetWeightKg ?? 0.0,
@@ -60,6 +71,7 @@ class RoutineListController extends _$RoutineListController {
             WorkoutSet(
               id: 'ws_${DateTime.now().microsecondsSinceEpoch}_$i',
               sessionId: session.id,
+              sessionExerciseId: sessionEx.id,
               exerciseId: ex.exerciseId,
               setNumber: i,
               weightKg: ex.targetWeightKg ?? 0.0,
