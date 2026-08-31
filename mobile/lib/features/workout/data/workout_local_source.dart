@@ -163,6 +163,34 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
         .get();
   }
 
+  /// Retrieves the most recent completed performance sets for a specific exercise.
+  Future<List<WorkoutSetRow>> getLastCompletedSetsForExercise(
+    String exerciseId,
+  ) async {
+    final query = select(workoutSessions).join([
+      innerJoin(
+        sessionExercises,
+        sessionExercises.sessionId.equalsExp(workoutSessions.id),
+      ),
+    ])
+      ..where(workoutSessions.status.equals('completed'))
+      ..where(sessionExercises.exerciseId.equals(exerciseId))
+      ..orderBy([
+        OrderingTerm.desc(workoutSessions.completedAt),
+        OrderingTerm.desc(workoutSessions.startedAt),
+      ])
+      ..limit(1);
+
+    final result = await query.getSingleOrNull();
+    if (result == null) return const [];
+
+    final sessionEx = result.readTable(sessionExercises);
+    return (select(workoutSets)
+          ..where((t) => t.sessionExerciseId.equals(sessionEx.id))
+          ..orderBy([(t) => OrderingTerm.asc(t.setNumber)]))
+        .get();
+  }
+
   /// Inserts a new workout session row.
   Future<int> createSession({
     required String id,

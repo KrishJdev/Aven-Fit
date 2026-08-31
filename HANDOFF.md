@@ -157,8 +157,23 @@
   - **Verification & Tests (`test/features/workout/` & `backend/`):**
     - Created `session_exercise_test.dart` (5 comprehensive unit & DAO tests): testing domain immutability/volume math, JSON serialization, in-memory Drift SQLite session exercises CRUD, two-pass reordering, cascade set deletion, and routine startup.
     - Updated `workout_reference_slice_test.dart` with `sessionExerciseId` and SQLite setup.
-    - `dart run build_runner build` (181 outputs), `flutter analyze` (0 issues), `flutter test` (**59/59 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
-  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.2: Ghost Prefill Logic** (`ghost_set.dart` Freezed value object, `ghost_prefill_service.dart` with 4-branch history/routine/set prefill resolution, unit tests).
+- **2026-08-31 (session 18):** Implemented **Slice 3 WU-3.2: Ghost Prefill Logic**:
+  - **Domain Layer (`features/workout/domain/`):**
+    - `ghost_set.dart`: Freezed value object `GhostSet` (`weightKg`, `reps`, `rpe`, `setType`, `source`, with `hasValue`, `weightDisplay`, `repsDisplay`, `prevSummary` helpers and JSON serialization) and `GhostSource` enum (`history`, `routineTarget`, `previousSet`, `none`).
+  - **Data Layer & Repository (`features/workout/data/`):**
+    - `workout_local_source.dart` & `workout_repository.dart`: Added `getLastCompletedSetsForExercise(exerciseId)` executing <10ms indexed SQLite lookup on completed workouts.
+    - `ghost_prefill_service.dart`: Created `GhostPrefillService` and Riverpod provider implementing the standard set population & ghost value fallback logic from `FEATURES.md` §7.2:
+      1. *History match:* When $N \le \text{historical count}$, prefill from historical Set $N$.
+      2. *Active session previous:* When $N > 1$ and Set $N-1$ exists in current session, copy from Set $N-1$.
+      3. *History overflow fallback:* When $N > \text{historical count}$ and history exists, fall back to last historical set.
+      4. *Routine target:* Prefill from routine target sets or per-exercise target configuration.
+      5. *Empty fallback:* Return clean empty ghost (`hasValue: false`) when no prior history or targets exist.
+      - Includes batch resolution `resolveGhostSetsForExercise` for instant exercise block rendering.
+  - **Verification & Tests (`test/features/workout/` & `backend/`):**
+    - Created `ghost_prefill_test.dart` (7 comprehensive unit tests) covering domain value object formatting/serialization, all 5 resolution branches, and batch resolution.
+    - `dart run build_runner build` (114 outputs), `flutter analyze` (0 issues), `flutter test` (**67/67 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
+  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.3: Exercise Picker (In-Session Mode)** (`exercise_picker_controller.dart`, `exercise_picker_screen.dart` with recent 10 exercises from session history, favourites, and catalog search integration).
+
 
 
 ---

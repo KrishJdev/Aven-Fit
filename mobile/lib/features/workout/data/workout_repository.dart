@@ -20,6 +20,7 @@ abstract class WorkoutRepository {
   Future<List<SessionExercise>> getSessionExercises(String sessionId);
   Stream<List<WorkoutSet>> watchSessionSets(String sessionId);
   Future<List<WorkoutSet>> getSetsForSession(String sessionId);
+  Future<List<WorkoutSet>> getLastCompletedSetsForExercise(String exerciseId);
   Future<WorkoutSession> startWorkout({
     String name = 'Workout',
     String? routineId,
@@ -110,6 +111,14 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
   @override
   Future<List<WorkoutSet>> getSetsForSession(String sessionId) async {
     final rows = await _dao.getSessionSets(sessionId);
+    return rows.map(_mapRowToSet).toList();
+  }
+
+  @override
+  Future<List<WorkoutSet>> getLastCompletedSetsForExercise(
+    String exerciseId,
+  ) async {
+    final rows = await _dao.getLastCompletedSetsForExercise(exerciseId);
     return rows.map(_mapRowToSet).toList();
   }
 
