@@ -3,6 +3,8 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 import '../../features/exercise/data/exercise_local_source.dart';
 import '../../features/exercise/data/exercise_tables.dart';
+import '../../features/progress/data/pr_local_source.dart';
+import '../../features/progress/data/pr_tables.dart';
 import '../../features/routine/data/routine_local_source.dart';
 import '../../features/routine/data/routine_tables.dart';
 import '../../features/workout/data/workout_local_source.dart';
@@ -26,15 +28,16 @@ part 'app_database.g.dart';
     Routines,
     RoutineExercises,
     RoutineSets,
+    PersonalRecords,
   ],
-  daos: [WorkoutDao, ExerciseDao, RoutineDao],
+  daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -54,6 +57,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 4) {
             await m.createTable(sessionExercises);
+          }
+          if (from < 5) {
+            await m.createTable(personalRecords);
           }
         },
         beforeOpen: (details) async {

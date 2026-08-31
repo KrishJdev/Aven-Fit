@@ -126,8 +126,9 @@ class SetRowWidget extends StatelessWidget {
   }
 
   Widget _buildSetBadge(bool isWarmup, bool isDropset) {
+    final Widget badge;
     if (isWarmup) {
-      return Container(
+      badge = Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
           color: AppTheme.burntOrange.withValues(alpha: 0.2),
@@ -144,10 +145,8 @@ class SetRowWidget extends StatelessWidget {
           ),
         ),
       );
-    }
-
-    if (isDropset) {
-      return Container(
+    } else if (isDropset) {
+      badge = Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         decoration: BoxDecoration(
           color: AppTheme.neonCyan.withValues(alpha: 0.2),
@@ -164,12 +163,24 @@ class SetRowWidget extends StatelessWidget {
           ),
         ),
       );
+    } else {
+      badge = Text(
+        set.setNumber.toString(),
+        textAlign: TextAlign.center,
+        style: AppTheme.num(13, weight: FontWeight.w600, color: AppTheme.textSecondary),
+      );
     }
 
-    return Text(
-      set.setNumber.toString(),
-      textAlign: TextAlign.center,
-      style: AppTheme.num(13, weight: FontWeight.w600, color: AppTheme.textSecondary),
+    // PR badge (§8.1): a tiny volt-green flash when this set beat any
+    // personal record (weight, e1RM, reps-at-weight, volume).
+    if (!set.isPr) return badge;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        badge,
+        const SizedBox(height: 2),
+        const _PrFlashBadge(),
+      ],
     );
   }
 
@@ -370,6 +381,60 @@ class SetRowWidget extends StatelessWidget {
             child: const Text('APPLY'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Tiny volt-green "PR" chip that pops in (scale + fade) the moment a set is
+/// confirmed as a new personal record, with a single medium haptic buzz on
+/// appearance — celebration stays haptic + visual only, never confetti-heavy
+/// (FEATURES.md §8.1, L5).
+class _PrFlashBadge extends StatefulWidget {
+  const _PrFlashBadge();
+
+  @override
+  State<_PrFlashBadge> createState() => _PrFlashBadgeState();
+}
+
+class _PrFlashBadgeState extends State<_PrFlashBadge> {
+  @override
+  void initState() {
+    super.initState();
+    HapticFeedback.mediumImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutBack,
+      builder: (context, t, child) => Transform.scale(
+        scale: 0.6 + 0.4 * t,
+        child: Opacity(
+          opacity: t.clamp(0.0, 1.0),
+          child: child,
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+        decoration: BoxDecoration(
+          color: AppTheme.voltGreen.withValues(alpha: 0.15),
+          border: Border.all(color: AppTheme.voltGreen),
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: const Text(
+          'PR',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppTheme.voltGreen,
+            fontSize: 8,
+            height: 1.1,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.5,
+          ),
+        ),
       ),
     );
   }

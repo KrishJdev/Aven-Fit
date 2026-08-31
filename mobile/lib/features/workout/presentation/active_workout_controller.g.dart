@@ -47,7 +47,7 @@ final class ActiveWorkoutControllerProvider
 }
 
 String _$activeWorkoutControllerHash() =>
-    r'759feeecdd7b04fe44568cc3227f1e768785fa0a';
+    r'4ffa8884473ab6cdbbabbb9da46e2bc179f15d29';
 
 /// Riverpod AsyncNotifier managing the unidirectional state updates for an active workout.
 ///

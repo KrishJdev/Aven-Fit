@@ -5,6 +5,7 @@ import 'package:aven_fit/features/workout/data/workout_repository.dart';
 import 'package:aven_fit/features/workout/domain/workout_set.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_controller.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_screen.dart';
+import 'package:aven_fit/main.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -72,6 +73,7 @@ void main() {
     test('generateWarmupPyramid creates progressive warmup sets excluded from working volume', () async {
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(db),
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
           notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
@@ -132,6 +134,7 @@ void main() {
     test('updateSet and updateWorkoutName modify active session state immutably', () async {
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(db),
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
           notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
@@ -195,6 +198,7 @@ void main() {
         (tester) async {
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(db),
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
           notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
@@ -229,6 +233,7 @@ void main() {
         (tester) async {
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(db),
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
           notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],

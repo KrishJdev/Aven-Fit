@@ -7,6 +7,7 @@ import 'package:aven_fit/features/workout/domain/workout_set.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_controller.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_state.dart';
 import 'package:aven_fit/features/workout/presentation/rest_timer_controller.dart';
+import 'package:aven_fit/main.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -229,6 +230,7 @@ void main() {
           );
       container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(db),
           workoutRepositoryProvider.overrideWithValue(repository),
           notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../progress/data/pr_repository.dart';
 import '../data/workout_repository.dart';
 import '../domain/session_exercise.dart';
 import '../domain/workout_set.dart';
@@ -193,28 +194,29 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
     final targetSet = current.sets[setIndex];
     final isNowCompleted = !targetSet.isCompleted;
-    final updatedSet = targetSet.copyWith(
+    var updatedSet = targetSet.copyWith(
       isCompleted: isNowCompleted,
       completedAt: isNowCompleted ? DateTime.now() : null,
     );
-    final updatedSets = [...current.sets]..[setIndex] = updatedSet;
-
-    final updatedExercises = current.exercises.map((se) {
-      if (se.id == targetSet.sessionExerciseId) {
-        final sIdx = se.sets.indexWhere((s) => s.id == setId);
-        if (sIdx != -1) {
-          final newSeSets = [...se.sets]..[sIdx] = updatedSet;
-          return se.copyWith(sets: newSeSets);
-        }
-      }
-      return se;
-    }).toList();
 
     // Optimistic UI update
-    state = AsyncValue.data(current.copyWith(
-      sets: updatedSets,
-      exercises: updatedExercises,
-    ));
+    state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
+
+    // PR detection (§8.1, §10.2): computed instantly from local history at
+    // set-save time. Warm-up sets never count; beaten records flash the PR
+    // badge on the set row and celebrate with a medium haptic (L5).
+    if (isNowCompleted &&
+        updatedSet.type != SetType.warmup &&
+        updatedSet.exerciseId != null) {
+      final newPRs = await ref.read(prRepositoryProvider).detectPRs(
+            exerciseId: updatedSet.exerciseId!,
+            set: updatedSet,
+          );
+      if (newPRs.isNotEmpty) {
+        updatedSet = updatedSet.copyWith(isPr: true);
+        state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
+      }
+    }
 
     // Write-through to SQLite
     final repository = ref.read(workoutRepositoryProvider);
@@ -238,6 +240,27 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
         );
       }
     }
+  }
+
+  /// Returns [current] with [set] patched into both the flat set list and its
+  /// nested session-exercise at [setIndex].
+  ActiveWorkoutState _withSet(
+    ActiveWorkoutState current,
+    WorkoutSet set,
+    int setIndex,
+  ) {
+    final updatedSets = [...current.sets]..[setIndex] = set;
+    final updatedExercises = current.exercises.map((se) {
+      if (se.id == set.sessionExerciseId) {
+        final sIdx = se.sets.indexWhere((s) => s.id == set.id);
+        if (sIdx != -1) {
+          final newSeSets = [...se.sets]..[sIdx] = set;
+          return se.copyWith(sets: newSeSets);
+        }
+      }
+      return se;
+    }).toList();
+    return current.copyWith(sets: updatedSets, exercises: updatedExercises);
   }
 
   /// Deletes a set from the session.
