@@ -1,5 +1,10 @@
+import 'package:aven_fit/features/exercise/presentation/create_custom_exercise_screen.dart';
+import 'package:aven_fit/features/exercise/presentation/exercise_detail_screen.dart';
+import 'package:aven_fit/features/exercise/presentation/exercise_list_screen.dart';
 import 'package:aven_fit/features/history/presentation/progress_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
+import 'package:aven_fit/features/routine/presentation/routine_detail_screen.dart';
+import 'package:aven_fit/features/routine/presentation/routine_editor_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routines_screen.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_screen.dart';
 import 'package:aven_fit/features/workout/presentation/home_screen.dart';
@@ -38,6 +43,36 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/workout/active',
       builder: (context, state) => const ActiveWorkoutScreen(),
+    ),
+    GoRoute(
+      path: '/exercises',
+      builder: (context, state) => const ExerciseListScreen(),
+    ),
+    GoRoute(
+      path: '/exercises/new',
+      builder: (context, state) => const CreateCustomExerciseScreen(),
+    ),
+    GoRoute(
+      path: '/exercises/:id',
+      builder: (context, state) => ExerciseDetailScreen(
+        exerciseId: state.pathParameters['id']!,
+      ),
+    ),
+    GoRoute(
+      path: '/routines/new',
+      builder: (context, state) => const RoutineEditorScreen(),
+    ),
+    GoRoute(
+      path: '/routines/:id',
+      builder: (context, state) => RoutineDetailScreen(
+        routineId: state.pathParameters['id']!,
+      ),
+    ),
+    GoRoute(
+      path: '/routines/:id/edit',
+      builder: (context, state) => RoutineEditorScreen(
+        routineId: state.pathParameters['id'],
+      ),
     ),
   ],
 );
