@@ -11,7 +11,10 @@ part of 'workout_summary_controller.dart';
 /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
 ///
 /// Loads the fully persisted session from SQLite — zero network, zero live
-/// re-fetch (L2/L7). Rendered immediately after Finish.
+/// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+/// badge reads the settings-driven forgiving goal via [StreakRepository]
+/// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+/// every surface computes it identically.
 
 @ProviderFor(WorkoutSummaryController)
 final workoutSummaryControllerProvider = WorkoutSummaryControllerFamily._();
@@ -19,14 +22,20 @@ final workoutSummaryControllerProvider = WorkoutSummaryControllerFamily._();
 /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
 ///
 /// Loads the fully persisted session from SQLite — zero network, zero live
-/// re-fetch (L2/L7). Rendered immediately after Finish.
+/// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+/// badge reads the settings-driven forgiving goal via [StreakRepository]
+/// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+/// every surface computes it identically.
 final class WorkoutSummaryControllerProvider
     extends
         $AsyncNotifierProvider<WorkoutSummaryController, WorkoutSummaryState> {
   /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
   ///
   /// Loads the fully persisted session from SQLite — zero network, zero live
-  /// re-fetch (L2/L7). Rendered immediately after Finish.
+  /// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+  /// badge reads the settings-driven forgiving goal via [StreakRepository]
+  /// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+  /// every surface computes it identically.
   WorkoutSummaryControllerProvider._({
     required WorkoutSummaryControllerFamily super.from,
     required String super.argument,
@@ -65,12 +74,15 @@ final class WorkoutSummaryControllerProvider
 }
 
 String _$workoutSummaryControllerHash() =>
-    r'a03a80ff1c9b68e65d3928dc376e3cf155c87fb1';
+    r'6bb345cede034e1c942b27c880741666992c4841';
 
 /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
 ///
 /// Loads the fully persisted session from SQLite — zero network, zero live
-/// re-fetch (L2/L7). Rendered immediately after Finish.
+/// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+/// badge reads the settings-driven forgiving goal via [StreakRepository]
+/// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+/// every surface computes it identically.
 
 final class WorkoutSummaryControllerFamily extends $Family
     with
@@ -93,7 +105,10 @@ final class WorkoutSummaryControllerFamily extends $Family
   /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
   ///
   /// Loads the fully persisted session from SQLite — zero network, zero live
-  /// re-fetch (L2/L7). Rendered immediately after Finish.
+  /// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+  /// badge reads the settings-driven forgiving goal via [StreakRepository]
+  /// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+  /// every surface computes it identically.
 
   WorkoutSummaryControllerProvider call(String sessionId) =>
       WorkoutSummaryControllerProvider._(argument: sessionId, from: this);
@@ -105,7 +120,10 @@ final class WorkoutSummaryControllerFamily extends $Family
 /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
 ///
 /// Loads the fully persisted session from SQLite — zero network, zero live
-/// re-fetch (L2/L7). Rendered immediately after Finish.
+/// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+/// badge reads the settings-driven forgiving goal via [StreakRepository]
+/// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+/// every surface computes it identically.
 
 abstract class _$WorkoutSummaryController
     extends $AsyncNotifier<WorkoutSummaryState> {

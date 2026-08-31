@@ -6,6 +6,8 @@ import '../../features/exercise/data/exercise_tables.dart';
 import '../../features/history/data/history_local_source.dart';
 import '../../features/progress/data/pr_local_source.dart';
 import '../../features/progress/data/pr_tables.dart';
+import '../../features/progress/data/streak_local_source.dart';
+import '../../features/progress/data/streak_tables.dart';
 import '../../features/routine/data/routine_local_source.dart';
 import '../../features/routine/data/routine_tables.dart';
 import '../../features/workout/data/workout_local_source.dart';
@@ -30,15 +32,16 @@ part 'app_database.g.dart';
     RoutineExercises,
     RoutineSets,
     PersonalRecords,
+    StreakSettings,
   ],
-  daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao, HistoryDao],
+  daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao, HistoryDao, StreakDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -68,6 +71,10 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(workoutSessions, workoutSessions.lastResumedAt);
             await m.addColumn(
                 workoutSessions, workoutSessions.pausedDurationSeconds);
+          }
+          if (from < 7) {
+            // Forgiving weekly streak settings (WU-X.2, §17).
+            await m.createTable(streakSettings);
           }
         },
         beforeOpen: (details) async {

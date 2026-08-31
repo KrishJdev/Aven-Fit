@@ -1,4 +1,5 @@
 import 'package:aven_fit/core/database/app_database.dart';
+import 'package:aven_fit/features/progress/data/streak_repository.dart';
 import 'package:aven_fit/features/workout/data/workout_repository.dart';
 import 'package:aven_fit/features/workout/domain/workout_session.dart';
 import 'package:aven_fit/features/workout/domain/workout_set.dart';
@@ -102,9 +103,11 @@ void main() {
 
     test('computes stats from persisted session; warm-ups excluded, PRs counted',
         () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final session = await seedCompletedWorkout(withPr: true);
       final state =
@@ -123,9 +126,11 @@ void main() {
 
     test('falls back to epoch math for duration when durationSeconds absent',
         () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final started = DateTime(2026, 8, 31, 10, 0, 0);
       await seedBareCompletedSession(
@@ -143,9 +148,11 @@ void main() {
 
     test('uses stored durationSeconds when present (epoch math still honors it)',
         () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       await seedBareCompletedSession(
         'ws_stored',
@@ -161,9 +168,11 @@ void main() {
     });
 
     test('returns designed not-found state for a missing session (L6)', () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final state =
           await container.read(workoutSummaryControllerProvider('missing_id').future);
@@ -175,9 +184,11 @@ void main() {
 
     test('renameWorkout persists via write-through; blank falls back to Workout',
         () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final session = await seedCompletedWorkout(name: 'Chest Day');
       // Keep the autoDispose provider alive across the read-mutate-read cycle.
@@ -212,16 +223,26 @@ void main() {
 
     test('weekly streak badge is met when 3+ workouts this week (incl. this one)',
         () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
+      // WeekStart-anchored seeds: deterministic regardless of the weekday
+      // the suite runs on (the streak counts by effective completion date).
       final now = DateTime.now();
-      await seedBareCompletedSession('ws_w1', now.subtract(const Duration(days: 1)));
-      await seedBareCompletedSession('ws_w2', now.subtract(const Duration(hours: 3)));
+      final today = DateTime(now.year, now.month, now.day);
+      final weekStart =
+          today.subtract(Duration(days: today.weekday - DateTime.monday));
+      await seedBareCompletedSession(
+          'ws_w1', weekStart.add(const Duration(hours: 9)));
+      await seedBareCompletedSession(
+          'ws_w2', weekStart.add(const Duration(hours: 10)));
 
-      // One workout 8 days back — always outside the current week, never counts.
-      await seedBareCompletedSession('ws_old', now.subtract(const Duration(days: 8)));
+      // One workout last week — always outside the current week.
+      await seedBareCompletedSession(
+          'ws_old', weekStart.subtract(const Duration(days: 2)));
 
       final summarySession = await seedCompletedWorkout(name: 'Third This Week');
 
@@ -235,9 +256,11 @@ void main() {
 
     test('weekly streak badge hidden when goal not met (adherence-neutral, L4)',
         () async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final summarySession = await seedCompletedWorkout();
 
@@ -311,9 +334,11 @@ void main() {
 
     testWidgets('renders stats grid, exercise breakdown, PR badge, streak badge',
         (tester) async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final session = await seedWorkoutWithPR(name: 'Push Power');
       // Two extra completed workouts this week → goal (3) met.
@@ -347,9 +372,11 @@ void main() {
     });
 
     testWidgets('hides streak badge when weekly goal not met', (tester) async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final session = await seedWorkoutWithPR(name: 'Solo Session');
 
@@ -370,9 +397,11 @@ void main() {
 
     testWidgets('inline rename saves via dialog; blank falls back to Workout',
         (tester) async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final session = await seedWorkoutWithPR(name: 'Rename Me');
 
@@ -413,9 +442,11 @@ void main() {
 
     testWidgets('shows designed not-found state with a way back (L6)',
         (tester) async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -434,9 +465,11 @@ void main() {
     });
 
     testWidgets('DONE navigates to Home (FEATURES.md §8.5)', (tester) async {
-      final container = ProviderContainer(
-        overrides: [workoutRepositoryProvider.overrideWithValue(workoutRepo)],
-      );
+      final container = ProviderContainer(overrides: [
+        workoutRepositoryProvider.overrideWithValue(workoutRepo),
+        streakRepositoryProvider
+            .overrideWithValue(StreakRepositoryImpl(db.streakDao)),
+      ]);
 
       final session = await seedWorkoutWithPR(name: 'Navigation Test');
 

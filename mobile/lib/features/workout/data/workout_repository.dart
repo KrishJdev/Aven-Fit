@@ -49,7 +49,6 @@ abstract class WorkoutRepository {
   Future<void> renameSession(String sessionId, String name);
   Future<WorkoutSession> pauseWorkout(String sessionId);
   Future<WorkoutSession> resumeWorkout(String sessionId);
-  Future<int> getCompletedWorkoutCountSince(DateTime since);
   Future<void> cancelWorkout(String sessionId);
 }
 
@@ -295,11 +294,6 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       throw StateError('Session $sessionId not found after resume write-through');
     }
     return _mapRowToSession(row);
-  }
-
-  @override
-  Future<int> getCompletedWorkoutCountSince(DateTime since) {
-    return _dao.getCompletedSessionCountSince(since);
   }
 
   WorkoutSession _mapRowToSession(WorkoutSessionRow row) {

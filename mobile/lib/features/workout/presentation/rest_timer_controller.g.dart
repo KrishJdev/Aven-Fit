@@ -93,7 +93,7 @@ final class RestTimerControllerProvider
 }
 
 String _$restTimerControllerHash() =>
-    r'04188416fea20deddd3469238f606905f073a996';
+    r'b4e2eddca40eb8bfacfa91236baec687fb32792d';
 
 /// Epoch-based rest countdown controller (WU-3.5, FEATURES.md §8.3).
 ///

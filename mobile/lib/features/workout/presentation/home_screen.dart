@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../progress/data/streak_repository.dart';
 import '../data/workout_repository.dart';
 import '../domain/workout_session.dart';
 import 'widgets/session_conflict_dialog.dart';
@@ -88,6 +89,11 @@ class HomePage extends ConsumerWidget {
                 },
                 child: const Text('START NEW SESSION'),
               ),
+              const SizedBox(height: 16),
+              // Glance stats (§5.2): "X of Y" forgiving-streak progress +
+              // current streak, reactive from SQLite (WU-X.2). The streak
+              // chip is omitted at 0 — a fact, never a shaming verdict (L4).
+              const _GlanceStatsRow(),
             ],
           ),
         ),
@@ -149,6 +155,82 @@ class _ResumeBanner extends StatelessWidget {
             const Icon(LucideIcons.chevronRight, size: 18, color: AppTheme.neonCyan),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Glance stats row (FEATURES.md §5.2, WU-X.2): weekly "X of Y" progress
+/// toward the forgiving goal and the current streak in weeks, both
+/// reactive from local SQLite. Renders neutrally while loading and keeps
+/// the streak chip out of the UI entirely at 0 (L4 — never shame).
+class _GlanceStatsRow extends ConsumerWidget {
+  const _GlanceStatsRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final streakAsync = ref.watch(watchStreakInfoProvider);
+
+    return streakAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+      data: (streak) {
+        return Row(
+          key: const ValueKey('home_glance_stats'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _GlanceChip(
+              label: 'THIS WEEK',
+              value: streak.weeklyProgressDisplay,
+              met: streak.weeklyGoalMet,
+            ),
+            if (streak.currentStreakWeeks > 0) ...[
+              const SizedBox(width: 8),
+              _GlanceChip(
+                label: 'STREAK',
+                value: streak.streakDisplay,
+                met: true,
+              ),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Single glass glance chip — cyan when the goal is met, neutral glass
+/// otherwise (adherence-neutral coloring, L4).
+class _GlanceChip extends StatelessWidget {
+  const _GlanceChip({required this.label, required this.value, required this.met});
+
+  final String label;
+  final String value;
+  final bool met;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = met ? AppTheme.neonCyan : AppTheme.textSecondary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.glassFill,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.glassBorder),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: AppTheme.num(10, weight: FontWeight.w700, color: accent),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: AppTheme.num(14, weight: FontWeight.w600, color: AppTheme.textPrimary),
+          ),
+        ],
       ),
     );
   }

@@ -1,8 +1,11 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../progress/domain/streak_info.dart';
 import '../domain/session_exercise.dart';
 import '../domain/workout_session.dart';
 import '../domain/workout_set.dart';
+
+export '../../progress/domain/streak_info.dart' show kDefaultWeeklyGoal;
 
 part 'workout_summary_state.freezed.dart';
 
@@ -54,7 +57,3 @@ abstract class WorkoutSummaryState with _$WorkoutSummaryState {
   /// Whether the forgiving weekly goal is met (FEATURES.md §10 / §17).
   bool get weeklyGoalMet => weeklyWorkoutCount >= weeklyGoal;
 }
-
-/// Default forgiving weekly goal (FEATURES.md §5.2 — skipped setups yield 3/week)
-/// until WU-X.2 introduces user-configurable streak settings.
-const int kDefaultWeeklyGoal = 3;

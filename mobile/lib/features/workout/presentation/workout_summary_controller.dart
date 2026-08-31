@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../progress/data/streak_repository.dart';
 import '../data/workout_repository.dart';
 import 'workout_summary_state.dart';
 
@@ -8,7 +9,10 @@ part 'workout_summary_controller.g.dart';
 /// Riverpod controller computing post-workout summary stats (FEATURES.md §8.5).
 ///
 /// Loads the fully persisted session from SQLite — zero network, zero live
-/// re-fetch (L2/L7). Rendered immediately after Finish.
+/// re-fetch (L2/L7). Rendered immediately after Finish. The weekly-streak
+/// badge reads the settings-driven forgiving goal via [StreakRepository]
+/// (WU-X.2, §17) — the Monday week anchor lives in the streak domain so
+/// every surface computes it identically.
 @riverpod
 class WorkoutSummaryController extends _$WorkoutSummaryController {
   @override
@@ -20,15 +24,13 @@ class WorkoutSummaryController extends _$WorkoutSummaryController {
       return const WorkoutSummaryState();
     }
 
-    final weekStart = _startOfWeek(DateTime.now());
-    final weeklyCount =
-        await repository.getCompletedWorkoutCountSince(weekStart);
+    final streak = await ref.watch(streakRepositoryProvider).getStreakInfo();
 
     return WorkoutSummaryState(
       session: session,
       exercises: session.exercises,
-      weeklyWorkoutCount: weeklyCount,
-      weeklyGoal: kDefaultWeeklyGoal,
+      weeklyWorkoutCount: streak.workoutsThisWeek,
+      weeklyGoal: streak.weeklyGoalDays,
     );
   }
 
@@ -47,11 +49,5 @@ class WorkoutSummaryController extends _$WorkoutSummaryController {
     );
 
     await ref.read(workoutRepositoryProvider).renameSession(session.id, finalName);
-  }
-
-  /// Monday 00:00 of the week containing [now].
-  static DateTime _startOfWeek(DateTime now) {
-    final today = DateTime(now.year, now.month, now.day);
-    return today.subtract(Duration(days: today.weekday - DateTime.monday));
   }
 }

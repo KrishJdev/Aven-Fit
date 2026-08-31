@@ -6085,6 +6085,281 @@ class PersonalRecordsCompanion extends UpdateCompanion<PersonalRecordRow> {
   }
 }
 
+class $StreakSettingsTable extends StreakSettings
+    with TableInfo<$StreakSettingsTable, StreakSettingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StreakSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _weeklyGoalDaysMeta = const VerificationMeta(
+    'weeklyGoalDays',
+  );
+  @override
+  late final GeneratedColumn<int> weeklyGoalDays = GeneratedColumn<int>(
+    'weekly_goal_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(3),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, weeklyGoalDays, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'streak_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StreakSettingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('weekly_goal_days')) {
+      context.handle(
+        _weeklyGoalDaysMeta,
+        weeklyGoalDays.isAcceptableOrUnknown(
+          data['weekly_goal_days']!,
+          _weeklyGoalDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StreakSettingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StreakSettingRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      weeklyGoalDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}weekly_goal_days'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+    );
+  }
+
+  @override
+  $StreakSettingsTable createAlias(String alias) {
+    return $StreakSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class StreakSettingRow extends DataClass
+    implements Insertable<StreakSettingRow> {
+  /// Singleton row key ('default') — one settings record per device.
+  final String id;
+
+  /// Target workouts per week for the forgiving streak (§17, 3–6 range
+  /// from §5.2). Defaults to 3 when the setup quiz was skipped (mirrors
+  /// [kDefaultWeeklyGoal]; a literal so generated code stays import-free).
+  final int weeklyGoalDays;
+  final DateTime? updatedAt;
+  const StreakSettingRow({
+    required this.id,
+    required this.weeklyGoalDays,
+    this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['weekly_goal_days'] = Variable<int>(weeklyGoalDays);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    return map;
+  }
+
+  StreakSettingsCompanion toCompanion(bool nullToAbsent) {
+    return StreakSettingsCompanion(
+      id: Value(id),
+      weeklyGoalDays: Value(weeklyGoalDays),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+    );
+  }
+
+  factory StreakSettingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StreakSettingRow(
+      id: serializer.fromJson<String>(json['id']),
+      weeklyGoalDays: serializer.fromJson<int>(json['weeklyGoalDays']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'weeklyGoalDays': serializer.toJson<int>(weeklyGoalDays),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+    };
+  }
+
+  StreakSettingRow copyWith({
+    String? id,
+    int? weeklyGoalDays,
+    Value<DateTime?> updatedAt = const Value.absent(),
+  }) => StreakSettingRow(
+    id: id ?? this.id,
+    weeklyGoalDays: weeklyGoalDays ?? this.weeklyGoalDays,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+  );
+  StreakSettingRow copyWithCompanion(StreakSettingsCompanion data) {
+    return StreakSettingRow(
+      id: data.id.present ? data.id.value : this.id,
+      weeklyGoalDays: data.weeklyGoalDays.present
+          ? data.weeklyGoalDays.value
+          : this.weeklyGoalDays,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StreakSettingRow(')
+          ..write('id: $id, ')
+          ..write('weeklyGoalDays: $weeklyGoalDays, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, weeklyGoalDays, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StreakSettingRow &&
+          other.id == this.id &&
+          other.weeklyGoalDays == this.weeklyGoalDays &&
+          other.updatedAt == this.updatedAt);
+}
+
+class StreakSettingsCompanion extends UpdateCompanion<StreakSettingRow> {
+  final Value<String> id;
+  final Value<int> weeklyGoalDays;
+  final Value<DateTime?> updatedAt;
+  final Value<int> rowid;
+  const StreakSettingsCompanion({
+    this.id = const Value.absent(),
+    this.weeklyGoalDays = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StreakSettingsCompanion.insert({
+    required String id,
+    this.weeklyGoalDays = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
+  static Insertable<StreakSettingRow> custom({
+    Expression<String>? id,
+    Expression<int>? weeklyGoalDays,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (weeklyGoalDays != null) 'weekly_goal_days': weeklyGoalDays,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StreakSettingsCompanion copyWith({
+    Value<String>? id,
+    Value<int>? weeklyGoalDays,
+    Value<DateTime?>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return StreakSettingsCompanion(
+      id: id ?? this.id,
+      weeklyGoalDays: weeklyGoalDays ?? this.weeklyGoalDays,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (weeklyGoalDays.present) {
+      map['weekly_goal_days'] = Variable<int>(weeklyGoalDays.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StreakSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('weeklyGoalDays: $weeklyGoalDays, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -6107,11 +6382,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PersonalRecordsTable personalRecords = $PersonalRecordsTable(
     this,
   );
+  late final $StreakSettingsTable streakSettings = $StreakSettingsTable(this);
   late final WorkoutDao workoutDao = WorkoutDao(this as AppDatabase);
   late final ExerciseDao exerciseDao = ExerciseDao(this as AppDatabase);
   late final RoutineDao routineDao = RoutineDao(this as AppDatabase);
   late final PrDao prDao = PrDao(this as AppDatabase);
   late final HistoryDao historyDao = HistoryDao(this as AppDatabase);
+  late final StreakDao streakDao = StreakDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6127,6 +6404,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     routineExercises,
     routineSets,
     personalRecords,
+    streakSettings,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -11853,6 +12131,176 @@ typedef $$PersonalRecordsTableProcessedTableManager =
       PersonalRecordRow,
       PrefetchHooks Function({bool exerciseId, bool sessionId, bool setId})
     >;
+typedef $$StreakSettingsTableCreateCompanionBuilder =
+    StreakSettingsCompanion Function({
+      required String id,
+      Value<int> weeklyGoalDays,
+      Value<DateTime?> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$StreakSettingsTableUpdateCompanionBuilder =
+    StreakSettingsCompanion Function({
+      Value<String> id,
+      Value<int> weeklyGoalDays,
+      Value<DateTime?> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$StreakSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $StreakSettingsTable> {
+  $$StreakSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get weeklyGoalDays => $composableBuilder(
+    column: $table.weeklyGoalDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$StreakSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $StreakSettingsTable> {
+  $$StreakSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get weeklyGoalDays => $composableBuilder(
+    column: $table.weeklyGoalDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$StreakSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StreakSettingsTable> {
+  $$StreakSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get weeklyGoalDays => $composableBuilder(
+    column: $table.weeklyGoalDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$StreakSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $StreakSettingsTable,
+          StreakSettingRow,
+          $$StreakSettingsTableFilterComposer,
+          $$StreakSettingsTableOrderingComposer,
+          $$StreakSettingsTableAnnotationComposer,
+          $$StreakSettingsTableCreateCompanionBuilder,
+          $$StreakSettingsTableUpdateCompanionBuilder,
+          (
+            StreakSettingRow,
+            BaseReferences<
+              _$AppDatabase,
+              $StreakSettingsTable,
+              StreakSettingRow
+            >,
+          ),
+          StreakSettingRow,
+          PrefetchHooks Function()
+        > {
+  $$StreakSettingsTableTableManager(
+    _$AppDatabase db,
+    $StreakSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StreakSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StreakSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StreakSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> weeklyGoalDays = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StreakSettingsCompanion(
+                id: id,
+                weeklyGoalDays: weeklyGoalDays,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<int> weeklyGoalDays = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StreakSettingsCompanion.insert(
+                id: id,
+                weeklyGoalDays: weeklyGoalDays,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$StreakSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $StreakSettingsTable,
+      StreakSettingRow,
+      $$StreakSettingsTableFilterComposer,
+      $$StreakSettingsTableOrderingComposer,
+      $$StreakSettingsTableAnnotationComposer,
+      $$StreakSettingsTableCreateCompanionBuilder,
+      $$StreakSettingsTableUpdateCompanionBuilder,
+      (
+        StreakSettingRow,
+        BaseReferences<_$AppDatabase, $StreakSettingsTable, StreakSettingRow>,
+      ),
+      StreakSettingRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -11877,4 +12325,6 @@ class $AppDatabaseManager {
       $$RoutineSetsTableTableManager(_db, _db.routineSets);
   $$PersonalRecordsTableTableManager get personalRecords =>
       $$PersonalRecordsTableTableManager(_db, _db.personalRecords);
+  $$StreakSettingsTableTableManager get streakSettings =>
+      $$StreakSettingsTableTableManager(_db, _db.streakSettings);
 }
