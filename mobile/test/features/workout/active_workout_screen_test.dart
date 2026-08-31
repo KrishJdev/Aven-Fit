@@ -1,4 +1,5 @@
 import 'package:aven_fit/core/database/app_database.dart';
+import 'package:aven_fit/core/notifications/notification_service.dart';
 import 'package:aven_fit/features/workout/data/workout_local_source.dart';
 import 'package:aven_fit/features/workout/data/workout_repository.dart';
 import 'package:aven_fit/features/workout/domain/workout_set.dart';
@@ -10,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+import 'fake_notification_service.dart';
 
 void main() {
   group('ActiveWorkoutController WU-3.4 Logic', () {
@@ -70,6 +73,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
       );
 
@@ -129,6 +133,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
       );
 
@@ -191,6 +196,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
       );
 
@@ -224,6 +230,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
       );
 

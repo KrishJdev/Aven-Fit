@@ -6,6 +6,7 @@ import '../data/workout_repository.dart';
 import '../domain/session_exercise.dart';
 import '../domain/workout_set.dart';
 import 'active_workout_state.dart';
+import 'rest_timer_controller.dart';
 
 part 'active_workout_controller.g.dart';
 
@@ -15,15 +16,10 @@ part 'active_workout_controller.g.dart';
 /// an immutable new state and initiates asynchronous write-through to SQLite.
 @riverpod
 class ActiveWorkoutController extends _$ActiveWorkoutController {
-  Timer? _restTimer;
   static int _setCounter = 0;
 
   @override
   FutureOr<ActiveWorkoutState> build() async {
-    ref.onDispose(() {
-      _restTimer?.cancel();
-    });
-
     final repository = ref.watch(workoutRepositoryProvider);
     final activeSession = await repository.getActiveSession();
     if (activeSession != null) {
@@ -224,9 +220,23 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     final repository = ref.read(workoutRepositoryProvider);
     await repository.updateSet(updatedSet);
 
-    // Trigger rest timer on set completion
+    // Rest timer (§8.3): resting and lifting are mutually exclusive — any ✓
+    // cancels the live countdown; a completed working set restarts it with
+    // the exercise's rest override (default 90s). Warm-up sets never rest.
+    final restTimer = ref.read(restTimerControllerProvider.notifier);
     if (updatedSet.isCompleted) {
-      startRestTimer(current.restTimerDurationSeconds);
+      if (updatedSet.type == SetType.warmup) {
+        restTimer.cancel();
+      } else {
+        final matches =
+            current.exercises.where((e) => e.id == updatedSet.sessionExerciseId);
+        final sessionExercise = matches.isNotEmpty ? matches.first : null;
+        restTimer.start(
+          seconds: sessionExercise?.restSeconds,
+          sessionExerciseId: updatedSet.sessionExerciseId,
+          exerciseName: sessionExercise?.exerciseName,
+        );
+      }
     }
   }
 
@@ -348,70 +358,12 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     }
   }
 
-  /// Starts the rest timer countdown with monotonic 1s ticks.
-  void startRestTimer(int durationSeconds) {
-    _restTimer?.cancel();
-    final current = state.value;
-    if (current == null) return;
-
-    state = AsyncValue.data(current.copyWith(
-      isRestTimerRunning: true,
-      restTimerDurationSeconds: durationSeconds,
-      restTimerRemainingSeconds: durationSeconds,
-    ));
-
-    _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final s = state.value;
-      if (s == null || !s.isRestTimerRunning) {
-        timer.cancel();
-        return;
-      }
-
-      if (s.restTimerRemainingSeconds <= 1) {
-        timer.cancel();
-        state = AsyncValue.data(s.copyWith(
-          isRestTimerRunning: false,
-          restTimerRemainingSeconds: 0,
-        ));
-      } else {
-        state = AsyncValue.data(s.copyWith(
-          restTimerRemainingSeconds: s.restTimerRemainingSeconds - 1,
-        ));
-      }
-    });
-  }
-
-  /// Adds extra rest time (e.g. +15s button).
-  void addRestTime(int additionalSeconds) {
-    final current = state.value;
-    if (current == null || !current.isRestTimerRunning) return;
-
-    state = AsyncValue.data(current.copyWith(
-      restTimerRemainingSeconds:
-          current.restTimerRemainingSeconds + additionalSeconds,
-      restTimerDurationSeconds:
-          current.restTimerDurationSeconds + additionalSeconds,
-    ));
-  }
-
-  /// Stops or skips the rest timer.
-  void stopRestTimer() {
-    _restTimer?.cancel();
-    final current = state.value;
-    if (current == null) return;
-
-    state = AsyncValue.data(current.copyWith(
-      isRestTimerRunning: false,
-      restTimerRemainingSeconds: 0,
-    ));
-  }
-
   /// Finishes the active workout session.
   Future<void> finishWorkout() async {
     final current = state.value;
     if (current == null || current.session == null) return;
 
-    _restTimer?.cancel();
+    ref.read(restTimerControllerProvider.notifier).cancel();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repository = ref.read(workoutRepositoryProvider);
@@ -429,7 +381,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     final current = state.value;
     if (current == null || current.session == null) return;
 
-    _restTimer?.cancel();
+    ref.read(restTimerControllerProvider.notifier).cancel();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repository = ref.read(workoutRepositoryProvider);

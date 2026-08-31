@@ -197,6 +197,22 @@
     - Created `active_workout_screen_test.dart` (5 comprehensive unit & widget tests) verifying time-of-day auto-names, warmup pyramid generation & volume exclusion, set/session mutation, and widget rendering & stepper interactions.
     - `dart run build_runner build` (102 outputs), `flutter analyze` (0 issues), `flutter test` (**80/80 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
   - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.5: Rest Timer & Notifications** (`rest_timer_service.dart`, background audio/vibration notification on timer completion, notification action `+15s`, lock-screen synchronization).
+- **2026-08-31 (session 21):** Implemented **Slice 3 WU-3.5: Rest Timer & Notification**:
+  - **Notification Infrastructure (`core/notifications/`):**
+    - `notification_service.dart`: `flutter_local_notifications` 22.3.0 added (v22 named-param API). Silent low-importance `avenfit_rest_timer` channel (§8.3 — no sound/vibration; completion feedback is a P1 Settings concern), idempotent `initialize()`, Android 13+ `POST_NOTIFICATIONS` runtime prompt, session-latched just-in-time priming (grant / "not now" — never re-nagged, §3), `showRestCountdown` (updates in place with progress bar + "+15s" action), `showRestComplete`, and `cancelRestNotification`. Every platform call is guarded — notifications denied or unsupported platforms never break the rest flow (L2/L4). `POST_NOTIFICATIONS` declared in `AndroidManifest.xml`.
+    - keepAlive `notificationServiceProvider`; channel bootstrap fires once on first watch. Full lock-screen action delivery is deferred to the WU-3.10 foreground service (the "+15s" action currently works while the app process is alive in the foreground).
+  - **Rest Timer Engine (`features/workout/presentation/`):**
+    - `rest_timer_state.dart`: Freezed `RestTimerState` — epoch deadline `endsAtEpochMs` is the single source of truth, `initialSeconds` preserves restart semantics, plus MM:SS / progress-fraction helpers.
+    - `rest_timer_controller.dart`: keepAlive `RestTimerController` — auto-starts on set confirmation (default 90s, per-exercise `restSeconds` override), `Stream.periodic` used ONLY for UI/notification refresh ticks with every value recomputed from the deadline (L8 — zero drift, zero CPU polling), +15s/−15s applied to the epoch deadline (dropping ≤0 dismisses), restart restores the original duration, instant cancel (§8.3 mutual exclusivity: resting ≠ lifting — any ✓ replaces the countdown), warm-up sets cancel rest instead of starting it, and natural completion flips the notification to a silent "rest complete" notice.
+    - `widgets/rest_timer_bar.dart`: slim animated bar under the session header — remaining time, ±15s, restart, dismiss, cyan progress track; never blocks content (§8.1/§8.3).
+  - **Integration (`active_workout_controller.dart` / `active_workout_screen.dart` / `active_workout_state.dart`):**
+    - Removed the legacy `Timer.periodic` rest logic and the duplicated rest fields from the workout controller/state; `toggleSetCompleted` now delegates to `RestTimerController`, and `finishWorkout`/`cancelWorkout` clear the countdown.
+    - Screen renders `RestTimerBar` under the header (AnimatedSize in/out), adds a header timer button for manual rest start (§8.3/L1), and shows the explainer primer dialog ("See your rest countdown on the lock screen") before the OS prompt on the first rest start.
+  - **Verification & Tests (`test/features/workout/`):**
+    - Created `rest_timer_test.dart` (13 tests): epoch deadline math, ±15s symmetry, dismissal below zero, cancel, restart semantics, replacement (auto-cancel rule), manual start, fake-async tick/complete pipeline, JIT primer grant/deny/no-re-nag, and `RestTimerBar` widget interactions.
+    - Created `fake_notification_service.dart` shared test double; updated `workout_reference_slice_test.dart` and `active_workout_screen_test.dart` to the new rest-timer API.
+    - `dart run build_runner build` (117 outputs), `flutter analyze` (0 issues), `flutter test` (**93/93 passing across mobile**).
+  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.6: PR Detection Engine** (`features/progress/domain/pr_record.dart`, `pr_tables.dart`, `pr_repository.dart` — 4 PR types, warm-up exclusion, Epley 1RM, hooked into set confirmation) — parallel-safe with WU-3.7/WU-3.8.
 
 
 

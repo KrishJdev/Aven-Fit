@@ -16,9 +16,6 @@ abstract class ActiveWorkoutState with _$ActiveWorkoutState {
     @Default(<SessionExercise>[]) List<SessionExercise> exercises,
     @Default(<WorkoutSet>[]) List<WorkoutSet> sets,
     @Default(0) int elapsedSeconds,
-    @Default(false) bool isRestTimerRunning,
-    @Default(90) int restTimerDurationSeconds,
-    @Default(0) int restTimerRemainingSeconds,
     @Default(false) bool isSaving,
     String? errorMessage,
   }) = _ActiveWorkoutState;

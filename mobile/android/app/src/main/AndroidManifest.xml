@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Rest-timer lock-screen countdown (FEATURES.md §8.3): runtime-requested
+         just-in-time on Android 13+; denial never breaks the in-app rest bar. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="aven_fit"
         android:name="${applicationName}"

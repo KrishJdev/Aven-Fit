@@ -1,14 +1,18 @@
 import 'package:aven_fit/core/database/app_database.dart';
+import 'package:aven_fit/core/notifications/notification_service.dart';
 import 'package:aven_fit/features/workout/data/workout_repository.dart';
 import 'package:aven_fit/features/workout/domain/session_exercise.dart';
 import 'package:aven_fit/features/workout/domain/workout_session.dart';
 import 'package:aven_fit/features/workout/domain/workout_set.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_controller.dart';
 import 'package:aven_fit/features/workout/presentation/active_workout_state.dart';
+import 'package:aven_fit/features/workout/presentation/rest_timer_controller.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'fake_notification_service.dart';
 
 void main() {
   group('Workout Domain Entities', () {
@@ -226,6 +230,7 @@ void main() {
       container = ProviderContainer(
         overrides: [
           workoutRepositoryProvider.overrideWithValue(repository),
+          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
         ],
       );
     });
@@ -273,16 +278,18 @@ void main() {
       state = await container.read(activeWorkoutControllerProvider.future);
       expect(state.sets.first.isCompleted, isTrue);
       expect(state.completedSetsCount, 1);
-      expect(state.isRestTimerRunning, isTrue);
+
+      // Rest timer auto-starts on set confirmation (§8.3, default 90s)
+      final restTimer = container.read(restTimerControllerProvider);
+      expect(restTimer.isRunning, isTrue);
+      expect(restTimer.totalSeconds, 90);
 
       // Rest timer adjustments
-      controller.addRestTime(15);
-      state = await container.read(activeWorkoutControllerProvider.future);
-      expect(state.restTimerRemainingSeconds, 105);
+      container.read(restTimerControllerProvider.notifier).addTime(15);
+      expect(container.read(restTimerControllerProvider).remainingSeconds, 105);
 
-      controller.stopRestTimer();
-      state = await container.read(activeWorkoutControllerProvider.future);
-      expect(state.isRestTimerRunning, isFalse);
+      container.read(restTimerControllerProvider.notifier).cancel();
+      expect(container.read(restTimerControllerProvider).isRunning, isFalse);
 
       // Finish workout
       await controller.finishWorkout();

@@ -10,7 +10,10 @@ import '../domain/ghost_set.dart';
 import 'active_workout_controller.dart';
 import 'active_workout_state.dart';
 import 'exercise_picker_screen.dart';
+import 'rest_timer_controller.dart';
+import 'rest_timer_state.dart';
 import 'widgets/exercise_block_card.dart';
+import 'widgets/rest_timer_bar.dart';
 
 /// Complete rebuild of the Active Workout Screen.
 ///
@@ -23,6 +26,15 @@ class ActiveWorkoutScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stateAsync = ref.watch(activeWorkoutControllerProvider);
     final controller = ref.read(activeWorkoutControllerProvider.notifier);
+    final restNotifier = ref.read(restTimerControllerProvider.notifier);
+
+    // Just-in-time notification primer (FEATURES.md §3): explained once,
+    // before the OS prompt, the first time a rest countdown starts.
+    ref.listen<RestTimerState>(restTimerControllerProvider, (prev, next) {
+      if (next.needsPermissionPrimer && prev?.needsPermissionPrimer != true) {
+        _showRestNotificationPrimer(context, ref);
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppTheme.oledBlack,
@@ -68,6 +80,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Manual rest start, always available without any
+                          // prior set (FEATURES.md §8.3 / Law L1).
+                          IconButton(
+                            icon: const Icon(LucideIcons.timer, size: 20, color: AppTheme.textSecondary),
+                            tooltip: 'Start rest timer',
+                            onPressed: () => restNotifier.start(),
+                          ),
                           TextButton(
                             onPressed: () => _confirmFinishWorkout(context, controller),
                             child: Text(
@@ -203,12 +222,19 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     ActiveWorkoutController controller,
   ) {
     final exercises = state.exercises;
+    final restTimer = ref.watch(restTimerControllerProvider);
 
     return Column(
       children: [
-        // Live Rest Timer Bar (if running)
-        if (state.isRestTimerRunning)
-          _buildRestTimerBar(state, controller),
+        // Slim rest timer bar under the header (§8.3) — animated in/out,
+        // never blocks content.
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          alignment: Alignment.topCenter,
+          child: restTimer.isRunning
+              ? RestTimerBar(key: const ValueKey('rest_timer_bar'))
+              : const SizedBox(width: double.infinity),
+        ),
 
         // Session Stats Summary Header
         _buildStatsHeader(state),
@@ -338,40 +364,41 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRestTimerBar(ActiveWorkoutState state, ActiveWorkoutController controller) {
-    final remaining = state.restTimerRemainingSeconds;
-    final minutes = (remaining ~/ 60).toString().padLeft(2, '0');
-    final seconds = (remaining % 60).toString().padLeft(2, '0');
+  void _showRestNotificationPrimer(BuildContext context, WidgetRef ref) {
+    final restNotifier = ref.read(restTimerControllerProvider.notifier);
 
-    return Container(
-      width: double.infinity,
-      color: const Color(0xFF11222C),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          const Icon(LucideIcons.timer, size: 18, color: AppTheme.neonCyan),
-          const SizedBox(width: 8),
-          Text(
-            'REST TIMER:',
-            style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.neonCyan),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            '$minutes:$seconds',
-            style: AppTheme.num(15, weight: FontWeight.w700, color: Colors.white),
-          ),
-          const Spacer(),
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF16191D),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'LOCK-SCREEN COUNTDOWN',
+          style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+        ),
+        content: const Text(
+          'See your rest countdown on the lock screen — with a +15s action — while you train. You can keep the timer inside the app too.',
+          style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+        ),
+        actions: [
           TextButton(
-            onPressed: () => controller.addRestTime(15),
-            child: Text(
-              '+15s',
-              style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.neonCyan),
-            ),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              restNotifier.resolvePermissionPrimer(enable: false);
+            },
+            child: const Text('NOT NOW', style: TextStyle(color: AppTheme.textSecondary)),
           ),
-          IconButton(
-            icon: const Icon(LucideIcons.x, size: 16, color: AppTheme.textSecondary),
-            onPressed: controller.stopRestTimer,
-            visualDensity: VisualDensity.compact,
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              restNotifier.resolvePermissionPrimer(enable: true);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.neonCyan,
+              foregroundColor: Colors.black,
+            ),
+            child: const Text('ALLOW'),
           ),
         ],
       ),
