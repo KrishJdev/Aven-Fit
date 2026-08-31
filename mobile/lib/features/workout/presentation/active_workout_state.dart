@@ -1,0 +1,37 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../domain/workout_session.dart';
+import '../domain/workout_set.dart';
+
+part 'active_workout_state.freezed.dart';
+
+/// Immutable view state for the active workout logging screen.
+///
+/// Designed to support 100% offline usage, sub-3s logging, and epoch math timers.
+@freezed
+abstract class ActiveWorkoutState with _$ActiveWorkoutState {
+  const factory ActiveWorkoutState({
+    required WorkoutSession? session,
+    @Default(<WorkoutSet>[]) List<WorkoutSet> sets,
+    @Default(0) int elapsedSeconds,
+    @Default(false) bool isRestTimerRunning,
+    @Default(90) int restTimerDurationSeconds,
+    @Default(0) int restTimerRemainingSeconds,
+    @Default(false) bool isSaving,
+    String? errorMessage,
+  }) = _ActiveWorkoutState;
+
+  const ActiveWorkoutState._();
+
+  /// Whether an active session is currently running.
+  bool get hasActiveSession =>
+      session != null && session?.status == WorkoutStatus.active;
+
+  /// Count of completed sets in the active session.
+  int get completedSetsCount => sets.where((s) => s.isCompleted).length;
+
+  /// Total working volume lifted in kg (excluding warmup sets per Law L1).
+  double get totalVolumeKg => sets
+      .where((s) => s.isCompleted && s.type != SetType.warmup)
+      .fold<double>(0.0, (sum, s) => sum + (s.weightKg * s.reps));
+}

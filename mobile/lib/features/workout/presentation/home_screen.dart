@@ -60,7 +60,7 @@ class HomePage extends ConsumerWidget {
               const Text('Foundation online — offline-first.', style: TextStyle(color: AppTheme.textSecondary)),
               const SizedBox(height: 24),
               FilledButton(
-                onPressed: () {},
+                onPressed: () => context.push('/workout/active'),
                 child: const Text('START NEW SESSION'),
               ),
             ],

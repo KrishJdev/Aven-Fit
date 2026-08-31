@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
-import 'tables/workout_sessions.dart';
+import '../../features/workout/data/workout_local_source.dart';
+import '../../features/workout/data/workout_tables.dart';
 
 part 'app_database.g.dart';
 
@@ -10,9 +11,13 @@ part 'app_database.g.dart';
 ///
 /// Runs in a background isolate via `drift_flutter` so queries never
 /// block the UI thread on budget devices.
-@DriftDatabase(tables: [WorkoutSessions])
+@DriftDatabase(
+  tables: [WorkoutSessions, WorkoutSets],
+  daos: [WorkoutDao],
+)
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase([QueryExecutor? executor])
+      : super(executor ?? _openConnection());
 
   @override
   int get schemaVersion => 1;

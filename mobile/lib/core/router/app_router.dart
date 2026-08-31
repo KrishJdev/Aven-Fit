@@ -1,6 +1,7 @@
 import 'package:aven_fit/features/history/presentation/progress_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routines_screen.dart';
+import 'package:aven_fit/features/workout/presentation/active_workout_screen.dart';
 import 'package:aven_fit/features/workout/presentation/home_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,6 +34,10 @@ final appRouter = GoRouter(
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/workout/active',
+      builder: (context, state) => const ActiveWorkoutScreen(),
     ),
   ],
 );
