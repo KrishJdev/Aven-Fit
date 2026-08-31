@@ -44,7 +44,7 @@ final class ExercisePickerControllerProvider
 }
 
 String _$exercisePickerControllerHash() =>
-    r'09e0521d894eabb5f0c038e5207ab0fd5a3384b4';
+    r'bcff8b9a95630694955d682af01a0ad28b13689f';
 
 /// Riverpod controller managing search, filtering, and recent history for the in-session exercise picker.
 ///

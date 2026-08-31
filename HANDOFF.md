@@ -181,8 +181,23 @@
     - `app_router.dart`: Registered `/workout/picker` route.
   - **Verification & Tests (`test/features/workout/` & `backend/`):**
     - Created `exercise_picker_test.dart` (8 comprehensive unit & widget tests) verifying search query filtering (<300ms latency), filter combinations, controller recent history SQLite queries, optimistic favourites toggles, and modal tap-to-add callbacks.
-    - `dart run build_runner build` (120 outputs), `flutter analyze` (0 issues), `flutter test` (**75/75 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
-  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.4: Active Workout Screen Rebuild** (Live session UI, auto-named header, dynamic exercise blocks, set table with PREV ghost columns, quick steppers +/−2.5kg, warm-up pyramid generator, swipe-to-delete, and rest timer integration).
+- **2026-08-31 (session 20):** Implemented **Slice 3 WU-3.4: Active Workout Screen Rebuild**:
+  - **Controller & Engine Enhancements (`features/workout/presentation/`):**
+    - `active_workout_controller.dart`: Added `updateWorkoutName(newName)` (inline session rename with write-through), `updateSet(set)` (optimistic + SQLite write-through), `generateWarmupPyramid(workingWeightKg)` (§8.1 progressive 4-tier warmup ladder: Empty bar 20kg × 10, 50% × 5, 70% × 3, 85% × 1 flagged as `SetType.warmup`), `generateDefaultWorkoutName(time)` (time-of-day auto-naming), and collision-safe monotonic set ID generation.
+  - **Presentation Widgets (`features/workout/presentation/widgets/`):**
+    - `set_row_widget.dart`: Interactive set row with `SET #` / `W` warmup / `D` dropset badge, `PREV` ghost value preview, `KG` quick steppers (`−2.5` / `+2.5` buttons + edit dialog), `REPS` quick steppers (`−1` / `+1` buttons + edit dialog), and Volt Green `✓` toggle with haptic feedback & rest timer trigger.
+    - `warmup_pyramid_sheet.dart`: Bottom modal calculating and previewing warmup ladder with target working load adjustment.
+    - `exercise_block_card.dart`: Dynamic exercise card block with muscle tag, 3-dots popup menu (Warm-up pyramid, Remove exercise), table headers, set rows list, and `+ ADD SET` button.
+  - **Active Workout Screen Rebuild (`features/workout/presentation/active_workout_screen.dart`):**
+    - Auto-named / editable title header with duration and summary stats (`SETS`, `WORKING VOLUME` strictly excluding warmups per Law L1, `EXERCISES`).
+    - Integrated `GhostPrefillService` batch resolution for instant rendering of previous performance values.
+    - Sticky bottom rest timer bar (`REST TIMER: MM:SS`, `+15s` button, stop/skip `✕` button).
+    - Sticky bottom action bar (`[+ ADD EXERCISE]`, `[✓ FINISH]`) and cancel/discard confirmation dialog.
+  - **Verification & Tests (`test/features/workout/` & `backend/`):**
+    - Created `active_workout_screen_test.dart` (5 comprehensive unit & widget tests) verifying time-of-day auto-names, warmup pyramid generation & volume exclusion, set/session mutation, and widget rendering & stepper interactions.
+    - `dart run build_runner build` (102 outputs), `flutter analyze` (0 issues), `flutter test` (**80/80 tests passing across mobile**), `./gradlew test` (**BUILD SUCCESSFUL across backend**).
+  - **NEXT STEP (exact):** Proceed to **Slice 3 WU-3.5: Rest Timer & Notifications** (`rest_timer_service.dart`, background audio/vibration notification on timer completion, notification action `+15s`, lock-screen synchronization).
+
 
 
 

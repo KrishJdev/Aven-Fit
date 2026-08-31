@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../domain/workout_set.dart';
+import '../../exercise/domain/exercise.dart';
+import '../data/ghost_prefill_service.dart';
+import '../domain/ghost_set.dart';
 import 'active_workout_controller.dart';
 import 'active_workout_state.dart';
+import 'exercise_picker_screen.dart';
+import 'widgets/exercise_block_card.dart';
 
-/// Declarative Active Workout Screen built with Sharp Glassmorphism design tokens.
+/// Complete rebuild of the Active Workout Screen.
 ///
-/// Observes [activeWorkoutControllerProvider] and dispatches unidirectional actions.
+/// Implements FEATURES.md §8.1, Law L1 (<3s set logging), Law L2 (100% offline),
+/// and Law L7 (instant write-through persistence).
 class ActiveWorkoutScreen extends ConsumerWidget {
   const ActiveWorkoutScreen({super.key});
 
@@ -23,23 +29,78 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppTheme.oledBlack,
         elevation: 0,
-        title: Text(
-          'ACTIVE WORKOUT',
-          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.neonCyan),
+        leading: IconButton(
+          icon: const Icon(LucideIcons.chevronDown, color: Colors.white, size: 22),
+          onPressed: () => context.pop(),
         ),
+        title: stateAsync.whenOrNull(
+              data: (state) => state.hasActiveSession
+                  ? GestureDetector(
+                      onTap: () => _editSessionNameDialog(
+                        context,
+                        currentName: state.session?.name ?? 'Workout',
+                        onSubmitted: controller.updateWorkoutName,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              state.session?.name ?? 'ACTIVE WORKOUT',
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(LucideIcons.pencil, size: 14, color: AppTheme.textSecondary),
+                        ],
+                      ),
+                    )
+                  : Text(
+                      'ACTIVE WORKOUT',
+                      style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.neonCyan),
+                    ),
+            ) ??
+            const SizedBox.shrink(),
         actions: [
           stateAsync.whenOrNull(
                 data: (state) => state.hasActiveSession
-                    ? TextButton(
-                        onPressed: () => _confirmFinishWorkout(context, controller),
-                        child: Text(
-                          'FINISH',
-                          style: AppTheme.num(
-                            14,
-                            weight: FontWeight.w700,
-                            color: AppTheme.voltGreen,
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TextButton(
+                            onPressed: () => _confirmFinishWorkout(context, controller),
+                            child: Text(
+                              'FINISH',
+                              style: AppTheme.num(
+                                14,
+                                weight: FontWeight.w700,
+                                color: AppTheme.voltGreen,
+                              ),
+                            ),
                           ),
-                        ),
+                          PopupMenuButton<String>(
+                            icon: const Icon(LucideIcons.ellipsisVertical, color: AppTheme.textSecondary, size: 20),
+                            color: const Color(0xFF1B1F24),
+                            onSelected: (val) {
+                              if (val == 'cancel') {
+                                _confirmCancelWorkout(context, controller);
+                              }
+                            },
+                            itemBuilder: (ctx) => [
+                              const PopupMenuItem(
+                                value: 'cancel',
+                                child: Row(
+                                  children: [
+                                    Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
+                                    SizedBox(width: 8),
+                                    Text('Discard Workout', style: TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       )
                     : null,
               ) ??
@@ -55,13 +116,20 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           if (!state.hasActiveSession) {
             return _buildEmptyState(context, controller);
           }
-          return _buildActiveWorkoutView(context, state, controller);
+          return _buildActiveWorkoutView(context, ref, state, controller);
         },
+      ),
+      bottomNavigationBar: stateAsync.whenOrNull(
+        data: (state) => state.hasActiveSession
+            ? _buildBottomStickyBar(context, ref, state, controller)
+            : null,
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context, ActiveWorkoutController controller) {
+    final defaultName = ActiveWorkoutController.generateDefaultWorkoutName();
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -82,14 +150,14 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => controller.startWorkout(name: 'Quick Workout'),
+              onPressed: () => controller.startWorkout(name: defaultName),
               icon: const Icon(LucideIcons.play, size: 18),
               label: const Text('START EMPTY WORKOUT'),
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.neonCyan,
                 foregroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
           ],
@@ -130,52 +198,140 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
   Widget _buildActiveWorkoutView(
     BuildContext context,
+    WidgetRef ref,
     ActiveWorkoutState state,
     ActiveWorkoutController controller,
   ) {
+    final exercises = state.exercises;
+
     return Column(
       children: [
-        // Summary & Rest timer bar
+        // Live Rest Timer Bar (if running)
         if (state.isRestTimerRunning)
           _buildRestTimerBar(state, controller),
 
-        // Workout stats header
+        // Session Stats Summary Header
         _buildStatsHeader(state),
 
-        // Exercise and sets list
+        // Exercise Blocks List
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            children: [
-              _buildExerciseCard(
-                exerciseName: 'Barbell Bench Press',
-                exerciseId: 'ex_bench_press',
-                sets: state.sets.where((s) => s.exerciseId == 'ex_bench_press').toList(),
-                controller: controller,
-              ),
-              const SizedBox(height: 16),
-              _buildExerciseCard(
-                exerciseName: 'Incline Dumbbell Press',
-                exerciseId: 'ex_incline_db_press',
-                sets: state.sets.where((s) => s.exerciseId == 'ex_incline_db_press').toList(),
-                controller: controller,
-              ),
-              const SizedBox(height: 32),
-              OutlinedButton.icon(
-                onPressed: () => _confirmCancelWorkout(context, controller),
-                icon: const Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
-                label: const Text(
-                  'CANCEL WORKOUT',
-                  style: TextStyle(color: AppTheme.burntOrange, fontWeight: FontWeight.w600),
+          child: exercises.isEmpty
+              ? _buildNoExercisesPlaceholder(context, ref, controller)
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                  itemCount: exercises.length,
+                  itemBuilder: (context, index) {
+                    final se = exercises[index];
+                    final sets = state.sets.where((s) => s.sessionExerciseId == se.id).toList();
+
+                    return FutureBuilder<List<GhostSet>>(
+                      future: ref.read(ghostPrefillServiceProvider).resolveGhostSetsForExercise(
+                            exerciseId: se.exerciseId,
+                            totalSetsCount: sets.isNotEmpty ? sets.length : 1,
+                            activeSessionSets: sets,
+                          ),
+                      builder: (context, snapshot) {
+                        final ghosts = snapshot.data ?? const [];
+                        return ExerciseBlockCard(
+                          sessionExercise: se,
+                          sets: sets,
+                          ghostSets: ghosts,
+                          controller: controller,
+                        );
+                      },
+                    );
+                  },
                 ),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.burntOrange),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoExercisesPlaceholder(
+    BuildContext context,
+    WidgetRef ref,
+    ActiveWorkoutController controller,
+  ) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.plusCircle, size: 52, color: AppTheme.textSecondary),
+            const SizedBox(height: 16),
+            Text(
+              'ADD YOUR FIRST EXERCISE',
+              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Search from 55+ built-in exercises or create your own custom exercise.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: () => _openExercisePicker(context, controller),
+              icon: const Icon(LucideIcons.plus, size: 16),
+              label: const Text('ADD EXERCISE'),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.neonCyan,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              const SizedBox(height: 48),
-            ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsHeader(ActiveWorkoutState state) {
+    final completedSets = state.completedSetsCount;
+    final totalSets = state.sets.length;
+    final volume = state.totalVolumeKg % 1 == 0
+        ? state.totalVolumeKg.toInt().toString()
+        : state.totalVolumeKg.toStringAsFixed(1);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.glassFill,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.glassBorder),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatColumn('SETS', '$completedSets / $totalSets'),
+          _buildStatColumn('WORKING VOLUME', '$volume kg', isHighlight: true),
+          _buildStatColumn('EXERCISES', '${state.exercises.length}'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatColumn(String label, String value, {bool isHighlight = false}) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textSecondary,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTheme.num(
+            14,
+            weight: FontWeight.w700,
+            color: isHighlight ? AppTheme.voltGreen : Colors.white,
           ),
         ),
       ],
@@ -189,31 +345,31 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFF13222B),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: const Color(0xFF11222C),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          const Icon(LucideIcons.timer, size: 20, color: AppTheme.neonCyan),
+          const Icon(LucideIcons.timer, size: 18, color: AppTheme.neonCyan),
           const SizedBox(width: 8),
           Text(
             'REST TIMER:',
-            style: AppTheme.num(13, weight: FontWeight.w600, color: AppTheme.neonCyan),
+            style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.neonCyan),
           ),
           const SizedBox(width: 6),
           Text(
             '$minutes:$seconds',
-            style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+            style: AppTheme.num(15, weight: FontWeight.w700, color: Colors.white),
           ),
           const Spacer(),
           TextButton(
             onPressed: () => controller.addRestTime(15),
             child: Text(
               '+15s',
-              style: AppTheme.num(13, weight: FontWeight.w700, color: AppTheme.neonCyan),
+              style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.neonCyan),
             ),
           ),
           IconButton(
-            icon: const Icon(LucideIcons.x, size: 18, color: AppTheme.textSecondary),
+            icon: const Icon(LucideIcons.x, size: 16, color: AppTheme.textSecondary),
             onPressed: controller.stopRestTimer,
             visualDensity: VisualDensity.compact,
           ),
@@ -222,227 +378,114 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsHeader(ActiveWorkoutState state) {
+  Widget _buildBottomStickyBar(
+    BuildContext context,
+    WidgetRef ref,
+    ActiveWorkoutState state,
+    ActiveWorkoutController controller,
+  ) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.glassBorder),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatColumn('SETS', '${state.completedSetsCount} / ${state.sets.length}'),
-          _buildStatColumn('VOLUME', '${state.totalVolumeKg.toStringAsFixed(1)} kg'),
-          _buildStatColumn('SESSION', state.session?.name ?? 'Workout'),
-        ],
+      color: AppTheme.oledBlack,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: OutlinedButton.icon(
+                  onPressed: () => _openExercisePicker(context, controller),
+                  icon: const Icon(LucideIcons.plus, size: 18),
+                  label: const Text('ADD EXERCISE'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.neonCyan,
+                    side: const BorderSide(color: AppTheme.neonCyan),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: FilledButton.icon(
+                  onPressed: () => _confirmFinishWorkout(context, controller),
+                  icon: const Icon(LucideIcons.check, size: 18),
+                  label: const Text('FINISH'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppTheme.voltGreen,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatColumn(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: AppTheme.textSecondary,
-            letterSpacing: 0.5,
-          ),
+  void _openExercisePicker(BuildContext context, ActiveWorkoutController controller) {
+    Navigator.of(context).push<Exercise>(
+      MaterialPageRoute(
+        builder: (ctx) => ExercisePickerScreen(
+          onExerciseSelected: (exercise) {
+            controller.addExercise(exercise.id);
+          },
         ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: AppTheme.num(15, weight: FontWeight.w700, color: Colors.white),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildExerciseCard({
-    required String exerciseName,
-    required String exerciseId,
-    required List<WorkoutSet> sets,
-    required ActiveWorkoutController controller,
+  void _editSessionNameDialog(
+    BuildContext context, {
+    required String currentName,
+    required ValueChanged<String> onSubmitted,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.glassBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Exercise Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  exerciseName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(LucideIcons.ellipsis, size: 18, color: AppTheme.textSecondary),
-                  onPressed: () {},
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
+    final textController = TextEditingController(text: currentName);
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF16191D),
+        title: Text('RENAME WORKOUT', style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
+        content: TextField(
+          controller: textController,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+          decoration: InputDecoration(
+            hintText: 'Workout name...',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
-          const Divider(color: AppTheme.glassBorder, height: 1),
-
-          // Sets Table Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 40,
-                  child: Text('SET', style: _tableHeaderStyle),
-                ),
-                Expanded(
-                  child: Text('PREV', style: _tableHeaderStyle, textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('KG', style: _tableHeaderStyle, textAlign: TextAlign.center),
-                ),
-                Expanded(
-                  child: Text('REPS', style: _tableHeaderStyle, textAlign: TextAlign.center),
-                ),
-                const SizedBox(width: 44, child: Text('✓', textAlign: TextAlign.center, style: _tableHeaderStyle)),
-              ],
-            ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
           ),
-
-          // Set Rows
-          if (sets.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Center(
-                child: Text('No sets logged yet.', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-              ),
-            )
-          else
-            ...sets.map((set) => _buildSetRow(set, controller)),
-
-          // Add Set Action
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: SizedBox(
-              width: double.infinity,
-              child: TextButton.icon(
-                onPressed: () => controller.addSet(
-                  exerciseId: exerciseId,
-                  weightKg: sets.isNotEmpty ? sets.last.weightKg : 60.0,
-                  reps: sets.isNotEmpty ? sets.last.reps : 10,
-                ),
-                icon: const Icon(LucideIcons.plus, size: 16, color: AppTheme.neonCyan),
-                label: const Text(
-                  'ADD SET',
-                  style: TextStyle(color: AppTheme.neonCyan, fontWeight: FontWeight.w600, fontSize: 13),
-                ),
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color(0x1A00F0FF),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-              ),
-            ),
+          FilledButton(
+            onPressed: () {
+              if (textController.text.trim().isNotEmpty) {
+                onSubmitted(textController.text.trim());
+              }
+              Navigator.of(ctx).pop();
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.neonCyan, foregroundColor: Colors.black),
+            child: const Text('SAVE'),
           ),
         ],
       ),
     );
   }
-
-  Widget _buildSetRow(WorkoutSet set, ActiveWorkoutController controller) {
-    final isDone = set.isCompleted;
-
-    return Container(
-      color: isDone ? const Color(0x14E2F835) : Colors.transparent,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 40,
-            child: Text(
-              set.setNumber.toString(),
-              style: AppTheme.num(14, weight: FontWeight.w600, color: AppTheme.textSecondary),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              '—',
-              textAlign: TextAlign.center,
-              style: AppTheme.num(14, color: AppTheme.textSecondary),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              set.weightKg.toStringAsFixed(1),
-              textAlign: TextAlign.center,
-              style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              set.reps.toString(),
-              textAlign: TextAlign.center,
-              style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
-            ),
-          ),
-          SizedBox(
-            width: 44,
-            child: Center(
-              child: InkWell(
-                onTap: () => controller.toggleSetCompleted(set.id),
-                borderRadius: BorderRadius.circular(6),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: isDone ? AppTheme.voltGreen : const Color(0xFF22262B),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: isDone ? AppTheme.voltGreen : AppTheme.glassBorder,
-                    ),
-                  ),
-                  child: Icon(
-                    LucideIcons.check,
-                    size: 18,
-                    color: isDone ? Colors.black : AppTheme.textSecondary,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static const TextStyle _tableHeaderStyle = TextStyle(
-    fontSize: 11,
-    fontWeight: FontWeight.w600,
-    color: AppTheme.textSecondary,
-    letterSpacing: 0.5,
-  );
 
   void _confirmFinishWorkout(BuildContext context, ActiveWorkoutController controller) {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.glassFill,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        backgroundColor: const Color(0xFF16191D),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           'FINISH WORKOUT',
           style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
@@ -454,7 +497,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
+            child: const Text('RESUME', style: TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () {
@@ -473,10 +516,10 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.glassFill,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        backgroundColor: const Color(0xFF16191D),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          'CANCEL WORKOUT',
+          'DISCARD WORKOUT',
           style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.burntOrange),
         ),
         content: const Text(

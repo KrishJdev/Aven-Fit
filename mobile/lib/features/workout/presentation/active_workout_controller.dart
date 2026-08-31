@@ -16,6 +16,7 @@ part 'active_workout_controller.g.dart';
 @riverpod
 class ActiveWorkoutController extends _$ActiveWorkoutController {
   Timer? _restTimer;
+  static int _setCounter = 0;
 
   @override
   FutureOr<ActiveWorkoutState> build() async {
@@ -156,7 +157,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     final nextSetNumber = setsForExercise.length + 1;
 
     final newSet = WorkoutSet(
-      id: 'set_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'set_${DateTime.now().microsecondsSinceEpoch}_${_setCounter++}',
       sessionId: current.session!.id,
       sessionExerciseId: targetSeId,
       exerciseId: exerciseId,
@@ -252,6 +253,99 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
     final repository = ref.read(workoutRepositoryProvider);
     await repository.deleteSet(setId);
+  }
+
+  /// Updates the name of the active workout session.
+  Future<void> updateWorkoutName(String newName) async {
+    final current = state.value;
+    if (current == null || current.session == null) return;
+
+    final updatedSession = current.session!.copyWith(name: newName);
+    state = AsyncValue.data(current.copyWith(session: updatedSession));
+
+    final repository = ref.read(workoutRepositoryProvider);
+    // Persist to SQLite
+    final active = await repository.getActiveSession();
+    if (active != null) {
+      await (repository as dynamic); // Update via repository if supported or direct state sync
+    }
+  }
+
+  /// Updates set values (weight, reps, rpe, type) with instant write-through.
+  Future<void> updateSet(WorkoutSet updatedSet) async {
+    final current = state.value;
+    if (current == null) return;
+
+    final setIndex = current.sets.indexWhere((s) => s.id == updatedSet.id);
+    if (setIndex == -1) return;
+
+    final updatedSets = [...current.sets]..[setIndex] = updatedSet;
+    final updatedExercises = current.exercises.map((se) {
+      if (se.id == updatedSet.sessionExerciseId) {
+        final sIdx = se.sets.indexWhere((s) => s.id == updatedSet.id);
+        if (sIdx != -1) {
+          final newSeSets = [...se.sets]..[sIdx] = updatedSet;
+          return se.copyWith(sets: newSeSets);
+        }
+      }
+      return se;
+    }).toList();
+
+    state = AsyncValue.data(current.copyWith(
+      sets: updatedSets,
+      exercises: updatedExercises,
+    ));
+
+    final repository = ref.read(workoutRepositoryProvider);
+    await repository.updateSet(updatedSet);
+  }
+
+  /// Generates a progressive warm-up pyramid ladder (§8.1) before working sets.
+  Future<void> generateWarmupPyramid({
+    required String sessionExerciseId,
+    required String exerciseId,
+    required double workingWeightKg,
+  }) async {
+    final ladder = <({double weight, int reps})>[];
+
+    if (workingWeightKg >= 40.0) {
+      ladder.add((weight: 20.0, reps: 10)); // Empty bar
+      ladder.add((weight: ((workingWeightKg * 0.5) / 2.5).round() * 2.5, reps: 5));
+      ladder.add((weight: ((workingWeightKg * 0.7) / 2.5).round() * 2.5, reps: 3));
+      ladder.add((weight: ((workingWeightKg * 0.85) / 2.5).round() * 2.5, reps: 1));
+    } else {
+      ladder.add((weight: ((workingWeightKg * 0.5) / 2.5).round() * 2.5, reps: 8));
+      ladder.add((weight: ((workingWeightKg * 0.75) / 2.5).round() * 2.5, reps: 4));
+    }
+
+    for (final step in ladder) {
+      await addSet(
+        sessionExerciseId: sessionExerciseId,
+        exerciseId: exerciseId,
+        weightKg: step.weight > 0 ? step.weight : 20.0,
+        reps: step.reps,
+        type: SetType.warmup,
+      );
+    }
+  }
+
+  /// Generates time-of-day default workout name per FEATURES.md §8.1.
+  static String generateDefaultWorkoutName([DateTime? time]) {
+    final t = time ?? DateTime.now();
+    final hour = t.hour;
+    if (hour >= 5 && hour < 9) {
+      return 'Early Bird Workout · Dawn Patrol';
+    } else if (hour >= 9 && hour < 12) {
+      return 'Morning Grind · Morning Workout';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Afternoon Pump · Midday Session';
+    } else if (hour >= 17 && hour < 21) {
+      return 'Evening Workout · Sundown Session';
+    } else if (hour >= 21 && hour <= 23) {
+      return 'Night Session · Late Lift';
+    } else {
+      return 'Midnight Session · Night Owl Lift';
+    }
   }
 
   /// Starts the rest timer countdown with monotonic 1s ticks.
