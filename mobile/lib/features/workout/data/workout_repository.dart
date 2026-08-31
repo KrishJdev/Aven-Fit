@@ -47,6 +47,8 @@ abstract class WorkoutRepository {
     String? notes,
   });
   Future<void> renameSession(String sessionId, String name);
+  Future<WorkoutSession> pauseWorkout(String sessionId);
+  Future<WorkoutSession> resumeWorkout(String sessionId);
   Future<int> getCompletedWorkoutCountSince(DateTime since);
   Future<void> cancelWorkout(String sessionId);
 }
@@ -276,6 +278,26 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
   }
 
   @override
+  Future<WorkoutSession> pauseWorkout(String sessionId) async {
+    await _dao.pauseSession(sessionId, DateTime.now());
+    final row = await _dao.getSessionById(sessionId);
+    if (row == null) {
+      throw StateError('Session $sessionId not found after pause write-through');
+    }
+    return _mapRowToSession(row);
+  }
+
+  @override
+  Future<WorkoutSession> resumeWorkout(String sessionId) async {
+    await _dao.resumeSession(sessionId, DateTime.now());
+    final row = await _dao.getSessionById(sessionId);
+    if (row == null) {
+      throw StateError('Session $sessionId not found after resume write-through');
+    }
+    return _mapRowToSession(row);
+  }
+
+  @override
   Future<int> getCompletedWorkoutCountSince(DateTime since) {
     return _dao.getCompletedSessionCountSince(since);
   }
@@ -290,6 +312,9 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       completedAt: row.completedAt,
       durationSeconds: row.durationSeconds,
       status: _parseStatus(row.status),
+      isPaused: row.isPaused,
+      lastResumedAt: row.lastResumedAt,
+      pausedDurationSeconds: row.pausedDurationSeconds,
       notes: row.notes,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -310,6 +335,9 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
       completedAt: item.session.completedAt,
       durationSeconds: item.session.durationSeconds,
       status: _parseStatus(item.session.status),
+      isPaused: item.session.isPaused,
+      lastResumedAt: item.session.lastResumedAt,
+      pausedDurationSeconds: item.session.pausedDurationSeconds,
       exercises: exercises,
       sets: allSets,
       notes: item.session.notes,
@@ -425,4 +453,12 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
 WorkoutRepository workoutRepository(Ref ref) {
   final db = ref.watch(appDatabaseProvider);
   return WorkoutRepositoryImpl(db.workoutDao);
+}
+
+/// Reactive stream of the active workout session (or null), fully joined with
+/// its exercises and sets. Drives the Home resume banner (§7.1) and the
+/// one-session rule checks (§8.1) — renders from local SQLite in <2s (L2/L7).
+@riverpod
+Stream<WorkoutSession?> watchActiveSession(Ref ref) {
+  return ref.watch(workoutRepositoryProvider).watchActiveSession();
 }

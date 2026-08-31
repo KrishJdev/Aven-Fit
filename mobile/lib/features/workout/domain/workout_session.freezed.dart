@@ -16,7 +16,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$WorkoutSession {
 
- String get id; String? get userId; String? get routineId; String get name; DateTime get startedAt; DateTime? get completedAt; int? get durationSeconds; WorkoutStatus get status; List<SessionExercise> get exercises; List<WorkoutSet> get sets; String? get notes; DateTime? get createdAt; DateTime? get updatedAt;
+ String get id; String? get userId; String? get routineId; String get name; DateTime get startedAt; DateTime? get completedAt; int? get durationSeconds; WorkoutStatus get status; bool get isPaused;/// Epoch of the last moment the session timer ticked — the freeze point
+/// while paused (`last_resumed_at` pattern, FEATURES.md §8.1 / L8).
+ DateTime? get lastResumedAt; int get pausedDurationSeconds; List<SessionExercise> get exercises; List<WorkoutSet> get sets; String? get notes; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of WorkoutSession
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +32,20 @@ $WorkoutSessionCopyWith<WorkoutSession> get copyWith => _$WorkoutSessionCopyWith
 @override
 bool operator ==(Object other) {
   final _this = this as WorkoutSession;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutSession&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.routineId, _this.routineId) || other.routineId == _this.routineId)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.startedAt, _this.startedAt) || other.startedAt == _this.startedAt)&&(identical(other.completedAt, _this.completedAt) || other.completedAt == _this.completedAt)&&(identical(other.durationSeconds, _this.durationSeconds) || other.durationSeconds == _this.durationSeconds)&&(identical(other.status, _this.status) || other.status == _this.status)&&const DeepCollectionEquality().equals(other.exercises, _this.exercises)&&const DeepCollectionEquality().equals(other.sets, _this.sets)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkoutSession&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.userId, _this.userId) || other.userId == _this.userId)&&(identical(other.routineId, _this.routineId) || other.routineId == _this.routineId)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.startedAt, _this.startedAt) || other.startedAt == _this.startedAt)&&(identical(other.completedAt, _this.completedAt) || other.completedAt == _this.completedAt)&&(identical(other.durationSeconds, _this.durationSeconds) || other.durationSeconds == _this.durationSeconds)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.isPaused, _this.isPaused) || other.isPaused == _this.isPaused)&&(identical(other.lastResumedAt, _this.lastResumedAt) || other.lastResumedAt == _this.lastResumedAt)&&(identical(other.pausedDurationSeconds, _this.pausedDurationSeconds) || other.pausedDurationSeconds == _this.pausedDurationSeconds)&&const DeepCollectionEquality().equals(other.exercises, _this.exercises)&&const DeepCollectionEquality().equals(other.sets, _this.sets)&&(identical(other.notes, _this.notes) || other.notes == _this.notes)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as WorkoutSession;
-  return Object.hash(runtimeType,_this.id,_this.userId,_this.routineId,_this.name,_this.startedAt,_this.completedAt,_this.durationSeconds,_this.status,const DeepCollectionEquality().hash(_this.exercises),const DeepCollectionEquality().hash(_this.sets),_this.notes,_this.createdAt,_this.updatedAt);
+  return Object.hash(runtimeType,_this.id,_this.userId,_this.routineId,_this.name,_this.startedAt,_this.completedAt,_this.durationSeconds,_this.status,_this.isPaused,_this.lastResumedAt,_this.pausedDurationSeconds,const DeepCollectionEquality().hash(_this.exercises),const DeepCollectionEquality().hash(_this.sets),_this.notes,_this.createdAt,_this.updatedAt);
 }
 
 @override
 String toString() {
   final _this = this as WorkoutSession;
-  return 'WorkoutSession(id: ${_this.id}, userId: ${_this.userId}, routineId: ${_this.routineId}, name: ${_this.name}, startedAt: ${_this.startedAt}, completedAt: ${_this.completedAt}, durationSeconds: ${_this.durationSeconds}, status: ${_this.status}, exercises: ${_this.exercises}, sets: ${_this.sets}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt})';
+  return 'WorkoutSession(id: ${_this.id}, userId: ${_this.userId}, routineId: ${_this.routineId}, name: ${_this.name}, startedAt: ${_this.startedAt}, completedAt: ${_this.completedAt}, durationSeconds: ${_this.durationSeconds}, status: ${_this.status}, isPaused: ${_this.isPaused}, lastResumedAt: ${_this.lastResumedAt}, pausedDurationSeconds: ${_this.pausedDurationSeconds}, exercises: ${_this.exercises}, sets: ${_this.sets}, notes: ${_this.notes}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt})';
 }
 
 
@@ -54,7 +56,7 @@ abstract mixin class $WorkoutSessionCopyWith<$Res>  {
   factory $WorkoutSessionCopyWith(WorkoutSession value, $Res Function(WorkoutSession) _then) = _$WorkoutSessionCopyWithImpl;
 @useResult
 $Res call({
- String id, String? userId, String? routineId, String name, DateTime startedAt, DateTime? completedAt, int? durationSeconds, WorkoutStatus status, List<SessionExercise> exercises, List<WorkoutSet> sets, String? notes, DateTime? createdAt, DateTime? updatedAt
+ String id, String? userId, String? routineId, String name, DateTime startedAt, DateTime? completedAt, int? durationSeconds, WorkoutStatus status, bool isPaused, DateTime? lastResumedAt, int pausedDurationSeconds, List<SessionExercise> exercises, List<WorkoutSet> sets, String? notes, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -71,7 +73,7 @@ class _$WorkoutSessionCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutSession
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = freezed,Object? routineId = freezed,Object? name = null,Object? startedAt = null,Object? completedAt = freezed,Object? durationSeconds = freezed,Object? status = null,Object? exercises = null,Object? sets = null,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = freezed,Object? routineId = freezed,Object? name = null,Object? startedAt = null,Object? completedAt = freezed,Object? durationSeconds = freezed,Object? status = null,Object? isPaused = null,Object? lastResumedAt = freezed,Object? pausedDurationSeconds = null,Object? exercises = null,Object? sets = null,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(WorkoutSession(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -81,7 +83,10 @@ as String,startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: 
 as DateTime,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,durationSeconds: freezed == durationSeconds ? _self.durationSeconds : durationSeconds // ignore: cast_nullable_to_non_nullable
 as int?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as WorkoutStatus,exercises: null == exercises ? _self.exercises : exercises // ignore: cast_nullable_to_non_nullable
+as WorkoutStatus,isPaused: null == isPaused ? _self.isPaused : isPaused // ignore: cast_nullable_to_non_nullable
+as bool,lastResumedAt: freezed == lastResumedAt ? _self.lastResumedAt : lastResumedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,pausedDurationSeconds: null == pausedDurationSeconds ? _self.pausedDurationSeconds : pausedDurationSeconds // ignore: cast_nullable_to_non_nullable
+as int,exercises: null == exercises ? _self.exercises : exercises // ignore: cast_nullable_to_non_nullable
 as List<SessionExercise>,sets: null == sets ? _self.sets : sets // ignore: cast_nullable_to_non_nullable
 as List<WorkoutSet>,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
@@ -171,10 +176,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? userId,  String? routineId,  String name,  DateTime startedAt,  DateTime? completedAt,  int? durationSeconds,  WorkoutStatus status,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? userId,  String? routineId,  String name,  DateTime startedAt,  DateTime? completedAt,  int? durationSeconds,  WorkoutStatus status,  bool isPaused,  DateTime? lastResumedAt,  int pausedDurationSeconds,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WorkoutSession() when $default != null:
-return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt,_that.completedAt,_that.durationSeconds,_that.status,_that.exercises,_that.sets,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt,_that.completedAt,_that.durationSeconds,_that.status,_that.isPaused,_that.lastResumedAt,_that.pausedDurationSeconds,_that.exercises,_that.sets,_that.notes,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -192,10 +197,10 @@ return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? userId,  String? routineId,  String name,  DateTime startedAt,  DateTime? completedAt,  int? durationSeconds,  WorkoutStatus status,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? userId,  String? routineId,  String name,  DateTime startedAt,  DateTime? completedAt,  int? durationSeconds,  WorkoutStatus status,  bool isPaused,  DateTime? lastResumedAt,  int pausedDurationSeconds,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutSession():
-return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt,_that.completedAt,_that.durationSeconds,_that.status,_that.exercises,_that.sets,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt,_that.completedAt,_that.durationSeconds,_that.status,_that.isPaused,_that.lastResumedAt,_that.pausedDurationSeconds,_that.exercises,_that.sets,_that.notes,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +217,10 @@ return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? userId,  String? routineId,  String name,  DateTime startedAt,  DateTime? completedAt,  int? durationSeconds,  WorkoutStatus status,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? userId,  String? routineId,  String name,  DateTime startedAt,  DateTime? completedAt,  int? durationSeconds,  WorkoutStatus status,  bool isPaused,  DateTime? lastResumedAt,  int pausedDurationSeconds,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  String? notes,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _WorkoutSession() when $default != null:
-return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt,_that.completedAt,_that.durationSeconds,_that.status,_that.exercises,_that.sets,_that.notes,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt,_that.completedAt,_that.durationSeconds,_that.status,_that.isPaused,_that.lastResumedAt,_that.pausedDurationSeconds,_that.exercises,_that.sets,_that.notes,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -227,7 +232,7 @@ return $default(_that.id,_that.userId,_that.routineId,_that.name,_that.startedAt
 @JsonSerializable()
 
 class _WorkoutSession extends WorkoutSession {
-  const _WorkoutSession({required this.id, this.userId, this.routineId, this.name = 'Workout', required this.startedAt, this.completedAt, this.durationSeconds, this.status = WorkoutStatus.active,  List<SessionExercise> exercises = const <SessionExercise>[],  List<WorkoutSet> sets = const <WorkoutSet>[], this.notes, this.createdAt, this.updatedAt}): _exercises = exercises,_sets = sets,super._();
+  const _WorkoutSession({required this.id, this.userId, this.routineId, this.name = 'Workout', required this.startedAt, this.completedAt, this.durationSeconds, this.status = WorkoutStatus.active, this.isPaused = false, this.lastResumedAt, this.pausedDurationSeconds = 0,  List<SessionExercise> exercises = const <SessionExercise>[],  List<WorkoutSet> sets = const <WorkoutSet>[], this.notes, this.createdAt, this.updatedAt}): _exercises = exercises,_sets = sets,super._();
   factory _WorkoutSession.fromJson(Map<String, dynamic> json) => _$WorkoutSessionFromJson(json);
 
 @override final  String id;
@@ -238,6 +243,11 @@ class _WorkoutSession extends WorkoutSession {
 @override final  DateTime? completedAt;
 @override final  int? durationSeconds;
 @override@JsonKey() final  WorkoutStatus status;
+@override@JsonKey() final  bool isPaused;
+/// Epoch of the last moment the session timer ticked — the freeze point
+/// while paused (`last_resumed_at` pattern, FEATURES.md §8.1 / L8).
+@override final  DateTime? lastResumedAt;
+@override@JsonKey() final  int pausedDurationSeconds;
  final  List<SessionExercise> _exercises;
 @override@JsonKey() List<SessionExercise> get exercises {
   if (_exercises is EqualUnmodifiableListView) return _exercises;
@@ -269,18 +279,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutSession&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.routineId, routineId) || other.routineId == routineId)&&(identical(other.name, name) || other.name == name)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.exercises, _exercises)&&const DeepCollectionEquality().equals(other.sets, _sets)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkoutSession&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.routineId, routineId) || other.routineId == routineId)&&(identical(other.name, name) || other.name == name)&&(identical(other.startedAt, startedAt) || other.startedAt == startedAt)&&(identical(other.completedAt, completedAt) || other.completedAt == completedAt)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.status, status) || other.status == status)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.lastResumedAt, lastResumedAt) || other.lastResumedAt == lastResumedAt)&&(identical(other.pausedDurationSeconds, pausedDurationSeconds) || other.pausedDurationSeconds == pausedDurationSeconds)&&const DeepCollectionEquality().equals(other.exercises, _exercises)&&const DeepCollectionEquality().equals(other.sets, _sets)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,userId,routineId,name,startedAt,completedAt,durationSeconds,status,const DeepCollectionEquality().hash(_exercises),const DeepCollectionEquality().hash(_sets),notes,createdAt,updatedAt);
+    return Object.hash(runtimeType,id,userId,routineId,name,startedAt,completedAt,durationSeconds,status,isPaused,lastResumedAt,pausedDurationSeconds,const DeepCollectionEquality().hash(_exercises),const DeepCollectionEquality().hash(_sets),notes,createdAt,updatedAt);
 }
 
 @override
 String toString() {
-    return 'WorkoutSession(id: $id, userId: $userId, routineId: $routineId, name: $name, startedAt: $startedAt, completedAt: $completedAt, durationSeconds: $durationSeconds, status: $status, exercises: $exercises, sets: $sets, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'WorkoutSession(id: $id, userId: $userId, routineId: $routineId, name: $name, startedAt: $startedAt, completedAt: $completedAt, durationSeconds: $durationSeconds, status: $status, isPaused: $isPaused, lastResumedAt: $lastResumedAt, pausedDurationSeconds: $pausedDurationSeconds, exercises: $exercises, sets: $sets, notes: $notes, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -291,7 +301,7 @@ abstract mixin class _$WorkoutSessionCopyWith<$Res> implements $WorkoutSessionCo
   factory _$WorkoutSessionCopyWith(_WorkoutSession value, $Res Function(_WorkoutSession) _then) = __$WorkoutSessionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? userId, String? routineId, String name, DateTime startedAt, DateTime? completedAt, int? durationSeconds, WorkoutStatus status, List<SessionExercise> exercises, List<WorkoutSet> sets, String? notes, DateTime? createdAt, DateTime? updatedAt
+ String id, String? userId, String? routineId, String name, DateTime startedAt, DateTime? completedAt, int? durationSeconds, WorkoutStatus status, bool isPaused, DateTime? lastResumedAt, int pausedDurationSeconds, List<SessionExercise> exercises, List<WorkoutSet> sets, String? notes, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -308,7 +318,7 @@ class __$WorkoutSessionCopyWithImpl<$Res>
 
 /// Create a copy of WorkoutSession
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = freezed,Object? routineId = freezed,Object? name = null,Object? startedAt = null,Object? completedAt = freezed,Object? durationSeconds = freezed,Object? status = null,Object? exercises = null,Object? sets = null,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = freezed,Object? routineId = freezed,Object? name = null,Object? startedAt = null,Object? completedAt = freezed,Object? durationSeconds = freezed,Object? status = null,Object? isPaused = null,Object? lastResumedAt = freezed,Object? pausedDurationSeconds = null,Object? exercises = null,Object? sets = null,Object? notes = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_WorkoutSession(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -318,7 +328,10 @@ as String,startedAt: null == startedAt ? _self.startedAt : startedAt // ignore: 
 as DateTime,completedAt: freezed == completedAt ? _self.completedAt : completedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,durationSeconds: freezed == durationSeconds ? _self.durationSeconds : durationSeconds // ignore: cast_nullable_to_non_nullable
 as int?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as WorkoutStatus,exercises: null == exercises ? _self._exercises : exercises // ignore: cast_nullable_to_non_nullable
+as WorkoutStatus,isPaused: null == isPaused ? _self.isPaused : isPaused // ignore: cast_nullable_to_non_nullable
+as bool,lastResumedAt: freezed == lastResumedAt ? _self.lastResumedAt : lastResumedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,pausedDurationSeconds: null == pausedDurationSeconds ? _self.pausedDurationSeconds : pausedDurationSeconds // ignore: cast_nullable_to_non_nullable
+as int,exercises: null == exercises ? _self._exercises : exercises // ignore: cast_nullable_to_non_nullable
 as List<SessionExercise>,sets: null == sets ? _self._sets : sets // ignore: cast_nullable_to_non_nullable
 as List<WorkoutSet>,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable

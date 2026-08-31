@@ -24,12 +24,17 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     final repository = ref.watch(workoutRepositoryProvider);
     final activeSession = await repository.getActiveSession();
     if (activeSession != null) {
+      // Crash resilience (WU-3.8, L7/L8): the launch-time restore path —
+      // every exercise, set, and the epoch-math elapsed time come straight
+      // from SQLite, so a force-kill mid-session loses nothing.
       final exercises = await repository.getSessionExercises(activeSession.id);
       final flatSets = exercises.expand((e) => e.sets).toList();
       return ActiveWorkoutState(
         session: activeSession,
         exercises: exercises,
         sets: flatSets,
+        elapsedSeconds: activeSession.elapsedSecondsNow(),
+        wasRestored: true,
       );
     }
 
@@ -185,6 +190,11 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
   }
 
   /// Toggles set completion status (<3s interaction loop).
+  ///
+  /// Crash resilience (WU-3.8, L7): the confirmed values are written through
+  /// to SQLite *before* the UI locks the row — a force-kill immediately after
+  /// ✓ can never lose the set (J1 gate). PR detection runs after the durable
+  /// write and must never jeopardize it.
   Future<void> toggleSetCompleted(String setId) async {
     final current = state.value;
     if (current == null) return;
@@ -193,34 +203,48 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     if (setIndex == -1) return;
 
     final targetSet = current.sets[setIndex];
-    final isNowCompleted = !targetSet.isCompleted;
-    var updatedSet = targetSet.copyWith(
-      isCompleted: isNowCompleted,
-      completedAt: isNowCompleted ? DateTime.now() : null,
-    );
+    final repository = ref.read(workoutRepositoryProvider);
 
-    // Optimistic UI update
+    if (targetSet.isCompleted) {
+      // Un-completing: revert to planned values, clear the PR flag.
+      final updatedSet = targetSet.copyWith(
+        isCompleted: false,
+        completedAt: null,
+        isPr: false,
+      );
+      state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
+      await repository.updateSet(updatedSet);
+      return;
+    }
+
+    // Write-through FIRST, then UI lock (L7): the confirmed values hit SQLite
+    // synchronously before the row renders Volt-Green locked.
+    var updatedSet = targetSet.copyWith(
+      isCompleted: true,
+      completedAt: DateTime.now(),
+    );
+    await repository.updateSet(updatedSet);
     state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
 
     // PR detection (§8.1, §10.2): computed instantly from local history at
     // set-save time. Warm-up sets never count; beaten records flash the PR
-    // badge on the set row and celebrate with a medium haptic (L5).
-    if (isNowCompleted &&
-        updatedSet.type != SetType.warmup &&
-        updatedSet.exerciseId != null) {
-      final newPRs = await ref.read(prRepositoryProvider).detectPRs(
-            exerciseId: updatedSet.exerciseId!,
-            set: updatedSet,
-          );
-      if (newPRs.isNotEmpty) {
-        updatedSet = updatedSet.copyWith(isPr: true);
-        state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
+    // badge on the set row and celebrate with a medium haptic (L5). A PR
+    // failure never rolls back the completion — the set is already durable.
+    if (updatedSet.type != SetType.warmup && updatedSet.exerciseId != null) {
+      try {
+        final newPRs = await ref.read(prRepositoryProvider).detectPRs(
+              exerciseId: updatedSet.exerciseId!,
+              set: updatedSet,
+            );
+        if (newPRs.isNotEmpty) {
+          updatedSet = updatedSet.copyWith(isPr: true);
+          state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
+          await repository.updateSet(updatedSet);
+        }
+      } catch (_) {
+        // PR detection is best-effort; the confirmed set is already persisted.
       }
     }
-
-    // Write-through to SQLite
-    final repository = ref.read(workoutRepositoryProvider);
-    await repository.updateSet(updatedSet);
 
     // Rest timer (§8.3): resting and lifting are mutually exclusive — any ✓
     // cancels the live countdown; a completed working set restarts it with
@@ -303,6 +327,46 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     await repository.renameSession(current.session!.id, trimmed);
   }
 
+  /// Pauses the session timer (§8.1): freezes elapsed time at the pause
+  /// moment and persists the paused state so a crash/kill restores it frozen
+  /// (L7/L8). Write-through first, then the state update.
+  Future<void> pauseWorkout() async {
+    final current = state.value;
+    if (current == null || current.session == null || current.session!.isPaused) {
+      return;
+    }
+
+    final repository = ref.read(workoutRepositoryProvider);
+    final updatedSession = await repository.pauseWorkout(current.session!.id);
+    state = AsyncValue.data(current.copyWith(
+      session: updatedSession,
+      elapsedSeconds: updatedSession.elapsedSecondsNow(),
+    ));
+  }
+
+  /// Resumes the session timer (§8.1): folds the pause span into
+  /// [WorkoutSession.pausedDurationSeconds] and keeps ticking from epoch math.
+  Future<void> resumeWorkout() async {
+    final current = state.value;
+    if (current == null || current.session == null || !current.session!.isPaused) {
+      return;
+    }
+
+    final repository = ref.read(workoutRepositoryProvider);
+    final updatedSession = await repository.resumeWorkout(current.session!.id);
+    state = AsyncValue.data(current.copyWith(
+      session: updatedSession,
+      elapsedSeconds: updatedSession.elapsedSecondsNow(),
+    ));
+  }
+
+  /// Dismisses the "Workout resumed" restore banner (§8.1 states).
+  void dismissRestoredBanner() {
+    final current = state.value;
+    if (current == null || !current.wasRestored) return;
+    state = AsyncValue.data(current.copyWith(wasRestored: false));
+  }
+
   /// Updates set values (weight, reps, rpe, type) with instant write-through.
   Future<void> updateSet(WorkoutSet updatedSet) async {
     final current = state.value;
@@ -382,17 +446,20 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
   /// Finishes the active workout session and returns its id so the screen can
   /// navigate to the Workout Summary (§8.5). Returns null when there was
-  /// nothing to finish or the write-through failed.
+  /// nothing to finish or the write-through failed. The stored duration is
+  /// computed via epoch math (`now − startedAt − pausedDuration`) so pauses
+  /// are honored and the summary never re-derives it (L7/L8).
   Future<String?> finishWorkout() async {
     final current = state.value;
     if (current == null || current.session == null) return null;
 
     final sessionId = current.session!.id;
+    final elapsedSeconds = current.session!.elapsedSecondsNow();
     ref.read(restTimerControllerProvider.notifier).cancel();
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repository = ref.read(workoutRepositoryProvider);
-      await repository.finishWorkout(sessionId);
+      await repository.finishWorkout(sessionId, durationSeconds: elapsedSeconds);
       return const ActiveWorkoutState(
         session: null,
         exercises: [],

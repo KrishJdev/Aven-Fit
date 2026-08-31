@@ -18,6 +18,12 @@ class WorkoutSessions extends Table {
   DateTimeColumn get completedAt => dateTime().nullable()();
   IntColumn get durationSeconds => integer().nullable()();
   TextColumn get status => text().withDefault(const Constant('active'))();
+  BoolColumn get isPaused => boolean().withDefault(const Constant(false))();
+  // Epoch of the last moment the session timer ticked — the freeze point
+  // while paused (FEATURES.md §8.1 `last_resumed_at` pattern from RN, L8).
+  DateTimeColumn get lastResumedAt => dateTime().nullable()();
+  IntColumn get pausedDurationSeconds =>
+      integer().withDefault(const Constant(0))();
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt =>
       dateTime().nullable().withDefault(currentDateAndTime)();

@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../domain/routine.dart';
 import '../domain/routine_exercise.dart';
 import 'routine_detail_controller.dart';
+import '../../workout/presentation/widgets/session_conflict_dialog.dart';
 
 /// Screen displaying a detailed read-only view of a routine with its planned
 /// sets breakdown, notes, and instant "START WORKOUT" action.
@@ -590,6 +591,11 @@ class RoutineDetailScreen extends ConsumerWidget {
           height: 46,
           child: ElevatedButton.icon(
             onPressed: () async {
+              // One-session rule (§8.1): never silently discards the
+              // active session.
+              final mayStart = await resolveOneSessionRule(context, ref);
+              if (!mayStart || !context.mounted) return;
+
               final controller = ref.read(
                   routineDetailControllerProvider(routine.id).notifier);
               final session = await controller.startWorkout();

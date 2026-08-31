@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../exercise/domain/exercise.dart';
 import '../data/ghost_prefill_service.dart';
 import '../domain/ghost_set.dart';
+import '../domain/workout_session.dart';
 import 'active_workout_controller.dart';
 import 'active_workout_state.dart';
 import 'exercise_picker_screen.dart';
@@ -80,6 +83,27 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Pause/resume session timer (§8.1 header) — freezes
+                          // via epoch math and survives process death (L7/L8).
+                          IconButton(
+                            key: const ValueKey('session_pause_toggle'),
+                            icon: Icon(
+                              state.session?.isPaused == true
+                                  ? LucideIcons.play
+                                  : LucideIcons.pause,
+                              size: 20,
+                              color: state.session?.isPaused == true
+                                  ? AppTheme.voltGreen
+                                  : AppTheme.textSecondary,
+                            ),
+                            tooltip: state.session?.isPaused == true
+                                ? 'Resume session timer'
+                                : 'Pause session timer',
+                            onPressed: () =>
+                                state.session?.isPaused == true
+                                    ? controller.resumeWorkout()
+                                    : controller.pauseWorkout(),
+                          ),
                           // Manual rest start, always available without any
                           // prior set (FEATURES.md §8.3 / Law L1).
                           IconButton(
@@ -236,6 +260,11 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               : const SizedBox(width: double.infinity),
         ),
 
+        // Restored-session banner (§8.1 states): shown after a crash/kill
+        // relaunch picked the session back up from SQLite.
+        if (state.wasRestored)
+          _buildRestoredBanner(context, controller, state),
+
         // Session Stats Summary Header
         _buildStatsHeader(state),
 
@@ -313,6 +342,39 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildRestoredBanner(
+    BuildContext context,
+    ActiveWorkoutController controller,
+    ActiveWorkoutState state,
+  ) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+      decoration: BoxDecoration(
+        color: AppTheme.glassFill,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppTheme.neonCyan),
+      ),
+      child: Row(
+        children: [
+          const Icon(LucideIcons.rotateCcw, size: 16, color: AppTheme.neonCyan),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'WORKOUT RESUMED · ${_formatElapsed(state.elapsedSeconds)} ELAPSED',
+              style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.neonCyan),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(LucideIcons.x, size: 16, color: AppTheme.textSecondary),
+            tooltip: 'Dismiss',
+            onPressed: controller.dismissRestoredBanner,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatsHeader(ActiveWorkoutState state) {
     final completedSets = state.completedSetsCount;
     final totalSets = state.sets.length;
@@ -334,9 +396,20 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           _buildStatColumn('SETS', '$completedSets / $totalSets'),
           _buildStatColumn('WORKING VOLUME', '$volume kg', isHighlight: true),
           _buildStatColumn('EXERCISES', '${state.exercises.length}'),
+          _ElapsedStatColumn(session: state.session),
         ],
       ),
     );
+  }
+
+  static String _formatElapsed(int totalSeconds) {
+    final hours = totalSeconds ~/ 3600;
+    final minutes = (totalSeconds % 3600) ~/ 60;
+    final seconds = totalSeconds % 60;
+    if (hours > 0) {
+      return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    }
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   Widget _buildStatColumn(String label, String value, {bool isHighlight = false}) {
@@ -571,6 +644,84 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Ticking session timer stat (§8.1): the displayed value is always
+/// recomputed from the epoch fields (`startedAt`, `lastResumedAt`,
+/// `pausedDurationSeconds`) — the 1s timer exists purely to refresh the UI,
+/// zero CPU polling (L8). Paused sessions render frozen and stop ticking.
+class _ElapsedStatColumn extends StatefulWidget {
+  const _ElapsedStatColumn({required this.session});
+
+  final WorkoutSession? session;
+
+  @override
+  State<_ElapsedStatColumn> createState() => _ElapsedStatColumnState();
+}
+
+class _ElapsedStatColumnState extends State<_ElapsedStatColumn> {
+  Timer? _tickTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncTicker();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ElapsedStatColumn oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.session?.id != widget.session?.id ||
+        oldWidget.session?.isPaused != widget.session?.isPaused) {
+      _syncTicker();
+    }
+  }
+
+  void _syncTicker() {
+    _tickTimer?.cancel();
+    _tickTimer = null;
+    final session = widget.session;
+    if (session != null &&
+        !session.isPaused &&
+        session.status == WorkoutStatus.active) {
+      _tickTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _tickTimer?.cancel();
+    _tickTimer = null;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = widget.session;
+    final seconds = session?.elapsedSecondsNow() ?? 0;
+    final label = session?.isPaused == true ? 'PAUSED' : 'ELAPSED';
+
+    return Column(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textSecondary,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          ActiveWorkoutScreen._formatElapsed(seconds),
+          style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
+        ),
+      ],
     );
   }
 }

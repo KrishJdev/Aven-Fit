@@ -37,7 +37,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -60,6 +60,13 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 5) {
             await m.createTable(personalRecords);
+          }
+          if (from < 6) {
+            // Crash resilience & pause tracking (WU-3.8, §8.1 L7/L8).
+            await m.addColumn(workoutSessions, workoutSessions.isPaused);
+            await m.addColumn(workoutSessions, workoutSessions.lastResumedAt);
+            await m.addColumn(
+                workoutSessions, workoutSessions.pausedDurationSeconds);
           }
         },
         beforeOpen: (details) async {

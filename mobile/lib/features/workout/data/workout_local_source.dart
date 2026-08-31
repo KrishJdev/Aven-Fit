@@ -285,6 +285,41 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
     );
   }
 
+  /// Pauses the session timer — freezes elapsed time at the current moment
+  /// by stamping [lastResumedAt] (the freeze point, §8.1 `last_resumed_at`
+  /// pattern). Write-through, L7.
+  Future<int> pauseSession(String id, DateTime pausedAt) {
+    return (update(workoutSessions)..where((tbl) => tbl.id.equals(id))).write(
+      WorkoutSessionsCompanion(
+        isPaused: const Value(true),
+        lastResumedAt: Value(pausedAt),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  /// Resumes the session timer — folds the just-elapsed pause span into
+  /// [pausedDurationSeconds] and clears the freeze point (L7/L8).
+  Future<int> resumeSession(String id, DateTime resumedAt) {
+    return transaction(() async {
+      final row = await (select(workoutSessions)
+            ..where((tbl) => tbl.id.equals(id)))
+          .getSingle();
+      final pausedAt = row.lastResumedAt;
+      final pauseSpan =
+          pausedAt == null ? 0 : resumedAt.difference(pausedAt).inSeconds;
+      final accumulated = row.pausedDurationSeconds + (pauseSpan < 0 ? 0 : pauseSpan);
+      return (update(workoutSessions)..where((tbl) => tbl.id.equals(id))).write(
+        WorkoutSessionsCompanion(
+          isPaused: const Value(false),
+          lastResumedAt: const Value(null),
+          pausedDurationSeconds: Value(accumulated),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+    });
+  }
+
   /// Counts completed workouts started on or after [since] — the basis of the
   /// forgiving weekly streak badge (FEATURES.md §10 / §17).
   Future<int> getCompletedSessionCountSince(DateTime since) async {

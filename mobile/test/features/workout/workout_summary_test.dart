@@ -183,7 +183,7 @@ void main() {
       // Keep the autoDispose provider alive across the read-mutate-read cycle.
       final sub = container.listen(
         workoutSummaryControllerProvider(session.id),
-        (_, __) {},
+        (_, _) {},
       );
       await container.read(workoutSummaryControllerProvider(session.id).future);
 

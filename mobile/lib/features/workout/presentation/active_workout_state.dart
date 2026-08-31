@@ -16,6 +16,9 @@ abstract class ActiveWorkoutState with _$ActiveWorkoutState {
     @Default(<SessionExercise>[]) List<SessionExercise> exercises,
     @Default(<WorkoutSet>[]) List<WorkoutSet> sets,
     @Default(0) int elapsedSeconds,
+    /// True when the state came from a launch-time SQLite restore after an
+    /// app kill (WU-3.8, §8.1 "restored session" state).
+    @Default(false) bool wasRestored,
     @Default(false) bool isSaving,
     String? errorMessage,
   }) = _ActiveWorkoutState;

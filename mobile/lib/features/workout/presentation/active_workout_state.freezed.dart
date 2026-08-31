@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ActiveWorkoutState {
 
- WorkoutSession? get session; List<SessionExercise> get exercises; List<WorkoutSet> get sets; int get elapsedSeconds; bool get isSaving; String? get errorMessage;
+ WorkoutSession? get session; List<SessionExercise> get exercises; List<WorkoutSet> get sets; int get elapsedSeconds;/// True when the state came from a launch-time SQLite restore after an
+/// app kill (WU-3.8, §8.1 "restored session" state).
+ bool get wasRestored; bool get isSaving; String? get errorMessage;
 /// Create a copy of ActiveWorkoutState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,20 +29,20 @@ $ActiveWorkoutStateCopyWith<ActiveWorkoutState> get copyWith => _$ActiveWorkoutS
 @override
 bool operator ==(Object other) {
   final _this = this as ActiveWorkoutState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActiveWorkoutState&&(identical(other.session, _this.session) || other.session == _this.session)&&const DeepCollectionEquality().equals(other.exercises, _this.exercises)&&const DeepCollectionEquality().equals(other.sets, _this.sets)&&(identical(other.elapsedSeconds, _this.elapsedSeconds) || other.elapsedSeconds == _this.elapsedSeconds)&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.errorMessage, _this.errorMessage) || other.errorMessage == _this.errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ActiveWorkoutState&&(identical(other.session, _this.session) || other.session == _this.session)&&const DeepCollectionEquality().equals(other.exercises, _this.exercises)&&const DeepCollectionEquality().equals(other.sets, _this.sets)&&(identical(other.elapsedSeconds, _this.elapsedSeconds) || other.elapsedSeconds == _this.elapsedSeconds)&&(identical(other.wasRestored, _this.wasRestored) || other.wasRestored == _this.wasRestored)&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.errorMessage, _this.errorMessage) || other.errorMessage == _this.errorMessage));
 }
 
 
 @override
 int get hashCode {
   final _this = this as ActiveWorkoutState;
-  return Object.hash(runtimeType,_this.session,const DeepCollectionEquality().hash(_this.exercises),const DeepCollectionEquality().hash(_this.sets),_this.elapsedSeconds,_this.isSaving,_this.errorMessage);
+  return Object.hash(runtimeType,_this.session,const DeepCollectionEquality().hash(_this.exercises),const DeepCollectionEquality().hash(_this.sets),_this.elapsedSeconds,_this.wasRestored,_this.isSaving,_this.errorMessage);
 }
 
 @override
 String toString() {
   final _this = this as ActiveWorkoutState;
-  return 'ActiveWorkoutState(session: ${_this.session}, exercises: ${_this.exercises}, sets: ${_this.sets}, elapsedSeconds: ${_this.elapsedSeconds}, isSaving: ${_this.isSaving}, errorMessage: ${_this.errorMessage})';
+  return 'ActiveWorkoutState(session: ${_this.session}, exercises: ${_this.exercises}, sets: ${_this.sets}, elapsedSeconds: ${_this.elapsedSeconds}, wasRestored: ${_this.wasRestored}, isSaving: ${_this.isSaving}, errorMessage: ${_this.errorMessage})';
 }
 
 
@@ -51,7 +53,7 @@ abstract mixin class $ActiveWorkoutStateCopyWith<$Res>  {
   factory $ActiveWorkoutStateCopyWith(ActiveWorkoutState value, $Res Function(ActiveWorkoutState) _then) = _$ActiveWorkoutStateCopyWithImpl;
 @useResult
 $Res call({
- WorkoutSession? session, List<SessionExercise> exercises, List<WorkoutSet> sets, int elapsedSeconds, bool isSaving, String? errorMessage
+ WorkoutSession? session, List<SessionExercise> exercises, List<WorkoutSet> sets, int elapsedSeconds, bool wasRestored, bool isSaving, String? errorMessage
 });
 
 
@@ -68,13 +70,14 @@ class _$ActiveWorkoutStateCopyWithImpl<$Res>
 
 /// Create a copy of ActiveWorkoutState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? session = freezed,Object? exercises = null,Object? sets = null,Object? elapsedSeconds = null,Object? isSaving = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? session = freezed,Object? exercises = null,Object? sets = null,Object? elapsedSeconds = null,Object? wasRestored = null,Object? isSaving = null,Object? errorMessage = freezed,}) {
   return _then(ActiveWorkoutState(
 session: freezed == session ? _self.session : session // ignore: cast_nullable_to_non_nullable
 as WorkoutSession?,exercises: null == exercises ? _self.exercises : exercises // ignore: cast_nullable_to_non_nullable
 as List<SessionExercise>,sets: null == sets ? _self.sets : sets // ignore: cast_nullable_to_non_nullable
 as List<WorkoutSet>,elapsedSeconds: null == elapsedSeconds ? _self.elapsedSeconds : elapsedSeconds // ignore: cast_nullable_to_non_nullable
-as int,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
+as int,wasRestored: null == wasRestored ? _self.wasRestored : wasRestored // ignore: cast_nullable_to_non_nullable
+as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -173,10 +176,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( WorkoutSession? session,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  int elapsedSeconds,  bool isSaving,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( WorkoutSession? session,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  int elapsedSeconds,  bool wasRestored,  bool isSaving,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ActiveWorkoutState() when $default != null:
-return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_that.isSaving,_that.errorMessage);case _:
+return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_that.wasRestored,_that.isSaving,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -194,10 +197,10 @@ return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( WorkoutSession? session,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  int elapsedSeconds,  bool isSaving,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( WorkoutSession? session,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  int elapsedSeconds,  bool wasRestored,  bool isSaving,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _ActiveWorkoutState():
-return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_that.isSaving,_that.errorMessage);case _:
+return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_that.wasRestored,_that.isSaving,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -214,10 +217,10 @@ return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( WorkoutSession? session,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  int elapsedSeconds,  bool isSaving,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( WorkoutSession? session,  List<SessionExercise> exercises,  List<WorkoutSet> sets,  int elapsedSeconds,  bool wasRestored,  bool isSaving,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _ActiveWorkoutState() when $default != null:
-return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_that.isSaving,_that.errorMessage);case _:
+return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_that.wasRestored,_that.isSaving,_that.errorMessage);case _:
   return null;
 
 }
@@ -229,7 +232,7 @@ return $default(_that.session,_that.exercises,_that.sets,_that.elapsedSeconds,_t
 
 
 class _ActiveWorkoutState extends ActiveWorkoutState {
-  const _ActiveWorkoutState({required this.session,  List<SessionExercise> exercises = const <SessionExercise>[],  List<WorkoutSet> sets = const <WorkoutSet>[], this.elapsedSeconds = 0, this.isSaving = false, this.errorMessage}): _exercises = exercises,_sets = sets,super._();
+  const _ActiveWorkoutState({required this.session,  List<SessionExercise> exercises = const <SessionExercise>[],  List<WorkoutSet> sets = const <WorkoutSet>[], this.elapsedSeconds = 0, this.wasRestored = false, this.isSaving = false, this.errorMessage}): _exercises = exercises,_sets = sets,super._();
   
 
 @override final  WorkoutSession? session;
@@ -248,6 +251,9 @@ class _ActiveWorkoutState extends ActiveWorkoutState {
 }
 
 @override@JsonKey() final  int elapsedSeconds;
+/// True when the state came from a launch-time SQLite restore after an
+/// app kill (WU-3.8, §8.1 "restored session" state).
+@override@JsonKey() final  bool wasRestored;
 @override@JsonKey() final  bool isSaving;
 @override final  String? errorMessage;
 
@@ -261,18 +267,18 @@ _$ActiveWorkoutStateCopyWith<_ActiveWorkoutState> get copyWith => __$ActiveWorko
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ActiveWorkoutState&&(identical(other.session, session) || other.session == session)&&const DeepCollectionEquality().equals(other.exercises, _exercises)&&const DeepCollectionEquality().equals(other.sets, _sets)&&(identical(other.elapsedSeconds, elapsedSeconds) || other.elapsedSeconds == elapsedSeconds)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ActiveWorkoutState&&(identical(other.session, session) || other.session == session)&&const DeepCollectionEquality().equals(other.exercises, _exercises)&&const DeepCollectionEquality().equals(other.sets, _sets)&&(identical(other.elapsedSeconds, elapsedSeconds) || other.elapsedSeconds == elapsedSeconds)&&(identical(other.wasRestored, wasRestored) || other.wasRestored == wasRestored)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,session,const DeepCollectionEquality().hash(_exercises),const DeepCollectionEquality().hash(_sets),elapsedSeconds,isSaving,errorMessage);
+    return Object.hash(runtimeType,session,const DeepCollectionEquality().hash(_exercises),const DeepCollectionEquality().hash(_sets),elapsedSeconds,wasRestored,isSaving,errorMessage);
 }
 
 @override
 String toString() {
-    return 'ActiveWorkoutState(session: $session, exercises: $exercises, sets: $sets, elapsedSeconds: $elapsedSeconds, isSaving: $isSaving, errorMessage: $errorMessage)';
+    return 'ActiveWorkoutState(session: $session, exercises: $exercises, sets: $sets, elapsedSeconds: $elapsedSeconds, wasRestored: $wasRestored, isSaving: $isSaving, errorMessage: $errorMessage)';
 }
 
 
@@ -283,7 +289,7 @@ abstract mixin class _$ActiveWorkoutStateCopyWith<$Res> implements $ActiveWorkou
   factory _$ActiveWorkoutStateCopyWith(_ActiveWorkoutState value, $Res Function(_ActiveWorkoutState) _then) = __$ActiveWorkoutStateCopyWithImpl;
 @override @useResult
 $Res call({
- WorkoutSession? session, List<SessionExercise> exercises, List<WorkoutSet> sets, int elapsedSeconds, bool isSaving, String? errorMessage
+ WorkoutSession? session, List<SessionExercise> exercises, List<WorkoutSet> sets, int elapsedSeconds, bool wasRestored, bool isSaving, String? errorMessage
 });
 
 
@@ -300,13 +306,14 @@ class __$ActiveWorkoutStateCopyWithImpl<$Res>
 
 /// Create a copy of ActiveWorkoutState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? session = freezed,Object? exercises = null,Object? sets = null,Object? elapsedSeconds = null,Object? isSaving = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? session = freezed,Object? exercises = null,Object? sets = null,Object? elapsedSeconds = null,Object? wasRestored = null,Object? isSaving = null,Object? errorMessage = freezed,}) {
   return _then(_ActiveWorkoutState(
 session: freezed == session ? _self.session : session // ignore: cast_nullable_to_non_nullable
 as WorkoutSession?,exercises: null == exercises ? _self._exercises : exercises // ignore: cast_nullable_to_non_nullable
 as List<SessionExercise>,sets: null == sets ? _self._sets : sets // ignore: cast_nullable_to_non_nullable
 as List<WorkoutSet>,elapsedSeconds: null == elapsedSeconds ? _self.elapsedSeconds : elapsedSeconds // ignore: cast_nullable_to_non_nullable
-as int,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
+as int,wasRestored: null == wasRestored ? _self.wasRestored : wasRestored // ignore: cast_nullable_to_non_nullable
+as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

@@ -6,6 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../core/theme/app_theme.dart';
 import '../domain/routine.dart';
 import 'routine_list_controller.dart';
+import '../../workout/presentation/widgets/session_conflict_dialog.dart';
 
 /// Screen displaying the user's workout routines, splits, and starter templates.
 ///
@@ -482,6 +483,10 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   Future<void> _handleStartWorkout(BuildContext context, Routine routine) async {
+    // One-session rule (§8.1): never silently discards the active session.
+    final mayStart = await resolveOneSessionRule(context, ref);
+    if (!mayStart || !context.mounted) return;
+
     final controller = ref.read(routineListControllerProvider.notifier);
     await controller.startWorkoutFromRoutine(routine);
     if (context.mounted) {

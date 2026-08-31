@@ -20,6 +20,12 @@ _WorkoutSession _$WorkoutSessionFromJson(Map<String, dynamic> json) =>
       status:
           $enumDecodeNullable(_$WorkoutStatusEnumMap, json['status']) ??
           WorkoutStatus.active,
+      isPaused: json['isPaused'] as bool? ?? false,
+      lastResumedAt: json['lastResumedAt'] == null
+          ? null
+          : DateTime.parse(json['lastResumedAt'] as String),
+      pausedDurationSeconds:
+          (json['pausedDurationSeconds'] as num?)?.toInt() ?? 0,
       exercises:
           (json['exercises'] as List<dynamic>?)
               ?.map((e) => SessionExercise.fromJson(e as Map<String, dynamic>))
@@ -49,6 +55,9 @@ Map<String, dynamic> _$WorkoutSessionToJson(_WorkoutSession instance) =>
       'completedAt': instance.completedAt?.toIso8601String(),
       'durationSeconds': instance.durationSeconds,
       'status': _$WorkoutStatusEnumMap[instance.status]!,
+      'isPaused': instance.isPaused,
+      'lastResumedAt': instance.lastResumedAt?.toIso8601String(),
+      'pausedDurationSeconds': instance.pausedDurationSeconds,
       'exercises': instance.exercises.map((e) => e.toJson()).toList(),
       'sets': instance.sets.map((e) => e.toJson()).toList(),
       'notes': instance.notes,

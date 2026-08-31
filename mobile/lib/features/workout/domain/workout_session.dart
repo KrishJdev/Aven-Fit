@@ -27,6 +27,11 @@ abstract class WorkoutSession with _$WorkoutSession {
     DateTime? completedAt,
     int? durationSeconds,
     @Default(WorkoutStatus.active) WorkoutStatus status,
+    @Default(false) bool isPaused,
+    /// Epoch of the last moment the session timer ticked — the freeze point
+    /// while paused (`last_resumed_at` pattern, FEATURES.md §8.1 / L8).
+    DateTime? lastResumedAt,
+    @Default(0) int pausedDurationSeconds,
     @Default(<SessionExercise>[]) List<SessionExercise> exercises,
     @Default(<WorkoutSet>[]) List<WorkoutSet> sets,
     String? notes,
@@ -36,6 +41,32 @@ abstract class WorkoutSession with _$WorkoutSession {
 
   factory WorkoutSession.fromJson(Map<String, dynamic> json) =>
       _$WorkoutSessionFromJson(json);
+
+  /// Wall-clock seconds the session has been running — pure epoch math,
+  /// zero CPU polling (L8):
+  ///
+  /// * running:   `now − startedAt − pausedDuration`
+  /// * paused:    frozen at the pause moment (`lastResumedAt − startedAt − pausedDuration`)
+  /// * completed: stored `durationSeconds` when present, else the epoch math
+  /// * discarded: frozen at the last tick so stale sessions never keep counting
+  int elapsedSecondsNow([DateTime? now]) {
+    final at = now ?? DateTime.now();
+    final int elapsed;
+    switch (status) {
+      case WorkoutStatus.completed:
+        final stored = durationSeconds;
+        if (stored != null) return stored < 0 ? 0 : stored;
+        elapsed = (completedAt ?? at).difference(startedAt).inSeconds;
+      case WorkoutStatus.active when isPaused:
+        elapsed = (lastResumedAt ?? startedAt).difference(startedAt).inSeconds;
+      case WorkoutStatus.active:
+        elapsed = at.difference(startedAt).inSeconds;
+      case WorkoutStatus.discarded:
+        elapsed = (lastResumedAt ?? startedAt).difference(startedAt).inSeconds;
+    }
+    final value = elapsed - pausedDurationSeconds;
+    return value < 0 ? 0 : value;
+  }
 
   /// Total number of sets across all exercises
   int get totalSetsCount => exercises.isNotEmpty
