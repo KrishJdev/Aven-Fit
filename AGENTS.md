@@ -71,6 +71,10 @@ Every agent MUST perform these baseline checks before starting work:
 - **`ARCHITECTURE.md`:** Consult when starting new feature slices, implementing layers (`domain`/`data`/`presentation`), adding Drift tables/DAOs, creating Riverpod stores, or building backend APIs. Skip for isolated bug fixes or minor tweaks to conserve tokens.
 
 > [!IMPORTANT]
+> **No Redundant Implementation Plans Rule:**  
+> Implementation plans and work units are already fully defined in `EXECUTION_PLAN.md`, `FEATURES.md`, and `ARCHITECTURE.md`. Agents must **NOT create separate implementation plans or pause for plan approval**. When a task or slice is requested, start immediately with code development, testing, and verification.
+
+> [!IMPORTANT]
 > **Archive Quarantine Rule:**  
 > Files in `docs/archive/` and `archive/` are strictly historical archives. Agents must **NEVER read, reference, cite, or base any implementation on files in `docs/archive/` or `archive/`** unless the user explicitly requests historical context. Active development relies solely on `FEATURES.md`, `ARCHITECTURE.md`, `AGENTS.md`, `HANDOFF.md`, and `README.md`.
 
