@@ -4,6 +4,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import '../../features/exercise/data/exercise_local_source.dart';
 import '../../features/exercise/data/exercise_tables.dart';
 import '../../features/history/data/history_local_source.dart';
+import '../../features/nutrition/data/nutrition_tables.dart';
 import '../../features/progress/data/pr_local_source.dart';
 import '../../features/progress/data/pr_tables.dart';
 import '../../features/progress/data/streak_local_source.dart';
@@ -33,6 +34,9 @@ part 'app_database.g.dart';
     RoutineSets,
     PersonalRecords,
     StreakSettings,
+    FoodItems,
+    LoggedMealItems,
+    NutritionGoals,
   ],
   daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao, HistoryDao, StreakDao],
 )
@@ -41,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +79,12 @@ class AppDatabase extends _$AppDatabase {
           if (from < 7) {
             // Forgiving weekly streak settings (WU-X.2, §17).
             await m.createTable(streakSettings);
+          }
+          if (from < 8) {
+            // Indian Nutrition Engine tables (WU-4.1, §11).
+            await m.createTable(foodItems);
+            await m.createTable(loggedMealItems);
+            await m.createTable(nutritionGoals);
           }
         },
         beforeOpen: (details) async {
