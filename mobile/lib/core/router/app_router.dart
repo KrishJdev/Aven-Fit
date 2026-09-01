@@ -4,6 +4,8 @@ import 'package:aven_fit/features/exercise/presentation/exercise_list_screen.dar
 import 'package:aven_fit/features/history/presentation/history_list_screen.dart';
 import 'package:aven_fit/features/history/presentation/progress_screen.dart';
 import 'package:aven_fit/features/history/presentation/workout_detail_screen.dart';
+import 'package:aven_fit/features/nutrition/presentation/food_detail_screen.dart';
+import 'package:aven_fit/features/nutrition/presentation/food_search_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_detail_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_editor_screen.dart';
@@ -80,6 +82,17 @@ final appRouter = GoRouter(
       path: '/exercises/:id',
       builder: (context, state) => ExerciseDetailScreen(
         exerciseId: state.pathParameters['id']!,
+      ),
+    ),
+    GoRoute(
+      path: '/foods',
+      builder: (context, state) => const FoodSearchScreen(),
+    ),
+    GoRoute(
+      path: '/foods/:id',
+      builder: (context, state) => FoodDetailScreen(
+        foodId: state.pathParameters['id']!,
+        mealHint: state.uri.queryParameters['meal'],
       ),
     ),
     GoRoute(
