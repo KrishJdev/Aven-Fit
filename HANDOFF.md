@@ -1,7 +1,7 @@
 # HANDOFF.md
 
 > **Canonical Handoff State** — Single persistent handoff file. Update in place at session end.
-> **Last updated:** 2026-08-31
+> **Last updated:** 2026-09-01
 
 ---
 
@@ -298,6 +298,19 @@
   - **Tests (`test/features/nutrition/nutrition_domain_test.dart` — 15 tests):** MealType tolerant parse/labels; FoodItem immutability + JSON round-trip; `scaleFor` exactness (1.5 katori dal = 157.5 kcal / 225 g, gram-linear half-serving, unknown-unit fallback, ratio fallback, NaN guard); `LoggedMealItem.calculate` snapshot math + JSON round-trip; goals round-trip; in-memory Drift CRUD, FK cascade delete (L7), goals singleton insert/update.
   - `dart run build_runner build` (clean), `flutter analyze` (0 issues), `flutter test` (**210/210 passing across mobile** — was 195).
   - **NEXT STEP (exact):** Proceed to **Slice 4 WU-4.2: Bundle Indian Food Database** (`assets/data/indian_foods.json` + `food_seed_loader.dart`). NOTE — EXECUTION_PLAN.md carries **Open Question Q1** on this WU: ship the 201 verified backend entries first and expand iteratively post-MVP (a), invest in curating ~5,000 IFCT-based entries now (b), or a middle ground of ~1,000–2,000 common items (c). **Ask the user for a decision before building the asset.**
+- **2026-09-01 (session 30):** Implemented **Slice 4 WU-4.2: Bundle Indian Food Database** (FEATURES.md §11, L10):
+  - **User decision (Open Question Q1):** middle ground (~1,000–2,000 common items) with an explicit accuracy mandate. Landed **948 entries** — the 201 backend-verified V9 rows plus 747 curated expansion entries. IFCT is licensed data and not accessible, so expansion values are reference-estimated; reliability is enforced by a hard data-integrity gate instead (below).
+  - **Asset (`mobile/assets/data/indian_foods.json`):**
+    - The 201 verified entries were extracted from `backend/.../V9__seed_indian_food_items.sql` **by script** (`node` regex row parser) — zero manual transcription. Each maps to the WU-4.1 schema with `householdUnitGramsRatio = servingSizeG` (the standard serving IS one household unit: 40 g roti, 150 g katori dal).
+    - Expansion (747) spans 19 categories total: `VEGETABLE`(94), `VEGETABLE_RAW`(36, per-100g standard values), `RAW_STAPLE`(28, raw dals/flours/grains per 100 g), `GRAIN`(85), `DAL_LENTIL`(35), `PANEER_DAIRY`(59), `NON_VEG`(99), `SOUTH_INDIAN`(66), `REGIONAL`(76 — Gujarati/Maharashtrian/Bengali/Rajasthani/Hyderabadi/Goan/Andhra/Kashmiri/Sindhi/Coastal Karnataka/Northeast), `INDIAN_SNACK`(113), `INDIAN_SWEET`(64), `BEVERAGE`(49), `FRUIT`(39), `DRY_FRUIT`(27), `CHINESE_INDO`(22), `VRAT_FASTING`(19), `CONDIMENT_FAT`(18), `SOUP_SALAD`(13), `PROTEIN_SUPPLEMENT`(6).
+    - **Satvik flags (§11.10, ships with this WU):** 124 entries flagged — sabudana/kuttu/singhara/samak/makhana/rajgira items, whole fruits, plain dairy (milk/curd/lassi/chaas/plain paneer), nuts & dry fruits, vrat-specific dishes. Cooked dishes with onion/garlic and legumes (Ekadashi rule) stay non-satvik — conservative by design. Satvik ⇒ vegetarian enforced in tests.
+    - **Accuracy gates:** every entry validated at build time and asserted per-row in tests: kcal ≈ 4P+4C+9F (Atwater) within max(25 kcal, 20%), positive servings, non-empty household units, zero duplicate IDs/names, `isCustom=false`, `barcode=null`. Expansion UUIDs assigned sequentially from `0x100001` (verified core max is `0x962`) — no collisions.
+  - **Loader (`features/nutrition/data/food_seed_loader.dart`):** mirrors `ExerciseSeedLoader` — `seedInitialData(db, {bundle, force})` with a first-run count guard (existing rows → no-op), `seedFromJsonString` for direct seeding, `insertOrReplace` batch (force re-seed is idempotent), and `countFoodItems`. Takes `AppDatabase` directly (no NutritionDao yet — that's WU-4.3). `assets/data/` was already directory-registered in pubspec — no change needed.
+  - **Wiring note:** the exercise catalog seeds via `ExerciseListController.build()` → `repository.seedInitialData()`; the nutrition equivalent arrives with the WU-4.3 controller, which should call `FoodSeedLoader.seedInitialData` the same way.
+  - **Verification & Tests (`test/features/nutrition/food_seed_test.dart` — 10 tests):** full-catalog insert (DB count == asset count ≥ 900), first-run guard preserves tampered rows, force re-seed restores them, `dal` search <300ms with ≥10 hits, `paneer` search asserting exact household units/ratios (raw 100 g vs katori 200 g), katori calibration sweep on dal entries, veg/non-veg population + satvik⇒veg invariant, §11.10 satvik spot-checks, per-row data-integrity sweep, and domain `scaleFor` macro math on a seeded row (1 katori = 150 g exact, 1.5 katori linear, gram passthrough). Hermetic `AssetBundle` fake covers the rootBundle path.
+  - **Note:** the extraction/merge/validator scripts (Node, `extract_core.js`/`merge_foods.js` + 13 batch files) were session-scratchpad tooling and are not in the repo; the durable accuracy gate is the test suite's per-row Atwater invariants, which any future expansion batch must pass.
+  - `dart run build_runner build` (clean, no schema change), `flutter analyze` (0 issues), `flutter test` (**220/220 passing across mobile** — was 210).
+  - **NEXT STEP (exact):** Proceed to **Slice 4 WU-4.3: Nutrition DAO & Repository** (`features/nutrition/data/nutrition_local_source.dart` — `NutritionDao` with `searchFoods(query, {vegOnly, satvikOnly})` <300ms, `logMealItem`, `watchDailyLog(date)`, `watchDailyTotals(date)`, quantity updates, custom foods, goals read/write; `nutrition_repository.dart` + `@riverpod` provider; wire `FoodSeedLoader.seedInitialData` into the controller path like the exercise catalog does).
 
 
 
