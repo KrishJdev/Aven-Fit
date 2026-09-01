@@ -60,7 +60,7 @@ final class FoodDetailControllerProvider
 }
 
 String _$foodDetailControllerHash() =>
-    r'a83196987ddbba426e66b096da1961fecb495609';
+    r'526e2dadfbd004cd6fb1b42713b74e00365bec52';
 
 /// Riverpod AsyncNotifier managing the food detail view (WU-4.4,
 /// FEATURES.md §11.4): serving unit + quantity selection with instant

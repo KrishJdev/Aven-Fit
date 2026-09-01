@@ -52,7 +52,7 @@ final class FoodSearchControllerProvider
 }
 
 String _$foodSearchControllerHash() =>
-    r'84400b28328b37641cc2b401258b1ee44ee843ff';
+    r'707150e4862c6b32d4de8eb289d57163d2f9f202';
 
 /// Riverpod AsyncNotifier managing the state and search filters of the
 /// Food Database Search screen (WU-4.4).

@@ -86,7 +86,11 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/foods',
-      builder: (context, state) => const FoodSearchScreen(),
+      builder: (context, state) => FoodSearchScreen(
+        // The dashboard's meal sections pass their bucket (e.g.
+        // `?meal=lunch`) so the flow logs into the right meal (WU-4.5).
+        mealHint: state.uri.queryParameters['meal'],
+      ),
     ),
     GoRoute(
       path: '/foods/:id',

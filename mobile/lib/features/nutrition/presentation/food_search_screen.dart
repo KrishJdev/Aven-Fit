@@ -14,7 +14,15 @@ import 'food_search_controller.dart';
 /// Implements Law L1 (<300ms query latency), Law L2 (100% offline catalog),
 /// and Law L6 (designed empty states with a filter-escape affordance).
 class FoodSearchScreen extends ConsumerStatefulWidget {
-  const FoodSearchScreen({super.key});
+  const FoodSearchScreen({
+    super.key,
+    this.mealHint,
+  });
+
+  /// Optional meal bucket the flow started from (the dashboard's meal
+  /// sections pass it, WU-4.5) — forwarded to the detail screen so the
+  /// item logs into the right meal.
+  final String? mealHint;
 
   @override
   ConsumerState<FoodSearchScreen> createState() => _FoodSearchScreenState();
@@ -136,7 +144,11 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                           final food = state.foods[index];
                           return _FoodTile(
                             food: food,
-                            onTap: () => context.push('/foods/${food.id}'),
+                            onTap: () => context.push(
+                              widget.mealHint == null
+                                  ? '/foods/${food.id}'
+                                  : '/foods/${food.id}?meal=${widget.mealHint}',
+                            ),
                           );
                         },
                       ),
