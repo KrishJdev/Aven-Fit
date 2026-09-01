@@ -4,6 +4,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import '../../features/exercise/data/exercise_local_source.dart';
 import '../../features/exercise/data/exercise_tables.dart';
 import '../../features/history/data/history_local_source.dart';
+import '../../features/nutrition/data/nutrition_local_source.dart';
 import '../../features/nutrition/data/nutrition_tables.dart';
 import '../../features/progress/data/pr_local_source.dart';
 import '../../features/progress/data/pr_tables.dart';
@@ -38,7 +39,15 @@ part 'app_database.g.dart';
     LoggedMealItems,
     NutritionGoals,
   ],
-  daos: [WorkoutDao, ExerciseDao, RoutineDao, PrDao, HistoryDao, StreakDao],
+  daos: [
+    WorkoutDao,
+    ExerciseDao,
+    RoutineDao,
+    PrDao,
+    HistoryDao,
+    StreakDao,
+    NutritionDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])

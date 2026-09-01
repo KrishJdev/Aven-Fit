@@ -37,6 +37,11 @@ abstract class LoggedMealItem with _$LoggedMealItem {
   factory LoggedMealItem.fromJson(Map<String, dynamic> json) =>
       _$LoggedMealItemFromJson(json);
 
+  /// Buckets any timestamp into its calendar day (local midnight) — the
+  /// single day-anchor every nutrition read/write must go through so the
+  /// dashboard bucketing never splits on a stray time component.
+  static DateTime normalizeDay(DateTime d) => DateTime(d.year, d.month, d.day);
+
   /// Builds a log entry from a [FoodItem], computing the macro snapshot
   /// through [FoodItem.scaleFor] — the single macro-math path in the app.
   static LoggedMealItem calculate({
