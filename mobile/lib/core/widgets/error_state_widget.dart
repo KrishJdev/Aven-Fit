@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../l10n/l10n.dart';
 import '../theme/app_theme.dart';
 
 /// Designed error state (WU-X.4, Law L6): what failed, why, and a RETRY
@@ -34,7 +35,7 @@ class ErrorStateWidget extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              'SOMETHING WENT WRONG',
+              l10nOf(context).somethingWentWrong,
               style: AppTheme.num(
                 14,
                 weight: FontWeight.w700,
@@ -56,9 +57,9 @@ class ErrorStateWidget extends StatelessWidget {
                   side: const BorderSide(color: AppTheme.neonCyan),
                   shape: const RoundedRectangleBorder(),
                 ),
-                child: const Text(
-                  'RETRY',
-                  style: TextStyle(
+                child: Text(
+                  l10nOf(context).retry,
+                  style: const TextStyle(
                     color: AppTheme.neonCyan,
                     fontWeight: FontWeight.w700,
                     fontSize: 12.5,

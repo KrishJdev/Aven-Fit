@@ -1,7 +1,11 @@
+import 'package:aven_fit/core/l10n/l10n.dart';
+import 'package:aven_fit/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-
-import '../../../../core/theme/app_theme.dart';
+import '../../../exercise/data/exercise_repository.dart';
+import '../../../exercise/domain/exercise.dart';
+import '../../data/workout_repository.dart';
 import '../../domain/ghost_set.dart';
 import '../../domain/session_exercise.dart';
 import '../../domain/workout_set.dart';
@@ -31,7 +35,8 @@ class ExerciseBlockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final exerciseName = sessionExercise.exerciseName ?? 'Exercise';
+    final l10n = l10nOf(context);
+    final exerciseName = sessionExercise.exerciseName ?? l10n.exerciseFallbackName;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -49,43 +54,47 @@ class ExerciseBlockCard extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        exerciseName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                  child: InkWell(
+                    key: ValueKey('block_header_info_${sessionExercise.id}'),
+                    onTap: () => _showQuickInfoSheet(context),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          exerciseName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      if (sessionExercise.exercise?.primaryMuscle != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppTheme.neonCyan.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              sessionExercise.exercise!.primaryMuscle!,
-                              style: const TextStyle(
-                                color: AppTheme.neonCyan,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                        if (sessionExercise.exercise?.primaryMuscle != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppTheme.neonCyan.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                sessionExercise.exercise!.primaryMuscle!,
+                                style: const TextStyle(
+                                  color: AppTheme.neonCyan,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 // Warm-up pyramid quick action
                 IconButton(
                   icon: const Icon(LucideIcons.flame, size: 18, color: AppTheme.burntOrange),
-                  tooltip: 'Warm-up Pyramid',
+                  tooltip: l10n.warmupPyramidTooltip,
                   onPressed: () => _openWarmupPyramidSheet(context),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -102,23 +111,23 @@ class ExerciseBlockCard extends StatelessWidget {
                     }
                   },
                   itemBuilder: (ctx) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'warmup',
                       child: Row(
                         children: [
-                          Icon(LucideIcons.flame, size: 16, color: AppTheme.burntOrange),
-                          SizedBox(width: 8),
-                          Text('Warm-up Pyramid', style: TextStyle(color: Colors.white, fontSize: 13)),
+                          const Icon(LucideIcons.flame, size: 16, color: AppTheme.burntOrange),
+                          const SizedBox(width: 8),
+                          Text(l10n.warmupPyramidMenu, style: const TextStyle(color: Colors.white, fontSize: 13)),
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'remove',
                       child: Row(
                         children: [
-                          Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
-                          SizedBox(width: 8),
-                          Text('Remove Exercise', style: TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
+                          const Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
+                          const SizedBox(width: 8),
+                          Text(l10n.removeExerciseMenu, style: const TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
                         ],
                       ),
                     ),
@@ -135,25 +144,25 @@ class ExerciseBlockCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 36,
-                  child: Text('SET', style: _tableHeaderStyle),
+                  child: Text(l10n.setColumn, style: _tableHeaderStyle),
                 ),
-                const Expanded(
+                Expanded(
                   flex: 3,
-                  child: Text('PREV', style: _tableHeaderStyle, textAlign: TextAlign.center),
+                  child: Text(l10n.prevColumn, style: _tableHeaderStyle, textAlign: TextAlign.center),
                 ),
-                const Expanded(
+                Expanded(
                   flex: 4,
-                  child: Text('KG', style: _tableHeaderStyle, textAlign: TextAlign.center),
+                  child: Text(l10n.kgColumn, style: _tableHeaderStyle, textAlign: TextAlign.center),
                 ),
                 const SizedBox(width: 4),
-                const Expanded(
+                Expanded(
                   flex: 4,
-                  child: Text('REPS', style: _tableHeaderStyle, textAlign: TextAlign.center),
+                  child: Text(l10n.repsColumn, style: _tableHeaderStyle, textAlign: TextAlign.center),
                 ),
                 const SizedBox(width: 8),
-                const SizedBox(
+                SizedBox(
                   width: 38,
                   child: Text('✓', textAlign: TextAlign.center, style: _tableHeaderStyle),
                 ),
@@ -163,12 +172,12 @@ class ExerciseBlockCard extends StatelessWidget {
 
           // Set Rows List
           if (sets.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
               child: Center(
                 child: Text(
-                  'No sets logged yet. Tap + ADD SET below.',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                  l10n.noSetsLogged,
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                 ),
               ),
             )
@@ -210,9 +219,9 @@ class ExerciseBlockCard extends StatelessWidget {
                         );
                       },
                       icon: const Icon(LucideIcons.plus, size: 16, color: AppTheme.neonCyan),
-                      label: const Text(
-                        'ADD SET',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.addSet,
+                        style: const TextStyle(
                           color: AppTheme.neonCyan,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
@@ -229,6 +238,120 @@ class ExerciseBlockCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// §8.1 quick-info sheet: the exercise's muscles and its last completed
+  /// performance ("Last: 4 sets · best 62.5 kg × 8") — both read offline
+  /// from SQLite at open time (L2/L7).
+  void _showQuickInfoSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.oledBlack,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (sheetContext) => Consumer(
+        builder: (context, ref, _) {
+          final exerciseFuture = ref
+              .read(exerciseRepositoryProvider)
+              .getExerciseById(sessionExercise.exerciseId);
+          final lastSetsFuture = ref
+              .read(workoutRepositoryProvider)
+              .getLastCompletedSetsForExercise(sessionExercise.exerciseId);
+
+          return FutureBuilder<List<Object?>>(
+            future: Future.wait<Object?>([exerciseFuture, lastSetsFuture]),
+            builder: (context, snapshot) {
+              final exercise =
+                  snapshot.data?[0] as Exercise?; // ignore: cast_nullable_to_non_nullable
+              final lastSets =
+                  (snapshot.data?[1] as List<WorkoutSet>?) ?? const [];
+
+              final muscleParts = <String>[
+                if (exercise?.primaryMuscle != null)
+                  'Primary: ${exercise!.primaryMuscle}',
+                if (exercise != null && exercise.secondaryMuscles.isNotEmpty)
+                  'Also: ${exercise.secondaryMuscles.join(', ')}',
+              ];
+              final muscleText =
+                  muscleParts.isEmpty ? '—' : muscleParts.join(' · ');
+
+              final completed =
+                  lastSets.where((s) => s.isCompleted).toList(growable: false);
+              String lastPerformance;
+              if (completed.isEmpty) {
+                lastPerformance = l10nOf(context).quickInfoNoHistory;
+              } else {
+                final best = completed.reduce(
+                  (a, b) => a.weightKg >= b.weightKg ? a : b,
+                );
+                final bestWeight = best.weightKg % 1 == 0
+                    ? best.weightKg.toInt().toString()
+                    : best.weightKg.toStringAsFixed(1);
+                lastPerformance =
+                    'Last: ${completed.length} set${completed.length == 1 ? '' : 's'}'
+                    ' · best $bestWeight kg × ${best.reps}';
+              }
+
+              return Padding(
+                key: const ValueKey('block_info_sheet'),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sessionExercise.exerciseName ?? 'Exercise',
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      l10nOf(context).quickInfoMuscles,
+                      style: AppTheme.num(
+                        10,
+                        weight: FontWeight.w700,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      muscleText,
+                      style: const TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      l10nOf(context).quickInfoLastPerformance,
+                      style: AppTheme.num(
+                        10,
+                        weight: FontWeight.w700,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      key: const ValueKey('quick_info_last_performance'),
+                      lastPerformance,
+                      style: AppTheme.num(
+                        13.5,
+                        weight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }

@@ -402,6 +402,55 @@ void main() {
       expect(find.text('VOLUME'), findsOneWidget);
     });
 
+    testWidgets('vault filter narrows to one exercise; sort ranks by value',
+        (tester) async {
+      await seedExercise('ex_bench', 'Barbell Bench Press');
+      await seedExercise('ex_squat', 'Barbell Back Squat');
+      // Bench achieved LATER but with a LOWER value than squat — so the
+      // date sort and the value sort disagree about group order.
+      await seedRecord(
+        'pr1',
+        exerciseId: 'ex_bench',
+        type: RecordType.maxWeight,
+        value: 100,
+        achievedAt: DateTime(2026, 8, 20),
+      );
+      await seedRecord(
+        'pr2',
+        exerciseId: 'ex_squat',
+        type: RecordType.volume,
+        value: 900,
+        achievedAt: DateTime(2026, 8, 1),
+      );
+      await pumpScreen(tester, initialLocation: '/progress/prs');
+
+      // Default (date) sort: newest achievement first → bench on top.
+      double topOf(String groupKey) => tester
+          .getTopLeft(find.byKey(ValueKey('pr_vault_group_$groupKey')))
+          .dy;
+      expect(topOf('Barbell Bench Press'), lessThan(topOf('Barbell Back Squat')));
+
+      // Toggle to value sort: the 900 kg volume record ranks first.
+      await tester.tap(find.byKey(const ValueKey('pr_vault_sort_toggle')));
+      await tester.pumpAndSettle();
+      expect(find.text('BEST VALUE'), findsOneWidget);
+      expect(
+        topOf('Barbell Back Squat'),
+        lessThan(topOf('Barbell Bench Press')),
+      );
+
+      // Filter narrows the vault to a single exercise.
+      await tester.tap(find.byKey(const ValueKey('pr_vault_exercise_filter')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Barbell Bench Press').last);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('pr_vault_group_Barbell Bench Press')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('pr_vault_group_Barbell Back Squat')),
+          findsNothing);
+    });
+
     testWidgets('vault empty state is designed (L6)', (tester) async {
       await pumpScreen(tester, initialLocation: '/progress/prs');
 

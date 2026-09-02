@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:aven_fit/core/database/app_database.dart';
 import 'package:aven_fit/core/notifications/notification_service.dart';
 import 'package:aven_fit/features/workout/data/workout_local_source.dart';
@@ -44,30 +46,56 @@ void main() {
       await db.close();
     });
 
-    test('generateDefaultWorkoutName returns correct names for time periods', () {
+    test('generateDefaultWorkoutName picks one of the two band names (§8.1)',
+        () {
       final morning = DateTime(2026, 8, 31, 7, 30);
-      expect(ActiveWorkoutController.generateDefaultWorkoutName(morning),
-          'Early Bird Workout · Dawn Patrol');
-
       final midMorning = DateTime(2026, 8, 31, 10, 0);
-      expect(ActiveWorkoutController.generateDefaultWorkoutName(midMorning),
-          'Morning Grind · Morning Workout');
-
       final afternoon = DateTime(2026, 8, 31, 14, 0);
-      expect(ActiveWorkoutController.generateDefaultWorkoutName(afternoon),
-          'Afternoon Pump · Midday Session');
-
       final evening = DateTime(2026, 8, 31, 18, 30);
-      expect(ActiveWorkoutController.generateDefaultWorkoutName(evening),
-          'Evening Workout · Sundown Session');
-
       final night = DateTime(2026, 8, 31, 22, 0);
-      expect(ActiveWorkoutController.generateDefaultWorkoutName(night),
-          'Night Session · Late Lift');
-
       final midnight = DateTime(2026, 8, 31, 2, 0);
-      expect(ActiveWorkoutController.generateDefaultWorkoutName(midnight),
-          'Midnight Session · Night Owl Lift');
+
+      // One of the spec's two options per band — never the old
+      // "both names joined" string.
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(morning),
+        anyOf('Early Bird Workout', 'Dawn Patrol'),
+      );
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(midMorning),
+        anyOf('Morning Grind', 'Morning Workout'),
+      );
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(afternoon),
+        anyOf('Afternoon Pump', 'Midday Session'),
+      );
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(evening),
+        anyOf('Evening Workout', 'Sundown Session'),
+      );
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(night),
+        anyOf('Night Session', 'Late Lift'),
+      );
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(midnight),
+        anyOf('Late Night Lift', 'Midnight Session'),
+      );
+
+      // Deterministic with an injected Random: same seed → same pick,
+      // always within the band.
+      final seededPick = ActiveWorkoutController.generateDefaultWorkoutName(
+        morning,
+        Random(1),
+      );
+      expect(
+        ActiveWorkoutController.generateDefaultWorkoutName(morning, Random(1)),
+        seededPick,
+      );
+      expect(
+        const ['Early Bird Workout', 'Dawn Patrol'],
+        contains(seededPick),
+      );
     });
 
     test('generateWarmupPyramid creates progressive warmup sets excluded from working volume', () async {
@@ -281,6 +309,61 @@ void main() {
 
       expect(find.text('1 / 1'), findsOneWidget);
       expect(find.text('REST TIMER:'), findsOneWidget);
+
+      container.dispose();
+    });
+
+    testWidgets('block header opens the quick-info sheet with last performance (§8.1)',
+        (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider.overrideWithValue(FakeNotificationService()),
+        ],
+      );
+
+      // Seed history: a completed workout with one confirmed 80×8 set.
+      final past = await workoutRepo.startWorkout(name: 'Past Session');
+      final pastEx = await workoutRepo.addExerciseToSession(
+        sessionId: past.id,
+        exerciseId: 'ex_bench',
+      );
+      await workoutRepo.logSet(WorkoutSet(
+        id: 'past_1',
+        sessionId: past.id,
+        sessionExerciseId: pastEx.id,
+        exerciseId: 'ex_bench',
+        setNumber: 1,
+        weightKg: 80,
+        reps: 8,
+        isCompleted: true,
+        completedAt: DateTime.now(),
+      ));
+      await workoutRepo.finishWorkout(past.id, durationSeconds: 1800);
+
+      // Start the live session and add the same exercise block.
+      final controller =
+          container.read(activeWorkoutControllerProvider.notifier);
+      await controller.startWorkout(name: 'Live Session');
+      await controller.addExercise('ex_bench');
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: ActiveWorkoutScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap the exercise name in the block header → quick-info sheet.
+      await tester.tap(find.text('Barbell Bench Press'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('block_info_sheet')), findsOneWidget);
+      expect(find.text('MUSCLES'), findsOneWidget);
+      expect(find.text('LAST PERFORMANCE'), findsOneWidget);
+      expect(find.text('Last: 1 set · best 80 kg × 8'), findsOneWidget);
 
       container.dispose();
     });

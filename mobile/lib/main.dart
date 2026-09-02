@@ -7,6 +7,7 @@ import 'core/database/app_database.dart';
 import 'core/router/app_router.dart';
 import 'core/sync/workmanager_dispatcher.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/app_localizations.dart';
 
 /// Provider so features resolve [AppDatabase] via DI — no globals, and
 /// tests can override it with an in-memory instance.
@@ -68,6 +69,10 @@ class AvenFitApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Aven Fit',
       theme: AppTheme.dark,
+      // §15 localization-ready: gen-l10n delegates installed; the English
+      // template arb is the single source for every UI string.
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: appRouter,
     );
   }

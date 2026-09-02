@@ -1,3 +1,4 @@
+import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,7 @@ class ProgressScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     final streakAsync = ref.watch(watchStreakInfoProvider);
     final vaultAsync = ref.watch(prVaultStreamProvider);
     final recentAsync = ref.watch(recentWorkoutsStreamProvider);
@@ -33,7 +35,7 @@ class ProgressScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
             Text(
-              'PROGRESS',
+              l10n.progressTitle,
               style: AppTheme.num(
                 20,
                 weight: FontWeight.w800,
@@ -52,9 +54,9 @@ class ProgressScreen extends ConsumerWidget {
             // PR Vault preview (§10.2): the newest records, full vault
             // one tap away.
             _SectionHeader(
-              title: 'PR VAULT',
+              title: l10n.prVaultTitle,
               actionKey: 'progress_pr_view_all',
-              actionLabel: 'VIEW ALL',
+              actionLabel: l10n.viewAll,
               onAction: () => context.push('/progress/prs'),
               visible: vaultAsync.value?.isNotEmpty ?? false,
             ),
@@ -75,9 +77,9 @@ class ProgressScreen extends ConsumerWidget {
             // Recent workouts (§7.1 parity): top 5, full history one tap
             // away (WU-3.9).
             _SectionHeader(
-              title: 'RECENT WORKOUTS',
+              title: l10n.homeRecentWorkouts,
               actionKey: 'progress_recent_view_all',
-              actionLabel: 'VIEW ALL',
+              actionLabel: l10n.viewAll,
               onAction: () => context.push('/history'),
               visible: recentAsync.value?.isNotEmpty ?? false,
             ),
@@ -169,6 +171,7 @@ class _StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final met = streak.weeklyGoalMet;
     return Container(
       key: const ValueKey('progress_streak_card'),
@@ -185,7 +188,7 @@ class _StreakCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'THIS WEEK',
+                  l10n.glanceThisWeek,
                   style: AppTheme.num(
                     10,
                     weight: FontWeight.w700,
@@ -227,7 +230,7 @@ class _StreakCard extends StatelessWidget {
                   key: const ValueKey('progress_streak_value'),
                   streak.currentStreakWeeks > 0
                       ? streak.streakDisplay
-                      : '0 weeks',
+                      : l10nOf(context).streakZeroWeeks,
                   style: AppTheme.num(
                     17,
                     weight: FontWeight.w600,
@@ -249,13 +252,18 @@ class _PrPreviewRow extends StatelessWidget {
 
   final PRVaultEntry entry;
 
-  static String _relativeDate(DateTime date, DateTime now) {
+  static String _relativeDate(
+    BuildContext context,
+    DateTime date,
+    DateTime now,
+  ) {
+    final l10n = l10nOf(context);
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(date.year, date.month, date.day);
     final diff = today.difference(day).inDays;
-    if (diff <= 0) return 'TODAY';
-    if (diff == 1) return 'YESTERDAY';
-    return '${diff}d ago';
+    if (diff <= 0) return l10n.dateToday;
+    if (diff == 1) return l10n.dateYesterday;
+    return l10n.dateDaysAgo(diff);
   }
 
   @override
@@ -291,7 +299,7 @@ class _PrPreviewRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _relativeDate(record.achievedAt, DateTime.now()),
+                    _relativeDate(context, record.achievedAt, DateTime.now()),
                     style: AppTheme.num(
                       10.5,
                       weight: FontWeight.w500,
@@ -339,6 +347,7 @@ class _PrEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: const ValueKey('progress_pr_empty'),
       width: double.infinity,
@@ -348,9 +357,9 @@ class _PrEmptyState extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppTheme.glassBorder),
       ),
-      child: const Text(
-        'No records yet — confirm a working set and the vault fills itself.',
-        style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
+      child: Text(
+        l10n.progressPrEmpty,
+        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
       ),
     );
   }
@@ -362,20 +371,29 @@ class _RecentWorkoutCard extends StatelessWidget {
 
   final WorkoutHistoryItem item;
 
-  static String _relativeDate(DateTime date, DateTime now) {
+  static String _relativeDate(
+    BuildContext context,
+    DateTime date,
+    DateTime now,
+  ) {
+    final l10n = l10nOf(context);
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(date.year, date.month, date.day);
     final diff = today.difference(day).inDays;
-    if (diff <= 0) return 'TODAY';
-    if (diff == 1) return 'YESTERDAY';
-    return '${diff}d ago';
+    if (diff <= 0) return l10n.dateToday;
+    if (diff == 1) return l10n.dateYesterday;
+    return l10n.dateDaysAgo(diff);
   }
 
   @override
   Widget build(BuildContext context) {
-    final meta =
-        '${item.exerciseCount} exercises · ${item.totalSetsCount} sets · '
-        '${item.volumeDisplay} kg';
+    final l10n = l10nOf(context);
+    final meta = l10n.progressRecentCardMeta(
+      _relativeDate(context, item.date, DateTime.now()),
+      item.exerciseCount,
+      item.totalSetsCount,
+      item.volumeDisplay,
+    );
 
     return InkWell(
       key: ValueKey('progress_recent_card_${item.id}'),
@@ -420,7 +438,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            '${item.prCount} PR',
+                            l10n.prCountChip(item.prCount),
                             style: AppTheme.num(
                               10,
                               weight: FontWeight.w700,
@@ -433,7 +451,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${_relativeDate(item.date, DateTime.now())} · $meta',
+                    '${_relativeDate(context, item.date, DateTime.now())} · $meta',
                     style: AppTheme.num(
                       11,
                       weight: FontWeight.w500,
@@ -462,6 +480,7 @@ class _RecentEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: const ValueKey('progress_recent_empty'),
       width: double.infinity,
@@ -471,9 +490,9 @@ class _RecentEmptyState extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppTheme.glassBorder),
       ),
-      child: const Text(
-        'Your history will appear here.',
-        style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
+      child: Text(
+        l10n.homeHistoryEmptyMessageShort,
+        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
       ),
     );
   }
@@ -485,6 +504,7 @@ class _BodyWeightPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: const ValueKey('progress_body_weight'),
       width: double.infinity,
@@ -507,7 +527,7 @@ class _BodyWeightPlaceholder extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'BODY WEIGHT',
+                  l10n.linkBodyWeight,
                   style: AppTheme.num(
                     11,
                     weight: FontWeight.w700,
@@ -515,9 +535,9 @@ class _BodyWeightPlaceholder extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
-                  'Trend tracking arrives in a future update.',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                Text(
+                  l10n.bodyWeightPlaceholder,
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                 ),
               ],
             ),

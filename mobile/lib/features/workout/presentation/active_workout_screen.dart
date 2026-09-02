@@ -1,12 +1,13 @@
 import 'dart:async';
 
+import 'package:aven_fit/core/l10n/l10n.dart';
+import 'package:aven_fit/core/theme/app_theme.dart';
+import 'package:aven_fit/core/widgets/loading_state_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/loading_state_widget.dart';
 import '../../exercise/domain/exercise.dart';
 import '../data/ghost_prefill_service.dart';
 import '../domain/ghost_set.dart';
@@ -73,7 +74,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                       ),
                     )
                   : Text(
-                      'ACTIVE WORKOUT',
+                      l10nOf(context).activeWorkoutTitle,
                       style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.neonCyan),
                     ),
             ) ??
@@ -98,8 +99,8 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                                   : AppTheme.textSecondary,
                             ),
                             tooltip: state.session?.isPaused == true
-                                ? 'Resume session timer'
-                                : 'Pause session timer',
+                                ? l10nOf(context).resumeSessionTooltip
+                                : l10nOf(context).pauseSessionTooltip,
                             onPressed: () =>
                                 state.session?.isPaused == true
                                     ? controller.resumeWorkout()
@@ -109,13 +110,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                           // prior set (FEATURES.md §8.3 / Law L1).
                           IconButton(
                             icon: const Icon(LucideIcons.timer, size: 20, color: AppTheme.textSecondary),
-                            tooltip: 'Start rest timer',
+                            tooltip: l10nOf(context).startRestTooltip,
                             onPressed: () => restNotifier.start(),
                           ),
                           TextButton(
                             onPressed: () => _confirmFinishWorkout(context, controller),
                             child: Text(
-                              'FINISH',
+                              l10nOf(context).finish,
                               style: AppTheme.num(
                                 14,
                                 weight: FontWeight.w700,
@@ -132,13 +133,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                               }
                             },
                             itemBuilder: (ctx) => [
-                              const PopupMenuItem(
+                              PopupMenuItem(
                                 value: 'cancel',
                                 child: Row(
                                   children: [
-                                    Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
-                                    SizedBox(width: 8),
-                                    Text('Discard Workout', style: TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
+                                    const Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
+                                    const SizedBox(width: 8),
+                                    Text(l10nOf(context).discardWorkout, style: const TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
                                   ],
                                 ),
                               ),
@@ -157,7 +158,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             child: LoadingStateWidget(),
           ),
         ),
-        error: (err, stack) => _buildErrorState(err, controller),
+        error: (err, stack) => _buildErrorState(context, err, controller),
         data: (state) {
           if (!state.hasActiveSession) {
             return _buildEmptyState(context, controller);
@@ -175,6 +176,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
   Widget _buildEmptyState(BuildContext context, ActiveWorkoutController controller) {
     final defaultName = ActiveWorkoutController.generateDefaultWorkoutName();
+    final l10n = l10nOf(context);
 
     return Center(
       child: Padding(
@@ -185,20 +187,20 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             const Icon(LucideIcons.dumbbell, size: 64, color: AppTheme.textSecondary),
             const SizedBox(height: 16),
             Text(
-              'NO ACTIVE WORKOUT',
+              l10n.noActiveWorkoutTitle,
               style: AppTheme.num(20, weight: FontWeight.w700, color: Colors.white),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Start a quick session or pick a routine from your library.',
+            Text(
+              l10n.noActiveWorkoutMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: () => controller.startWorkout(name: defaultName),
               icon: const Icon(LucideIcons.play, size: 18),
-              label: const Text('START EMPTY WORKOUT'),
+              label: Text(l10n.startEmptyWorkout),
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.neonCyan,
                 foregroundColor: Colors.black,
@@ -212,7 +214,12 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildErrorState(Object error, ActiveWorkoutController controller) {
+  Widget _buildErrorState(
+    BuildContext context,
+    Object error,
+    ActiveWorkoutController controller,
+  ) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -222,7 +229,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.burntOrange),
             const SizedBox(height: 16),
             Text(
-              'COULD NOT LOAD WORKOUT',
+              l10n.couldNotLoadWorkout,
               style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
             ),
             const SizedBox(height: 8),
@@ -234,7 +241,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             OutlinedButton(
               onPressed: () => controller.startWorkout(),
-              child: const Text('RETRY'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -269,7 +276,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           _buildRestoredBanner(context, controller, state),
 
         // Session Stats Summary Header
-        _buildStatsHeader(state),
+        _buildStatsHeader(context, state),
 
         // Exercise Blocks List
         Expanded(
@@ -310,6 +317,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     WidgetRef ref,
     ActiveWorkoutController controller,
   ) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -319,20 +327,20 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             const Icon(LucideIcons.plusCircle, size: 52, color: AppTheme.textSecondary),
             const SizedBox(height: 16),
             Text(
-              'ADD YOUR FIRST EXERCISE',
+              l10n.addYourFirstExercise,
               style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Search from 55+ built-in exercises or create your own custom exercise.',
+            Text(
+              l10n.addYourFirstExerciseMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: () => _openExercisePicker(context, controller),
               icon: const Icon(LucideIcons.plus, size: 16),
-              label: const Text('ADD EXERCISE'),
+              label: Text(l10n.addExercise),
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.neonCyan,
                 foregroundColor: Colors.black,
@@ -364,13 +372,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'WORKOUT RESUMED · ${_formatElapsed(state.elapsedSeconds)} ELAPSED',
+              l10nOf(context).workoutResumedBanner(_formatElapsed(state.elapsedSeconds)),
               style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.neonCyan),
             ),
           ),
           IconButton(
             icon: const Icon(LucideIcons.x, size: 16, color: AppTheme.textSecondary),
-            tooltip: 'Dismiss',
+            tooltip: l10nOf(context).dismiss,
             onPressed: controller.dismissRestoredBanner,
           ),
         ],
@@ -378,7 +386,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsHeader(ActiveWorkoutState state) {
+  Widget _buildStatsHeader(BuildContext context, ActiveWorkoutState state) {
     final completedSets = state.completedSetsCount;
     final totalSets = state.sets.length;
     final volume = state.totalVolumeKg % 1 == 0
@@ -396,9 +404,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatColumn('SETS', '$completedSets / $totalSets'),
-          _buildStatColumn('WORKING VOLUME', '$volume kg', isHighlight: true),
-          _buildStatColumn('EXERCISES', '${state.exercises.length}'),
+          _buildStatColumn(l10nOf(context).statSets, '$completedSets / $totalSets'),
+          _buildStatColumn(l10nOf(context).statWorkingVolume, '$volume kg', isHighlight: true),
+          _buildStatColumn(l10nOf(context).statExercises, '${state.exercises.length}'),
           _ElapsedStatColumn(session: state.session),
         ],
       ),
@@ -442,6 +450,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
   void _showRestNotificationPrimer(BuildContext context, WidgetRef ref) {
     final restNotifier = ref.read(restTimerControllerProvider.notifier);
+    final l10n = l10nOf(context);
 
     showDialog<void>(
       context: context,
@@ -450,12 +459,12 @@ class ActiveWorkoutScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF16191D),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          'LOCK-SCREEN COUNTDOWN',
+          l10n.lockScreenCountdownTitle,
           style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
         ),
-        content: const Text(
-          'See your rest countdown on the lock screen — with a +15s action — while you train. You can keep the timer inside the app too.',
-          style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+        content: Text(
+          l10n.lockScreenCountdownMessage,
+          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
         ),
         actions: [
           TextButton(
@@ -463,7 +472,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
               restNotifier.resolvePermissionPrimer(enable: false);
             },
-            child: const Text('NOT NOW', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(l10n.notNow, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () {
@@ -474,7 +483,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               backgroundColor: AppTheme.neonCyan,
               foregroundColor: Colors.black,
             ),
-            child: const Text('ALLOW'),
+            child: Text(l10n.allow),
           ),
         ],
       ),
@@ -500,7 +509,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                 child: OutlinedButton.icon(
                   onPressed: () => _openExercisePicker(context, controller),
                   icon: const Icon(LucideIcons.plus, size: 18),
-                  label: const Text('ADD EXERCISE'),
+                  label: Text(l10nOf(context).addExercise),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.neonCyan,
                     side: const BorderSide(color: AppTheme.neonCyan),
@@ -516,7 +525,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                 child: FilledButton.icon(
                   onPressed: () => _confirmFinishWorkout(context, controller),
                   icon: const Icon(LucideIcons.check, size: 18),
-                  label: const Text('FINISH'),
+                  label: Text(l10nOf(context).finish),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppTheme.voltGreen,
                     foregroundColor: Colors.black,
@@ -548,25 +557,26 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     required String currentName,
     required ValueChanged<String> onSubmitted,
   }) {
+    final l10n = l10nOf(context);
     final textController = TextEditingController(text: currentName);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF16191D),
-        title: Text('RENAME WORKOUT', style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
+        title: Text(l10n.renameWorkoutTitle, style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
         content: TextField(
           controller: textController,
           autofocus: true,
           style: const TextStyle(color: Colors.white, fontSize: 16),
           decoration: InputDecoration(
-            hintText: 'Workout name...',
+            hintText: l10n.workoutNameHint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(l10n.dialogCancel, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () {
@@ -576,7 +586,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
             },
             style: FilledButton.styleFrom(backgroundColor: AppTheme.neonCyan, foregroundColor: Colors.black),
-            child: const Text('SAVE'),
+            child: Text(l10n.dialogSave),
           ),
         ],
       ),
@@ -602,16 +612,16 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       ..showSnackBar(
         SnackBar(
           key: const ValueKey('finish_save_error_snackbar'),
-          content: const Text(
-            'Could not save workout — your sets are safe on this device.',
-            style: TextStyle(color: AppTheme.textPrimary),
+          content: Text(
+            l10nOf(context).finishSaveError,
+            style: const TextStyle(color: AppTheme.textPrimary),
           ),
           backgroundColor: const Color(0xFF16191D),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 6),
           action: SnackBarAction(
             key: const ValueKey('finish_save_error_retry'),
-            label: 'RETRY',
+            label: l10nOf(context).retry,
             textColor: AppTheme.neonCyan,
             onPressed: () => _finishAndNavigate(context, controller),
           ),
@@ -620,23 +630,24 @@ class ActiveWorkoutScreen extends ConsumerWidget {
   }
 
   void _confirmFinishWorkout(BuildContext context, ActiveWorkoutController controller) {
+    final l10n = l10nOf(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF16191D),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          'FINISH WORKOUT',
+          l10n.finishWorkoutTitle,
           style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
         ),
-        content: const Text(
-          'Are you ready to complete and save this workout session?',
-          style: TextStyle(color: AppTheme.textSecondary),
+        content: Text(
+          l10n.finishWorkoutMessage,
+          style: const TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('RESUME', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(l10n.dialogResume, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () async {
@@ -644,7 +655,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               await _finishAndNavigate(context, controller);
             },
             style: FilledButton.styleFrom(backgroundColor: AppTheme.voltGreen, foregroundColor: Colors.black),
-            child: const Text('FINISH & SAVE'),
+            child: Text(l10n.finishAndSave),
           ),
         ],
       ),
@@ -652,23 +663,24 @@ class ActiveWorkoutScreen extends ConsumerWidget {
   }
 
   void _confirmCancelWorkout(BuildContext context, ActiveWorkoutController controller) {
+    final l10n = l10nOf(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF16191D),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          'DISCARD WORKOUT',
+          l10n.discardWorkoutTitle,
           style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.burntOrange),
         ),
-        content: const Text(
-          'Are you sure you want to discard this workout? All sets logged in this session will be removed.',
-          style: TextStyle(color: AppTheme.textSecondary),
+        content: Text(
+          l10n.discardWorkoutMessage,
+          style: const TextStyle(color: AppTheme.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('RESUME', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(l10n.dialogResume, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () {
@@ -676,7 +688,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               controller.cancelWorkout();
             },
             style: FilledButton.styleFrom(backgroundColor: AppTheme.burntOrange, foregroundColor: Colors.white),
-            child: const Text('DISCARD'),
+            child: Text(l10n.discard),
           ),
         ],
       ),
@@ -739,7 +751,9 @@ class _ElapsedStatColumnState extends State<_ElapsedStatColumn> {
   Widget build(BuildContext context) {
     final session = widget.session;
     final seconds = session?.elapsedSecondsNow() ?? 0;
-    final label = session?.isPaused == true ? 'PAUSED' : 'ELAPSED';
+    final label = session?.isPaused == true
+        ? l10nOf(context).statPaused
+        : l10nOf(context).statElapsed;
 
     return Column(
       children: [

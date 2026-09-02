@@ -1,3 +1,4 @@
+import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,11 +34,11 @@ class MainShell extends StatelessWidget {
             index,
             initialLocation: index == navigationShell.currentIndex,
           ),
-          destinations: const [
-            NavigationDestination(icon: Icon(LucideIcons.home), label: 'Home'),
-            NavigationDestination(icon: Icon(LucideIcons.dumbbell), label: 'Workouts'),
-            NavigationDestination(icon: Icon(LucideIcons.chartColumn), label: 'Progress'),
-            NavigationDestination(icon: Icon(LucideIcons.salad), label: 'Nutrition'),
+          destinations: [
+            NavigationDestination(icon: const Icon(LucideIcons.home), label: l10nOf(context).navHome),
+            NavigationDestination(icon: const Icon(LucideIcons.dumbbell), label: l10nOf(context).navWorkouts),
+            NavigationDestination(icon: const Icon(LucideIcons.chartColumn), label: l10nOf(context).navProgress),
+            NavigationDestination(icon: const Icon(LucideIcons.salad), label: l10nOf(context).navNutrition),
           ],
         ),
       ),
@@ -125,7 +126,7 @@ class _HomeHeader extends StatelessWidget {
           ),
           IconButton(
             key: const ValueKey('home_profile_avatar'),
-            tooltip: 'Profile',
+            tooltip: l10nOf(context).homeProfileTooltip,
             onPressed: () => context.push('/profile'),
             icon: const Icon(
               LucideIcons.circleUserRound,
@@ -149,6 +150,7 @@ class _ResumeBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final elapsed = session.elapsedSecondsNow();
     final elapsedText =
         '${(elapsed ~/ 60).toString().padLeft(2, '0')}:${(elapsed % 60).toString().padLeft(2, '0')}';
@@ -175,12 +177,12 @@ class _ResumeBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'WORKOUT IN PROGRESS',
+                    l10n.homeResumeBannerTitle,
                     style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.neonCyan),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${session.name} · $elapsedText elapsed · $setsDone/$setsTotal sets',
+                    l10n.homeResumeBannerSubtitle(session.name, elapsedText, setsDone, setsTotal),
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                   ),
@@ -212,6 +214,7 @@ class _StartSessionButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     return SizedBox(
       height: 64,
       width: double.infinity,
@@ -228,7 +231,7 @@ class _StartSessionButton extends ConsumerWidget {
             letterSpacing: 1.2,
           ),
         ),
-        child: Text(isFirstRun ? 'START FIRST WORKOUT' : 'START NEW SESSION'),
+        child: Text(isFirstRun ? l10n.homeStartFirstWorkout : l10n.homeStartNewSession),
       ),
     );
   }
@@ -256,9 +259,12 @@ class _SuggestedRoutineCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final meta =
-        '${routine.exerciseCount} exercises · ${routine.totalSets} sets · '
-        '~${routine.estimatedDurationMinutes} min';
+    final l10n = l10nOf(context);
+    final meta = l10n.homeSuggestedRoutineMeta(
+      routine.exerciseCount,
+      routine.totalSets,
+      routine.estimatedDurationMinutes,
+    );
 
     return InkWell(
       key: const ValueKey('home_suggested_routine'),
@@ -280,7 +286,7 @@ class _SuggestedRoutineCard extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SUGGESTED ROUTINE',
+                    l10n.homeSuggestedRoutineTitle,
                     style: AppTheme.num(
                       10,
                       weight: FontWeight.w700,
@@ -328,6 +334,7 @@ class _GlanceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final streak = state.streak;
     final glance = state.weeklyGlance;
 
@@ -355,7 +362,7 @@ class _GlanceSection extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
-          '▲ NEW',
+          l10n.glanceVolumeNew,
           style: AppTheme.num(
             10,
             weight: FontWeight.w700,
@@ -373,30 +380,30 @@ class _GlanceSection extends StatelessWidget {
       runSpacing: 10,
       children: [
         _GlanceChip(
-          label: 'THIS WEEK',
+          label: l10n.glanceThisWeek,
           value: streak?.weeklyProgressDisplay ?? '—',
           accent: (streak?.weeklyGoalMet ?? false)
               ? AppTheme.neonCyan
               : AppTheme.textSecondary,
         ),
         _GlanceChip(
-          label: 'VOLUME',
+          label: l10n.glanceVolume,
           value: glance == null ? '—' : '${glance.thisWeek.volumeDisplay} kg',
           trailing: volumeBadge,
         ),
         _GlanceChip(
-          label: 'SETS',
+          label: l10n.glanceSets,
           value: glance == null ? '—' : '${glance.thisWeek.completedSetCount}',
         ),
         if (streak != null && streak.currentStreakWeeks > 0)
           _GlanceChip(
-            label: 'STREAK',
+            label: l10n.glanceStreak,
             value: streak.streakDisplay,
             accent: AppTheme.neonCyan,
           ),
         if (state.hasCalorieGoal && calories != null)
           _GlanceChip(
-            label: 'CALORIES LEFT',
+            label: l10n.glanceCaloriesLeft,
             value: '${calories.round()} kcal',
           ),
       ],
@@ -469,13 +476,14 @@ class _RecentWorkoutsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             Text(
-              'RECENT WORKOUTS',
+              l10n.homeRecentWorkouts,
               style: AppTheme.num(
                 11,
                 weight: FontWeight.w700,
@@ -492,9 +500,9 @@ class _RecentWorkoutsSection extends StatelessWidget {
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text(
-                  'VIEW ALL',
-                  style: TextStyle(
+                child: Text(
+                  l10n.viewAll,
+                  style: const TextStyle(
                     color: AppTheme.neonCyan,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
@@ -522,6 +530,7 @@ class _RecentEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: const ValueKey('home_recent_empty'),
       width: double.infinity,
@@ -534,7 +543,7 @@ class _RecentEmptyState extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'YOUR HISTORY WILL APPEAR HERE',
+            l10n.homeHistoryEmptyTitle,
             style: AppTheme.num(
               12,
               weight: FontWeight.w700,
@@ -542,9 +551,9 @@ class _RecentEmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'No account needed. Works offline.',
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
+          Text(
+            l10n.homeHistoryEmptyMessage,
+            style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
           ),
         ],
       ),
@@ -559,13 +568,18 @@ class _RecentWorkoutCard extends StatelessWidget {
 
   final WorkoutHistoryItem item;
 
-  static String _relativeDate(DateTime date, DateTime now) {
+  static String _relativeDate(
+    BuildContext context,
+    DateTime date,
+    DateTime now,
+  ) {
+    final l10n = l10nOf(context);
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(date.year, date.month, date.day);
     final diff = today.difference(day).inDays;
-    if (diff <= 0) return 'TODAY';
-    if (diff == 1) return 'YESTERDAY';
-    return '${diff}d ago';
+    if (diff <= 0) return l10n.dateToday;
+    if (diff == 1) return l10n.dateYesterday;
+    return l10n.dateDaysAgo(diff);
   }
 
   static String _duration(int seconds) {
@@ -579,9 +593,13 @@ class _RecentWorkoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final meta =
-        '${item.exerciseCount} exercises · ${item.totalSetsCount} sets · '
-        '${item.volumeDisplay} kg · ${_duration(item.durationSeconds)}';
+    final l10n = l10nOf(context);
+    final meta = l10n.homeRecentCardMeta(
+      item.exerciseCount,
+      item.totalSetsCount,
+      item.volumeDisplay,
+      _duration(item.durationSeconds),
+    );
 
     return InkWell(
       key: ValueKey('home_recent_card_${item.id}'),
@@ -627,7 +645,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            '${item.prCount} PR',
+                            l10n.prCountChip(item.prCount),
                             style: AppTheme.num(
                               10,
                               weight: FontWeight.w700,
@@ -640,7 +658,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    _relativeDate(item.date, DateTime.now()),
+                    _relativeDate(context, item.date, DateTime.now()),
                     style: AppTheme.num(
                       10.5,
                       weight: FontWeight.w500,

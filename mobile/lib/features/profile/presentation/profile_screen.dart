@@ -1,9 +1,11 @@
+import 'package:aven_fit/core/l10n/l10n.dart';
+import 'package:aven_fit/core/theme/app_theme.dart';
+import 'package:aven_fit/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../core/theme/app_theme.dart';
 import '../../auth/domain/auth_state.dart';
 import '../../history/domain/lifetime_stats.dart';
 import 'profile_controller.dart';
@@ -32,7 +34,7 @@ class ProfileScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'PROFILE',
+          l10nOf(context).profileTitle,
           style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
         ),
       ),
@@ -69,47 +71,51 @@ class _IdentityHeader extends StatelessWidget {
 
   final AuthState auth;
 
-  ({String name, String subtitle, String? initial}) get _identity =>
-      switch (auth) {
-        AuthLoading() => const (
-            name: 'Loading…',
-            subtitle: '',
-            initial: null,
-          ),
-        AuthGuest() => const (
-            name: 'Guest',
-            subtitle: 'Local profile',
-            initial: null,
-          ),
-        AuthAuthenticated(:final displayName, :final phoneNumber) =>
-          _authenticatedIdentity(displayName, phoneNumber),
-        AuthError() => const (
-            name: 'Guest',
-            subtitle: 'Local profile',
-            initial: null,
-          ),
-      };
+  ({String name, String subtitle, String? initial}) _identityOf(
+    BuildContext context,
+  ) {
+    final l10n = l10nOf(context);
+    return switch (auth) {
+      AuthLoading() => (name: l10n.profileLoading, subtitle: '', initial: null),
+      AuthGuest() => (
+          name: l10n.profileGuest,
+          subtitle: l10n.profileLocalSubtitle,
+          initial: null,
+        ),
+      AuthAuthenticated(:final displayName, :final phoneNumber) =>
+        _authenticatedIdentity(l10n, displayName, phoneNumber),
+      AuthError() => (
+          name: l10n.profileGuest,
+          subtitle: l10n.profileLocalSubtitle,
+          initial: null,
+        ),
+    };
+  }
 
   /// Account identity: display name first, phone fallback, then the
   /// neutral "Athlete" (never a blank identity, L6).
   static ({String name, String subtitle, String? initial})
-      _authenticatedIdentity(String? displayName, String? phoneNumber) {
+      _authenticatedIdentity(
+    AppLocalizations l10n,
+    String? displayName,
+    String? phoneNumber,
+  ) {
     if (displayName != null && displayName.isNotEmpty) {
       return (
         name: displayName,
-        subtitle: 'Signed in',
+        subtitle: l10n.profileSignedIn,
         initial: displayName[0].toUpperCase(),
       );
     }
     if (phoneNumber != null && phoneNumber.isNotEmpty) {
-      return (name: phoneNumber, subtitle: 'Signed in', initial: null);
+      return (name: phoneNumber, subtitle: l10n.profileSignedIn, initial: null);
     }
-    return (name: 'Athlete', subtitle: 'Signed in', initial: null);
+    return (name: l10n.profileAthlete, subtitle: l10n.profileSignedIn, initial: null);
   }
 
   @override
   Widget build(BuildContext context) {
-    final identity = _identity;
+    final identity = _identityOf(context);
 
     return Container(
       key: const ValueKey('profile_identity_card'),
@@ -183,6 +189,7 @@ class _GuestUpgradeBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: const ValueKey('profile_upgrade_banner'),
       padding: const EdgeInsets.all(14),
@@ -200,14 +207,14 @@ class _GuestUpgradeBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'LOCAL PROFILE',
+                  l10n.profileBannerTitle,
                   style: AppTheme.num(11, weight: FontWeight.w700,
                       color: AppTheme.neonCyan),
                 ),
                 const SizedBox(height: 2),
-                const Text(
-                  'Sign in to back up your data and sync across devices.',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
+                Text(
+                  l10n.profileBannerMessage,
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
                 ),
               ],
             ),
@@ -224,9 +231,9 @@ class _GuestUpgradeBanner extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 shape: const RoundedRectangleBorder(),
               ),
-              child: const Text(
-                'SIGN IN',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+              child: Text(
+                l10n.profileSignIn,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
               ),
             ),
           ),
@@ -246,6 +253,7 @@ class _LifetimeStatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Column(
       key: const ValueKey('profile_stats_grid'),
       children: [
@@ -253,7 +261,7 @@ class _LifetimeStatsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _StatCell(
-                label: 'WORKOUTS',
+                label: l10n.statsWorkouts,
                 value: '${stats.workoutCount}',
                 valueKey: 'profile_stat_workouts',
               ),
@@ -261,7 +269,7 @@ class _LifetimeStatsGrid extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: _StatCell(
-                label: 'WORKING VOLUME (KG)',
+                label: l10n.statsWorkingVolume,
                 value: stats.volumeDisplay,
                 valueKey: 'profile_stat_volume',
               ),
@@ -273,7 +281,7 @@ class _LifetimeStatsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _StatCell(
-                label: 'SETS LOGGED',
+                label: l10n.statsSets,
                 value: '${stats.completedSetCount}',
                 valueKey: 'profile_stat_sets',
               ),
@@ -281,7 +289,7 @@ class _LifetimeStatsGrid extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: _StatCell(
-                label: 'MEMBER SINCE',
+                label: l10n.statsMemberSince,
                 value: stats.memberSinceDisplay,
                 valueKey: 'profile_stat_since',
               ),
@@ -355,6 +363,7 @@ class _QuickLinks extends StatelessWidget {
   }
 
   void _showAbout(BuildContext context) {
+    final l10n = l10nOf(context);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -365,15 +374,14 @@ class _QuickLinks extends StatelessWidget {
           style: AppTheme.num(18, weight: FontWeight.w700,
               color: AppTheme.neonCyan),
         ),
-        content: const Text(
-          'Offline-first gym & nutrition tracker. Your data lives on this '
-          'device — no account needed, no cloud required.',
-          style: TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
+        content: Text(
+          l10n.aboutMessage,
+          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('OK'),
+            child: Text(l10n.dialogOk),
           ),
         ],
       ),
@@ -382,6 +390,7 @@ class _QuickLinks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: const ValueKey('profile_quick_links'),
       decoration: BoxDecoration(
@@ -394,23 +403,21 @@ class _QuickLinks extends StatelessWidget {
           _LinkRow(
             key: const ValueKey('profile_link_settings'),
             icon: LucideIcons.settings,
-            label: 'SETTINGS',
-            onTap: () =>
-                _showNotice(context, 'Settings is coming in a future update.'),
+            label: l10n.linkSettings,
+            onTap: () => _showNotice(context, l10n.settingsComingSoon),
           ),
           const Divider(height: 1, color: AppTheme.glassBorder),
           _LinkRow(
             key: const ValueKey('profile_link_export'),
             icon: LucideIcons.download,
-            label: 'DATA EXPORT',
-            onTap: () => _showNotice(
-                context, 'Data export is coming in a future update.'),
+            label: l10n.linkDataExport,
+            onTap: () => _showNotice(context, l10n.dataExportComingSoon),
           ),
           const Divider(height: 1, color: AppTheme.glassBorder),
           _LinkRow(
             key: const ValueKey('profile_link_about'),
             icon: LucideIcons.info,
-            label: 'ABOUT',
+            label: l10n.linkAbout,
             onTap: () => _showAbout(context),
           ),
         ],
@@ -472,35 +479,34 @@ class _SignOutTile extends StatelessWidget {
   final Future<void> Function() onConfirm;
 
   Future<void> _confirmAndSignOut(BuildContext context) async {
+    final l10n = l10nOf(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: const RoundedRectangleBorder(),
         title: Text(
-          'SIGN OUT?',
+          l10n.signOutTitle,
           style: AppTheme.num(16, weight: FontWeight.w700,
               color: AppTheme.textPrimary),
         ),
-        content: const Text(
-          'Your workouts, routines and nutrition history stay safely on '
-          'this device. You can sign in again anytime to pick up where '
-          'you left off.',
-          style: TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
+        content: Text(
+          l10n.signOutMessage,
+          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
         ),
         actions: [
           TextButton(
             key: const ValueKey('profile_sign_out_cancel'),
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('CANCEL'),
+            child: Text(l10n.dialogCancel),
           ),
           TextButton(
             key: const ValueKey('profile_sign_out_confirm'),
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: TextButton.styleFrom(foregroundColor: AppTheme.burntOrange),
-            child: const Text(
-              'SIGN OUT',
-              style: TextStyle(fontWeight: FontWeight.w700),
+            child: Text(
+              l10n.signOutConfirm,
+              style: const TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
         ],
@@ -513,6 +519,7 @@ class _SignOutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.glassFill,
@@ -523,16 +530,16 @@ class _SignOutTile extends StatelessWidget {
         key: const ValueKey('profile_sign_out_button'),
         onTap: () => _confirmAndSignOut(context),
         borderRadius: BorderRadius.circular(8),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Row(
             children: [
-              Icon(LucideIcons.logOut, size: 18, color: AppTheme.burntOrange),
-              SizedBox(width: 12),
+              const Icon(LucideIcons.logOut, size: 18, color: AppTheme.burntOrange),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'SIGN OUT',
-                  style: TextStyle(
+                  l10n.signOutConfirm,
+                  style: const TextStyle(
                     color: AppTheme.burntOrange,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,

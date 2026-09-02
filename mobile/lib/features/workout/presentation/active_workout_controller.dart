@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -438,23 +439,22 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     }
   }
 
-  /// Generates time-of-day default workout name per FEATURES.md §8.1.
-  static String generateDefaultWorkoutName([DateTime? time]) {
+  /// Generates a time-of-day default workout name per FEATURES.md §8.1 —
+  /// each band offers two names and ONE is picked randomly, so repeated
+  /// sessions vary. [random] is injectable for deterministic tests.
+  static String generateDefaultWorkoutName([DateTime? time, Random? random]) {
     final t = time ?? DateTime.now();
     final hour = t.hour;
-    if (hour >= 5 && hour < 9) {
-      return 'Early Bird Workout · Dawn Patrol';
-    } else if (hour >= 9 && hour < 12) {
-      return 'Morning Grind · Morning Workout';
-    } else if (hour >= 12 && hour < 17) {
-      return 'Afternoon Pump · Midday Session';
-    } else if (hour >= 17 && hour < 21) {
-      return 'Evening Workout · Sundown Session';
-    } else if (hour >= 21 && hour <= 23) {
-      return 'Night Session · Late Lift';
-    } else {
-      return 'Midnight Session · Night Owl Lift';
-    }
+    final names = switch (hour) {
+      >= 5 && < 9 => ['Early Bird Workout', 'Dawn Patrol'],
+      >= 9 && < 12 => ['Morning Grind', 'Morning Workout'],
+      >= 12 && < 17 => ['Afternoon Pump', 'Midday Session'],
+      >= 17 && < 21 => ['Evening Workout', 'Sundown Session'],
+      >= 21 => ['Night Session', 'Late Lift'],
+      _ => ['Late Night Lift', 'Midnight Session'],
+    };
+    final rand = random ?? Random();
+    return names[rand.nextInt(names.length)];
   }
 
   /// Finishes the active workout session and returns its id so the screen can

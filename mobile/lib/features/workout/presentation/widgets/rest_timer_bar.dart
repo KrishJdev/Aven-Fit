@@ -1,8 +1,9 @@
+import 'package:aven_fit/core/l10n/l10n.dart';
+import 'package:aven_fit/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../../../core/theme/app_theme.dart';
 import '../rest_timer_controller.dart';
 
 /// Slim rest-timer bar rendered under the session header (FEATURES.md
@@ -28,7 +29,7 @@ class RestTimerBar extends ConsumerWidget {
               const Icon(LucideIcons.timer, size: 18, color: AppTheme.neonCyan),
               const SizedBox(width: 8),
               Text(
-                'REST TIMER:',
+                l10nOf(context).restTimerLabel,
                 style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.neonCyan),
               ),
               const SizedBox(width: 6),
@@ -58,13 +59,13 @@ class RestTimerBar extends ConsumerWidget {
               IconButton(
                 onPressed: restNotifier.restart,
                 icon: const Icon(LucideIcons.rotateCcw, size: 16, color: AppTheme.textSecondary),
-                tooltip: 'Restart rest',
+                tooltip: l10nOf(context).restartRestTooltip,
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
                 onPressed: restNotifier.cancel,
                 icon: const Icon(LucideIcons.x, size: 16, color: AppTheme.textSecondary),
-                tooltip: 'Skip rest',
+                tooltip: l10nOf(context).skipRestTooltip,
                 visualDensity: VisualDensity.compact,
               ),
             ],

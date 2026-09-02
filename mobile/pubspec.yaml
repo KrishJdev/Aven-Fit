@@ -31,6 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Localization (§15 localization-ready): gen-l10n delegates + messages.
+  flutter_localizations:
+    sdk: flutter
+
   cupertino_icons: ^1.0.8
 
   # State Management & DI
@@ -91,6 +95,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  # Generates lib/l10n/app_localizations*.dart from l10n.yaml + app_en.arb
+  # (§15: all UI strings externalized, localization-ready from day one).
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
