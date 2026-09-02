@@ -51,6 +51,9 @@ dependencies:
   dio: ^5.8.0+1
   workmanager: ^0.10.9
 
+  # Auth (WU-5.1) — encrypted token storage on Android (Keystore-backed)
+  flutter_secure_storage: ^9.2.4
+
   # Crash Reporting
   sentry_flutter: ^8.12.0
 
