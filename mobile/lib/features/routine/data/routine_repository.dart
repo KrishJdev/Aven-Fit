@@ -66,6 +66,10 @@ abstract class RoutineRepository {
 
   /// Removes an exercise entry from a routine.
   Future<bool> removeExerciseFromRoutine(String routineExerciseId);
+
+  /// Reactive id of the suggested routine (WU-X.1 Home §7.1): the most
+  /// recently used routine, falling back to the newest-created one.
+  Stream<String?> watchSuggestedRoutineId();
 }
 
 /// Production implementation of [RoutineRepository] backed by [RoutineDao].
@@ -79,6 +83,11 @@ class RoutineRepositoryImpl implements RoutineRepository {
     return _dao.watchAllRoutines().map((list) {
       return list.map(_mapWithExercisesToRoutine).toList();
     });
+  }
+
+  @override
+  Stream<String?> watchSuggestedRoutineId() {
+    return _dao.watchSuggestedRoutineId();
   }
 
   @override

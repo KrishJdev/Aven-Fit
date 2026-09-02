@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
+import '../../progress/domain/streak_info.dart';
 import '../../routine/data/routine_tables.dart';
 import '../../workout/data/workout_tables.dart';
 import '../domain/lifetime_stats.dart';
+import '../domain/week_stats.dart';
 import '../domain/workout_history_item.dart';
 
 part 'history_local_source.g.dart';
@@ -184,6 +186,72 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
       completedSetCount: setCount,
       totalVolumeKg: volume,
       firstSessionAt: firstSessionAt,
+    );
+  }
+
+  /// Reactive week-over-week glance (WU-X.1, FEATURES.md §7.1): this
+  /// week's and last week's completed workouts, confirmed sets, and
+  /// working volume (warm-ups excluded, L1), bucketed Monday-anchored
+  /// through the single `StreakInfo.startOfWeek` anchor. Same
+  /// dual-trigger pattern as the lifetime stats — derived, never stored.
+  Stream<WeeklyGlance> watchWeeklyGlance() {
+    return customSelect(
+      'SELECT COUNT(*) AS session_count FROM workout_sessions',
+      readsFrom: {workoutSessions, workoutSets},
+    )
+        .watchSingle()
+        .asyncMap((_) => _computeWeeklyGlance());
+  }
+
+  /// Recomputes both week buckets fresh from the tables. A session's
+  /// week is its effective completion date (`completedAt ?? startedAt`,
+  /// the same effective date the streak counts by).
+  Future<WeeklyGlance> _computeWeeklyGlance() async {
+    final thisWeekStart = StreakInfo.startOfWeek(DateTime.now());
+    final lastWeekStart = thisWeekStart.subtract(const Duration(days: 7));
+    final thisWeekEnd = thisWeekStart.add(const Duration(days: 7));
+
+    final completed = await (select(workoutSessions)
+          ..where((t) => t.status.equals('completed')))
+        .get();
+    final completedIds = completed.map((s) => s.id).toList();
+    final setRows = completedIds.isEmpty
+        ? const <WorkoutSetRow>[]
+        : await (select(workoutSets)
+              ..where((t) =>
+                  t.sessionId.isIn(completedIds) & t.isCompleted.equals(true)))
+            .get();
+    final sessionById = {for (final s in completed) s.id: s};
+
+    WeekStats bucketFor(DateTime weekStart, DateTime weekEnd) {
+      var workoutCount = 0;
+      var setCount = 0;
+      var volume = 0.0;
+      for (final session in completed) {
+        final date = session.completedAt ?? session.startedAt;
+        if (date.isBefore(weekStart) || !date.isBefore(weekEnd)) continue;
+        workoutCount++;
+      }
+      for (final set in setRows) {
+        final session = sessionById[set.sessionId];
+        if (session == null) continue;
+        final date = session.completedAt ?? session.startedAt;
+        if (date.isBefore(weekStart) || !date.isBefore(weekEnd)) continue;
+        setCount++;
+        if (set.setType != 'warmup') {
+          volume += set.weightKg * set.reps;
+        }
+      }
+      return WeekStats(
+        workoutCount: workoutCount,
+        completedSetCount: setCount,
+        volumeKg: volume,
+      );
+    }
+
+    return (
+      thisWeek: bucketFor(thisWeekStart, thisWeekEnd),
+      lastWeek: bucketFor(lastWeekStart, thisWeekStart),
     );
   }
 

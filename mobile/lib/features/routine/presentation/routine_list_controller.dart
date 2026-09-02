@@ -12,7 +12,11 @@ part 'routine_list_controller.g.dart';
 ///
 /// Implements Law L2 (offline stream), Law L3 (unlimited routines),
 /// and Law L7 (write-through duplication, deletion with confirmation, and safe session start).
-@riverpod
+///
+/// KeepAlive: the Home suggested-routine card (WU-X.1) one-tap-starts
+/// through [startWorkoutFromRoutine] — an autoDispose controller could
+/// be torn down mid-flight while its async write-through runs.
+@Riverpod(keepAlive: true)
 class RoutineListController extends _$RoutineListController {
   @override
   Stream<List<Routine>> build() {

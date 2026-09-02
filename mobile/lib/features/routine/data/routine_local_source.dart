@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/database/app_database.dart';
 import '../../exercise/data/exercise_tables.dart';
+import '../../workout/data/workout_tables.dart';
 import 'routine_tables.dart';
 
 part 'routine_local_source.g.dart';
@@ -41,10 +42,40 @@ class RoutineExerciseWithSets {
   Exercises,
   MuscleGroups,
   ExerciseMuscleGroups,
+  WorkoutSessions,
 ])
 class RoutineDao extends DatabaseAccessor<AppDatabase>
     with _$RoutineDaoMixin {
   RoutineDao(super.db);
+
+  /// Reactive id of the suggested routine (WU-X.1 Home, FEATURES.md
+  /// §7.1: "most-used routine"). P0 heuristic: the routine started in
+  /// the newest non-discarded session; when no routine has ever been
+  /// used, the newest-created routine. Re-emits when sessions or the
+  /// routine catalog change (L8).
+  Stream<String?> watchSuggestedRoutineId() {
+    return customSelect(
+      'SELECT routine_id, MAX(started_at) AS last_used_at '
+      'FROM workout_sessions '
+      'WHERE routine_id IS NOT NULL AND status != ? '
+      'GROUP BY routine_id '
+      'ORDER BY last_used_at DESC '
+      'LIMIT 1',
+      variables: [Variable<String>('discarded')],
+      readsFrom: {workoutSessions, routines},
+    ).watchSingle().asyncMap((row) async {
+      final usedId = row.readNullable<String>('routine_id');
+      if (usedId != null) {
+        return usedId;
+      }
+      // Nothing used yet → the newest-created routine.
+      final newest = await (select(routines)
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+            ..limit(1))
+          .getSingleOrNull();
+      return newest?.id;
+    });
+  }
 
   /// Streams all routines with their associated exercises and sets.
   Stream<List<RoutineWithExercises>> watchAllRoutines() {

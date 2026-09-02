@@ -290,6 +290,16 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+
+      // WU-X.1: Home now watches the same stream mix as the nutrition
+      // dashboard, so tearDown's db.close() needs this drain (WU-4.5
+      // recipe): unmount → dispose → pump lets drift's stream-close
+      // cleanup timers fire while the fake-async zone is still alive.
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        container.dispose();
+        await tester.pump(const Duration(milliseconds: 100));
+      });
     }
 
     testWidgets('renders "0 of 3" and omits the streak chip on a fresh DB',

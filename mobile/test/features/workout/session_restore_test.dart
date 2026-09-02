@@ -483,6 +483,16 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+
+      // WU-X.1: Home now watches the same stream mix as the nutrition
+      // dashboard, so the group's db.close() needs this drain (WU-4.5
+      // recipe): unmount → dispose → pump lets drift's stream-close
+      // cleanup timers fire while the fake-async zone is still alive.
+      addTearDown(() async {
+        await tester.pumpWidget(const SizedBox.shrink());
+        container.dispose();
+        await tester.pump(const Duration(milliseconds: 100));
+      });
     }
 
     testWidgets('shows the banner with name, elapsed time, and set progress',
@@ -514,10 +524,11 @@ void main() {
       await pumpHome(tester);
 
       expect(find.byKey(const ValueKey('home_resume_banner')), findsNothing);
-      expect(find.text('START NEW SESSION'), findsOneWidget);
+      // Fresh DB → the §5.1 first-run CTA label.
+      expect(find.text('START FIRST WORKOUT'), findsOneWidget);
 
       // One-session rule passes straight through → navigates.
-      await tester.tap(find.text('START NEW SESSION'));
+      await tester.tap(find.text('START FIRST WORKOUT'));
       await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('active_stub')), findsOneWidget);
     });

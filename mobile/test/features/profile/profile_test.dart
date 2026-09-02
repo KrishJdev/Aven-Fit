@@ -9,10 +9,9 @@ import 'package:aven_fit/features/history/domain/lifetime_stats.dart';
 import 'package:aven_fit/features/profile/presentation/profile_controller.dart';
 import 'package:aven_fit/features/profile/presentation/profile_screen.dart';
 import 'package:aven_fit/features/progress/data/pr_repository.dart';
-import 'package:aven_fit/features/progress/data/streak_repository.dart';
-import 'package:aven_fit/features/progress/domain/streak_info.dart';
 import 'package:aven_fit/features/workout/data/workout_repository.dart';
 import 'package:aven_fit/features/workout/presentation/home_screen.dart';
+import 'package:aven_fit/main.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -559,13 +558,15 @@ void main() {
     profileScreenTest('Home header avatar navigates to Profile (§7.1)',
         (tester) async {
       container = ProviderContainer(overrides: [
+        appDatabaseProvider.overrideWithValue(
+          // Hermetic SQLite: every Home dashboard stream (weekly glance,
+          // recent logs, suggested routine, nutrition) resolves through it.
+          AppDatabase(NativeDatabase.memory()),
+        ),
         authRepositoryProvider.overrideWith((ref) => repo),
         watchAuthStateProvider.overrideWith((ref) => repo.watchAuthState()),
         watchLifetimeStatsProvider
             .overrideWith((ref) => Stream.value(const LifetimeStats())),
-        watchActiveSessionProvider.overrideWith((ref) => Stream.value(null)),
-        watchStreakInfoProvider.overrideWith(
-            (ref) => Stream.value(const StreakInfo())),
       ]);
       final router = GoRouter(
         initialLocation: '/home',

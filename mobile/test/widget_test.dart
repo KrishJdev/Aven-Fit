@@ -31,6 +31,7 @@ void main() {
 
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
-    expect(find.text('START NEW SESSION'), findsOneWidget);
+    // Fresh in-memory DB → the §5.1 first-run CTA.
+    expect(find.text('START FIRST WORKOUT'), findsOneWidget);
   });
 }

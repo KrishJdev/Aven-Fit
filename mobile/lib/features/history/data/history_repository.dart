@@ -5,6 +5,7 @@ import '../../progress/data/pr_repository.dart';
 import '../../workout/data/workout_repository.dart';
 import '../../workout/domain/workout_session.dart';
 import '../domain/lifetime_stats.dart';
+import '../domain/week_stats.dart';
 import '../domain/workout_history_item.dart';
 import 'history_local_source.dart';
 
@@ -28,6 +29,10 @@ abstract class HistoryRepository {
   /// workouts, confirmed sets, working volume (warm-ups excluded, L1)
   /// and the "member since" anchor — recomputed on every history change.
   Stream<LifetimeStats> watchLifetimeStats();
+
+  /// Reactive week-over-week glance (WU-X.1, §7.1): this week's and last
+  /// week's workouts/sets/working volume for the Home delta badges.
+  Stream<WeeklyGlance> watchWeeklyGlance();
 
   /// Full read-only breakdown (exercises with names + every set).
   Future<WorkoutSession?> getWorkoutDetail(String sessionId);
@@ -77,6 +82,11 @@ class HistoryRepositoryImpl implements HistoryRepository {
   @override
   Stream<LifetimeStats> watchLifetimeStats() {
     return _dao.watchLifetimeStats();
+  }
+
+  @override
+  Stream<WeeklyGlance> watchWeeklyGlance() {
+    return _dao.watchWeeklyGlance();
   }
 
   @override
