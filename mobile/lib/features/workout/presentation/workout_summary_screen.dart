@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/session_exercise.dart';
 import '../domain/workout_set.dart';
 import 'workout_summary_controller.dart';
@@ -53,7 +54,9 @@ class WorkoutSummaryScreen extends ConsumerWidget {
       ),
       body: stateAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.neonCyan),
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
+          ),
         ),
         error: (err, stack) => _buildErrorState(context, ref, err),
         data: (state) => state.notFound

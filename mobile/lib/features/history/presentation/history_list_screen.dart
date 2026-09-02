@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../data/history_repository.dart';
 import '../domain/workout_history_item.dart';
 
@@ -35,7 +36,9 @@ class HistoryListScreen extends ConsumerWidget {
       ),
       body: feedAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.neonCyan),
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
+          ),
         ),
         error: (err, _) => _HistoryErrorState(error: err),
         data: (items) {

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/error_state_widget.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/muscle_group.dart';
 import 'exercise_detail_controller.dart';
 
@@ -288,16 +290,14 @@ class ExerciseDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.neonCyan,
-            strokeWidth: 2,
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
           ),
         ),
-        error: (err, _) => Center(
-          child: Text(
-            'Error: $err',
-            style: const TextStyle(color: AppTheme.burntOrange),
-          ),
+        error: (err, _) => ErrorStateWidget(
+          error: err,
+          onRetry: () =>
+              ref.invalidate(exerciseDetailControllerProvider(exerciseId)),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../../workout/domain/session_exercise.dart';
 import '../../workout/domain/workout_session.dart';
 import '../../workout/domain/workout_set.dart';
@@ -105,7 +106,9 @@ class WorkoutDetailScreen extends ConsumerWidget {
       ),
       body: sessionAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.neonCyan),
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
+          ),
         ),
         error: (err, _) => _ErrorState(error: err, sessionId: sessionId),
         data: (session) {

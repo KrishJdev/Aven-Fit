@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/error_state_widget.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/meal_type.dart';
 import 'food_detail_controller.dart';
 import 'food_search_screen.dart';
@@ -366,16 +368,14 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.neonCyan,
-            strokeWidth: 2,
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
           ),
         ),
-        error: (err, _) => Center(
-          child: Text(
-            'Error: $err',
-            style: const TextStyle(color: AppTheme.burntOrange),
-          ),
+        error: (err, _) => ErrorStateWidget(
+          error: err,
+          onRetry: () =>
+              ref.invalidate(foodDetailControllerProvider(widget.foodId)),
         ),
       ),
     );

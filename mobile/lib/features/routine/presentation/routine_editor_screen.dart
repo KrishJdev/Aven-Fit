@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/error_state_widget.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../../exercise/presentation/exercise_list_screen.dart';
 import '../domain/routine_exercise.dart';
 import 'routine_editor_controller.dart';
@@ -138,19 +140,17 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
       loading: () => const Scaffold(
         backgroundColor: AppTheme.oledBlack,
         body: Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.neonCyan,
-            strokeWidth: 2,
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
           ),
         ),
       ),
       error: (err, stack) => Scaffold(
         backgroundColor: AppTheme.oledBlack,
-        body: Center(
-          child: Text(
-            'Error loading routine: $err',
-            style: const TextStyle(color: AppTheme.burntOrange),
-          ),
+        body: ErrorStateWidget(
+          error: err,
+          onRetry: () => ref
+              .invalidate(routineEditorControllerProvider(widget.routineId)),
         ),
       ),
     );

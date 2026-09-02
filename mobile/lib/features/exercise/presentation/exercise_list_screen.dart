@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/exercise.dart';
 import 'exercise_list_controller.dart';
 import 'exercise_search_delegate.dart';
@@ -158,9 +159,8 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
           );
         },
         loading: () => const Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.neonCyan,
-            strokeWidth: 2,
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
           ),
         ),
         error: (err, stack) => Center(

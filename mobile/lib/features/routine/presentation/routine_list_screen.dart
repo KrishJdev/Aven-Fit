@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/error_state_widget.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/routine.dart';
 import 'routine_list_controller.dart';
 import '../../workout/presentation/widgets/session_conflict_dialog.dart';
@@ -65,34 +67,14 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                   return _buildRoutinesList(context, filtered);
                 },
                 loading: () => const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppTheme.neonCyan,
+                  child: SingleChildScrollView(
+                    child: LoadingStateWidget(),
                   ),
                 ),
-                error: (err, stack) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          LucideIcons.alertTriangle,
-                          color: AppTheme.burntOrange,
-                          size: 32,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Error loading routines: $err',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                error: (err, stack) => ErrorStateWidget(
+                  error: err,
+                  onRetry: () =>
+                      ref.invalidate(routineListControllerProvider),
                 ),
               ),
             ),

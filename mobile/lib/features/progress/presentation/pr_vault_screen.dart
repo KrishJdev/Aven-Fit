@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/empty_state_widget.dart';
+import '../../../core/widgets/error_state_widget.dart';
+import '../../../core/widgets/loading_state_widget.dart';
 import '../data/pr_local_source.dart';
 import '../domain/pr_record.dart';
 import 'pr_vault_controller.dart';
@@ -35,12 +38,25 @@ class PrVaultScreen extends ConsumerWidget {
       ),
       body: vaultAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: AppTheme.neonCyan),
+          child: SingleChildScrollView(
+            child: LoadingStateWidget(),
+          ),
         ),
-        error: (err, _) => _VaultErrorState(error: err),
+        error: (err, _) => ErrorStateWidget(
+          error: err,
+          onRetry: () => ref.invalidate(prVaultStreamProvider),
+        ),
         data: (entries) {
           if (entries.isEmpty) {
-            return const _VaultEmptyState();
+            return Center(
+              child: EmptyStateWidget(
+                key: const ValueKey('pr_vault_empty'),
+                icon: LucideIcons.trophy,
+                title: 'NO RECORDS YET',
+                message:
+                    'Confirm a working set — records are detected automatically.',
+              ),
+            );
           }
           return _VaultList(entries: entries);
         },
@@ -191,80 +207,3 @@ class _PrRow extends StatelessWidget {
   }
 }
 
-/// Designed empty state (L6): records appear automatically once a
-/// working set is confirmed — never a blank screen.
-class _VaultEmptyState extends StatelessWidget {
-  const _VaultEmptyState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        key: const ValueKey('pr_vault_empty'),
-        margin: const EdgeInsets.all(24),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-        decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              LucideIcons.trophy,
-              size: 28,
-              color: AppTheme.textSecondary,
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'NO RECORDS YET',
-              style: AppTheme.num(
-                12,
-                weight: FontWeight.w700,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Confirm a working set — records are detected automatically.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _VaultErrorState extends StatelessWidget {
-  const _VaultErrorState({required this.error});
-
-  final Object error;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'COULD NOT LOAD RECORDS',
-              style: TextStyle(color: AppTheme.burntOrange, fontSize: 13),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$error',
-              textAlign: TextAlign.center,
-              style:
-                  const TextStyle(color: AppTheme.textSecondary, fontSize: 11.5),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
