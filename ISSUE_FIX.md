@@ -33,7 +33,7 @@ This document serves as the **central persistent issue tracker and remediation p
 | **ISSUE-08** | Data Integrity (L7) | **Medium** | Unlinked local SQLite data on user sign-in (guest data retains `user_id = null`) | `[x] FIXED` |
 | **ISSUE-09** | Performance (L8) | **Medium** | In-memory full-table loading in Lifetime & Glance stats calculations | `[x] FIXED` |
 | **ISSUE-10** | Database Migration | **Low** | Incomplete incremental migration from v1/v2/v3 in `AppDatabase.onUpgrade` | `[x] FIXED` |
-| **ISSUE-11** | Backend Sync Contract | **High** | Mobile SQLite vs Backend PostgreSQL sync schema and enum divergence | `[ ] OPEN` |
+| **ISSUE-11** | Backend Sync Contract | **High** | Mobile SQLite vs Backend PostgreSQL sync schema and enum divergence | `[x] FIXED` |
 
 ---
 
@@ -345,7 +345,7 @@ The migration step only called `createTable(sessionExercises)`. While fresh inst
 
 - **Category:** Backend Sync Contract (Phase V1.1 / J6 Gate)
 - **Severity:** **HIGH**
-- **Status:** `[ ] OPEN`
+- **Status:** `[x] FIXED`
 - **Affected Files:**
   - `mobile/lib/features/sync/`
   - Backend Flyway migrations: `V3`, `V4`, `V5`, `V6`
@@ -384,6 +384,7 @@ The backend Spring Boot sync endpoint (`POST /api/v1/sync/push`) expects:
 | 2026-09-03 | **ISSUE-08** | Added `linkGuestDataToUser(userId)` to `WorkoutDao` & `RoutineDao`; wired into `AuthRepositoryImpl._applySession` to link guest rows on sign-in (§5.4, §6.2) | Verified via `auth_test.dart`: guest workout session and routine linked to authenticated user | Antigravity |
 | 2026-09-03 | **ISSUE-09** | Replaced full-table Dart in-memory scans in `HistoryDao._computeLifetimeStats` and `_computeWeeklyGlance` with optimized native SQLite aggregate queries (`SUM`, `COUNT`, `MIN`, `COALESCE`) | Verified via `home_dashboard_test.dart` & `history_test.dart`: exact stats computed in <1ms with O(1) memory | Antigravity |
 | 2026-09-03 | **ISSUE-10** | Added missing `addColumn` migrations for `workout_sets` (`sessionExerciseId`, `isPr`, `completedAt`, `notes`) and `workout_sessions` (`routineId`, `durationSeconds`) inside `onUpgrade` (`from < 4`) in `AppDatabase` | Verified via `migration_test.dart`: clean incremental schema migration | Antigravity |
+| 2026-09-03 | **ISSUE-11** | Implemented `sync_models.dart`, `sync_dto_mapper.dart`, and `sync_repository.dart` for bidirectional schema mapping between Flutter SQLite and Spring Boot PostgreSQL REST contracts | 11/11 sync tests passed (`sync_mapper_test.dart` + `sync_repository_test.dart`); 387/387 total tests green | Antigravity |
 
 ---
 

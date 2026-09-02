@@ -464,6 +464,14 @@
   4. **ISSUE-09 (Full-table scan optimizations in Lifetime & Glance stats, Law L8):** Replaced in-memory Dart loops and full-table `WorkoutSetRow` loading in `HistoryDao._computeLifetimeStats()` and `_computeWeeklyGlance()` with native SQLite aggregate queries (`SUM`, `COUNT`, `MIN`, `COALESCE`) executed in $<1\text{ms}$ with $O(1)$ memory. Verified via `home_dashboard_test.dart` & `history_test.dart`.
   5. **ISSUE-10 (Incremental migration upgrade ladder in `AppDatabase.onUpgrade`):** Added missing column migrations for `workout_sets` (`sessionExerciseId`, `isPr`, `completedAt`, `notes`) and `workout_sessions` (`routineId`, `durationSeconds`) inside `onUpgrade` (`from < 4`). Created `test/core/database/migration_test.dart` verifying schema version 8 and migration callbacks.
   - Gates: `flutter analyze` clean (0 issues), `flutter test` (**376/376 passing across mobile** — was 372). Marked ISSUE-06 through ISSUE-10 as `[x] FIXED` in `ISSUE_FIX.md`.
+- **2026-09-03 (session 47):** **Executed Phase 3 / Batch 3 Remediation (ISSUE-11: Backend Sync Contract Alignment)**:
+  1. **ISSUE-11 (Mobile SQLite vs Backend PostgreSQL Sync Contract Divergence):**
+     - Designed and implemented `mobile/lib/features/sync/domain/sync_models.dart`: Models `SyncOperation`, `SyncPushRequest`, `SyncPushResponse`, `SyncOperationResult`, and `SyncPullResponse` matching Spring Boot REST contracts.
+     - Implemented `mobile/lib/features/sync/data/sync_dto_mapper.dart`: Bi-directional translation between Drift SQLite models (`WorkoutSessionRow`, `SessionExerciseRow`, `WorkoutSetRow`, `RoutineWithExercises`, `FoodItemRow`, `ExerciseRow`) and backend PostgreSQL JSON structures. Mapped enums with fallbacks (`active`/`completed`/`discarded` $\leftrightarrow$ `IN_PROGRESS`/`COMPLETED`/`CANCELLED`; `normal`/`warmup`/`dropSet`/`failure` $\leftrightarrow$ `NORMAL`/`WARMUP`/`DROP`/`FAILURE`), column renames (`orderIndex` $\leftrightarrow$ `position`, `setNumber` $\leftrightarrow$ `position`, `sessionId` $\leftrightarrow$ `workoutId`, `sessionExerciseId` $\leftrightarrow$ `workoutExerciseId`), and nutrition macro fields.
+     - Implemented `mobile/lib/features/sync/data/sync_repository.dart`: `SyncRepository` and `SyncRepositoryImpl` supporting mutation pushes to `/api/sync/push`, timestamped delta pulls from `/api/sync/pull`, and atomic SQLite ingestion of pulled models within `db.transaction(...)`.
+     - Verified backend `./gradlew test` (clean passing, 5/5 up to date).
+     - Added 11 tests in `mobile/test/features/sync/`: 8 bidirectional serialization tests in `sync_mapper_test.dart` and 3 repository tests with scripted HTTP adapters and in-memory Drift SQLite in `sync_repository_test.dart`.
+  - Gates: `flutter analyze` clean (0 issues), `flutter test` (**387/387 passing across mobile** — was 376: +11 new tests). Marked ISSUE-11 as `[x] FIXED` in `ISSUE_FIX.md`. All 11 discovered issues across P0 are now 100% resolved.
 
 ---
 
