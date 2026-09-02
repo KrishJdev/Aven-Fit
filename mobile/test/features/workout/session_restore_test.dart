@@ -13,8 +13,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'fake_notification_service.dart';
+
+/// Real [WorkoutRepository] for every read; the finish write-through is
+/// scriptable so the §8.1 save-error path can be forced deterministically.
+class _FailingFinishRepository extends Mock implements WorkoutRepository {}
 
 void main() {
   late AppDatabase db;
@@ -335,6 +340,80 @@ void main() {
       expect(row.durationSeconds, isNotNull);
       // ~5 minutes elapsed (±3s of test-execution drift).
       expect(row.durationSeconds!, inExclusiveRange(297, 303));
+      sub.close();
+    });
+  });
+
+  group('Finish save-error path (§8.1, L6/L7)', () {
+    late FakeNotificationService notifications;
+    late ProviderContainer container;
+    late _FailingFinishRepository failingRepo;
+
+    setUp(() {
+      notifications = FakeNotificationService();
+      failingRepo = _FailingFinishRepository();
+      container = ProviderContainer(overrides: [
+        appDatabaseProvider.overrideWithValue(db),
+        workoutRepositoryProvider.overrideWithValue(failingRepo),
+        notificationServiceProvider.overrideWithValue(notifications),
+      ]);
+    });
+
+    tearDown(() => container.dispose());
+
+    test('a failed finish keeps the session, sets, and error in state — '
+        'retry completes the workout', () async {
+      final session = await seedActiveSnapshot(
+          startedAgo: const Duration(minutes: 23, seconds: 41));
+
+      // Reads delegate to the real repository so the launch-time restore
+      // sees the true snapshot; only the finish write-through fails.
+      when(() => failingRepo.getActiveSession())
+          .thenAnswer((_) => repo.getActiveSession());
+      when(() => failingRepo.getSessionExercises(session.id))
+          .thenAnswer((_) => repo.getSessionExercises(session.id));
+      when(() => failingRepo.finishWorkout(
+            session.id,
+            durationSeconds: any(named: 'durationSeconds'),
+          )).thenThrow(Exception('disk full'));
+
+      final sub = container.listen(activeWorkoutControllerProvider, (_, _) {});
+      final restored =
+          await container.read(activeWorkoutControllerProvider.future);
+      expect(restored.sets, hasLength(2));
+
+      final finishedId = await container
+          .read(activeWorkoutControllerProvider.notifier)
+          .finishWorkout();
+
+      // The save reported failure — but nothing was lost: the state keeps
+      // the session and every set, the row is still active in SQLite, and
+      // the error is surfaced for the designed RETRY (L6/L7).
+      expect(finishedId, isNull);
+      final state = container.read(activeWorkoutControllerProvider).value!;
+      expect(state.hasActiveSession, isTrue);
+      expect(state.session!.id, session.id);
+      expect(state.sets, hasLength(2));
+      expect(state.isSaving, isFalse);
+      expect(state.errorMessage, isNotNull);
+      final stillActive = await repo.getActiveSession();
+      expect(stillActive, isNotNull);
+      expect(stillActive!.id, session.id);
+
+      // RETRY with the write-through healthy completes the workout — the
+      // stub forwards to the real repository so SQLite is truth (L7).
+      when(() => failingRepo.finishWorkout(
+            session.id,
+            durationSeconds: any(named: 'durationSeconds'),
+          )).thenAnswer((inv) => repo.finishWorkout(
+            session.id,
+            durationSeconds: inv.namedArguments[#durationSeconds] as int?,
+          ));
+      final retriedId = await container
+          .read(activeWorkoutControllerProvider.notifier)
+          .finishWorkout();
+      expect(retriedId, session.id);
+      expect(await repo.getActiveSession(), isNull);
       sub.close();
     });
   });

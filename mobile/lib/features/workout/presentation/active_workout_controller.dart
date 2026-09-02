@@ -459,28 +459,43 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
   /// Finishes the active workout session and returns its id so the screen can
   /// navigate to the Workout Summary (§8.5). Returns null when there was
-  /// nothing to finish or the write-through failed. The stored duration is
-  /// computed via epoch math (`now − startedAt − pausedDuration`) so pauses
-  /// are honored and the summary never re-derives it (L7/L8).
+  /// nothing to finish, the save is already in flight, or the write-through
+  /// failed. The stored duration is computed via epoch math
+  /// (`now − startedAt − pausedDuration`) so pauses are honored and the
+  /// summary never re-derives it (L7/L8).
   Future<String?> finishWorkout() async {
     final current = state.value;
-    if (current == null || current.session == null) return null;
+    if (current == null || current.session == null || current.isSaving) {
+      return null;
+    }
 
     final sessionId = current.session!.id;
     final elapsedSeconds = current.session!.elapsedSecondsNow();
     ref.read(restTimerControllerProvider.notifier).cancel();
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() async {
+
+    // §8.1 "saving" state: the logging view stays fully alive (session +
+    // every logged set still in state) while the write-through completes —
+    // a finish must never collapse the screen into the load-error state.
+    state = AsyncValue.data(current.copyWith(isSaving: true));
+    try {
       final repository = ref.read(workoutRepositoryProvider);
       await repository.finishWorkout(sessionId, durationSeconds: elapsedSeconds);
       unawaited(ref.read(workoutForegroundServiceProvider).stop());
-      return const ActiveWorkoutState(
-        session: null,
-        exercises: [],
-        sets: [],
+      state = const AsyncValue.data(
+        ActiveWorkoutState(session: null, exercises: [], sets: []),
       );
-    });
-    return state.hasValue ? sessionId : null;
+      return sessionId;
+    } catch (_) {
+      // §8.1 "save error with retry": the write failed but the data is
+      // still local and recoverable — the state keeps the session and
+      // every set, the screen surfaces the designed error + RETRY, and a
+      // retry simply re-runs this finish (L6/L7).
+      state = AsyncValue.data(current.copyWith(
+        isSaving: false,
+        errorMessage: 'Could not save workout. Your sets are safe on this device.',
+      ));
+      return null;
+    }
   }
 
   /// Discards/cancels the active workout session.

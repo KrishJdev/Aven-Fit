@@ -583,6 +583,42 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     );
   }
 
+  /// Runs the finish write-through and navigates to the Workout Summary on
+  /// success. On a save failure (§8.1 "save error with retry") the logging
+  /// view stays alive with every set on screen and a designed snackbar
+  /// offers RETRY — the data never leaves the device (L6/L7).
+  Future<void> _finishAndNavigate(
+    BuildContext context,
+    ActiveWorkoutController controller,
+  ) async {
+    final finishedSessionId = await controller.finishWorkout();
+    if (!context.mounted) return;
+    if (finishedSessionId != null) {
+      context.go('/workout/summary/$finishedSessionId');
+      return;
+    }
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          key: const ValueKey('finish_save_error_snackbar'),
+          content: const Text(
+            'Could not save workout — your sets are safe on this device.',
+            style: TextStyle(color: AppTheme.textPrimary),
+          ),
+          backgroundColor: const Color(0xFF16191D),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 6),
+          action: SnackBarAction(
+            key: const ValueKey('finish_save_error_retry'),
+            label: 'RETRY',
+            textColor: AppTheme.neonCyan,
+            onPressed: () => _finishAndNavigate(context, controller),
+          ),
+        ),
+      );
+  }
+
   void _confirmFinishWorkout(BuildContext context, ActiveWorkoutController controller) {
     showDialog<void>(
       context: context,
@@ -605,10 +641,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           FilledButton(
             onPressed: () async {
               Navigator.of(ctx).pop();
-              final finishedSessionId = await controller.finishWorkout();
-              if (finishedSessionId != null && context.mounted) {
-                context.go('/workout/summary/$finishedSessionId');
-              }
+              await _finishAndNavigate(context, controller);
             },
             style: FilledButton.styleFrom(backgroundColor: AppTheme.voltGreen, foregroundColor: Colors.black),
             child: const Text('FINISH & SAVE'),
