@@ -1,3 +1,6 @@
+import 'package:aven_fit/features/auth/presentation/login_screen.dart';
+import 'package:aven_fit/features/auth/presentation/login_state.dart';
+import 'package:aven_fit/features/auth/presentation/otp_verification_screen.dart';
 import 'package:aven_fit/features/exercise/presentation/create_custom_exercise_screen.dart';
 import 'package:aven_fit/features/exercise/presentation/exercise_detail_screen.dart';
 import 'package:aven_fit/features/exercise/presentation/exercise_list_screen.dart';
@@ -114,6 +117,29 @@ final appRouter = GoRouter(
       builder: (context, state) => RoutineEditorScreen(
         routineId: state.pathParameters['id'],
       ),
+    ),
+    // Auth (WU-5.2) — reachable only by explicit navigation (Profile in
+    // WU-5.3), never a gate: guest mode works without ever seeing these
+    // screens (L2).
+    GoRoute(
+      path: '/auth/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/auth/otp',
+      builder: (context, state) {
+        final phone = state.uri.queryParameters['phone'];
+        if (phone == null || phone.isEmpty) {
+          // Deep-link without a number → restart the flow at login.
+          return const LoginScreen();
+        }
+        return OtpVerificationScreen(
+          phoneNumber: phone,
+          expiresInSeconds:
+              int.tryParse(state.uri.queryParameters['expires'] ?? '') ??
+                  kDefaultOtpExpirySeconds,
+        );
+      },
     ),
   ],
 );
