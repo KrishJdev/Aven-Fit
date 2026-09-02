@@ -36,10 +36,50 @@ class SetRowWidget extends StatelessWidget {
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 16),
         color: AppTheme.burntOrange.withValues(alpha: 0.2),
         child: const Icon(LucideIcons.trash2, color: AppTheme.burntOrange, size: 20),
       ),
+      confirmDismiss: (direction) async {
+        if (!set.isCompleted) return true;
+        return await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: const Color(0xFF16191D),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: Text(
+              'DELETE COMPLETED SET?',
+              style: AppTheme.num(
+                16,
+                weight: FontWeight.w700,
+                color: AppTheme.burntOrange,
+              ),
+            ),
+            content: const Text(
+              'This set is marked as completed. Are you sure you want to delete it?',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text(
+                  'CANCEL',
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppTheme.burntOrange,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('DELETE'),
+              ),
+            ],
+          ),
+        ) ?? false;
+      },
       onDismissed: (_) => onDeleteSet(),
       child: Container(
         color: isDone

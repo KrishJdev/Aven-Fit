@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:aven_fit/core/database/app_database.dart';
 import 'package:aven_fit/core/network/api_client.dart';
+import 'package:aven_fit/main.dart';
+import 'package:drift/drift.dart' as drift;
+import 'package:drift/native.dart';
 import 'package:aven_fit/features/auth/data/auth_local_source.dart';
 import 'package:aven_fit/features/auth/data/auth_repository.dart';
 import 'package:aven_fit/features/auth/domain/auth_state.dart';
@@ -587,8 +591,13 @@ void main() {
       client.dio.httpClientAdapter = adapter;
       adapter.respond(_json(_envelope(_authData())));
 
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
       final container = ProviderContainer(
-        overrides: [apiClientProvider.overrideWithValue(client)],
+        overrides: [
+          apiClientProvider.overrideWithValue(client),
+          appDatabaseProvider.overrideWithValue(db),
+        ],
       );
       addTearDown(container.dispose);
 
@@ -597,6 +606,76 @@ void main() {
 
       expect(state, isA<AuthAuthenticated>());
       expect(secureStore[AuthStorageKeys.accessToken], 'access_1');
+    });
+
+    test(
+        'silently links guest workouts and routines to user upon login (FEATURES.md §5.4, §6.2)',
+        () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      // Seed unlinked guest workout session and routine (userId is null)
+      await db.into(db.workoutSessions).insert(
+            WorkoutSessionsCompanion.insert(
+              id: 'ws_guest_1',
+              name: const drift.Value('Guest Workout'),
+              startedAt: DateTime.now(),
+            ),
+          );
+      await db.into(db.routines).insert(
+            RoutinesCompanion.insert(
+              id: 'r_guest_1',
+              name: 'Guest Routine',
+            ),
+          );
+
+      var unlinkedSessions = await (db.select(db.workoutSessions)
+            ..where((t) => t.userId.isNull()))
+          .get();
+      expect(unlinkedSessions, hasLength(1));
+      var unlinkedRoutines = await (db.select(db.routines)
+            ..where((t) => t.userId.isNull()))
+          .get();
+      expect(unlinkedRoutines, hasLength(1));
+
+      final adapter = _ScriptedAdapter();
+      final client = ApiClient(baseUrl: 'http://test.local');
+      client.dio.httpClientAdapter = adapter;
+      adapter.respond(
+          _json(_envelope(_authData(userId: 'usr_newly_signed_in'))));
+
+      final container = ProviderContainer(
+        overrides: [
+          apiClientProvider.overrideWithValue(client),
+          appDatabaseProvider.overrideWithValue(db),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final repo = container.read(authRepositoryProvider);
+      final state = await repo.loginWithOtp('+919876543210', '123456');
+
+      expect(state, isA<AuthAuthenticated>());
+      final auth = state as AuthAuthenticated;
+      expect(auth.userId, 'usr_newly_signed_in');
+
+      // Assert guest data has now been linked in SQLite!
+      unlinkedSessions = await (db.select(db.workoutSessions)
+            ..where((t) => t.userId.isNull()))
+          .get();
+      expect(unlinkedSessions, isEmpty);
+      final linkedSession = await (db.select(db.workoutSessions)
+            ..where((t) => t.userId.equals('usr_newly_signed_in')))
+          .getSingle();
+      expect(linkedSession.name, 'Guest Workout');
+
+      unlinkedRoutines =
+          await (db.select(db.routines)..where((t) => t.userId.isNull())).get();
+      expect(unlinkedRoutines, isEmpty);
+      final linkedRoutine = await (db.select(db.routines)
+            ..where((t) => t.userId.equals('usr_newly_signed_in')))
+          .getSingle();
+      expect(linkedRoutine.name, 'Guest Routine');
     });
   });
 }

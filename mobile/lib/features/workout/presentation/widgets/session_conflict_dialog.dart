@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/services/workout_foreground_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/workout_repository.dart';
 import '../../domain/workout_session.dart';
+import '../rest_timer_controller.dart';
 
 /// Outcome chosen by the user in the one-session conflict dialog (§8.1).
 enum SessionConflictDecision { resume, saveAsCompleted, discard }
@@ -40,6 +42,8 @@ Future<bool> resolveOneSessionRule(
       return false;
 
     case SessionConflictDecision.saveAsCompleted:
+      ref.read(restTimerControllerProvider.notifier).cancel();
+      await ref.read(workoutForegroundServiceProvider).stop();
       await repository.finishWorkout(
         active.id,
         durationSeconds: active.elapsedSecondsNow(),
@@ -77,6 +81,8 @@ Future<bool> resolveOneSessionRule(
         ),
       );
       if (confirmed != true) return false;
+      ref.read(restTimerControllerProvider.notifier).cancel();
+      await ref.read(workoutForegroundServiceProvider).stop();
       await repository.cancelWorkout(active.id);
       return true;
   }

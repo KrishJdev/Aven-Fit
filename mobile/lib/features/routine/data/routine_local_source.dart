@@ -391,4 +391,14 @@ class RoutineDao extends DatabaseAccessor<AppDatabase>
     }
     return results;
   }
+
+  /// Links unlinked guest routines to the newly signed-in user (FEATURES.md §5.4).
+  Future<int> linkGuestDataToUser(String userId) {
+    return (update(routines)..where((t) => t.userId.isNull())).write(
+      RoutinesCompanion(
+        userId: Value(userId),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
 }

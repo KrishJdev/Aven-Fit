@@ -146,43 +146,53 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
         .asyncMap((_) => _computeLifetimeStats());
   }
 
-  /// Recomputes the lifetime aggregate from the session/set tables. Set
-  /// and volume semantics mirror the history feed exactly (confirmed
-  /// sets only; warm-ups excluded from working volume, L1).
+  /// Recomputes the lifetime aggregate directly in SQLite via aggregate
+  /// queries (Law L8, zero in-memory table scans). Set and volume semantics
+  /// mirror the history feed exactly (confirmed sets only; warm-ups excluded, L1).
   Future<LifetimeStats> _computeLifetimeStats() async {
-    final completed = await (select(workoutSessions)
-          ..where((t) => t.status.equals('completed')))
-        .get();
-    final completedIds = completed.map((s) => s.id).toList();
+    final statsRow = await customSelect(
+      '''
+      SELECT 
+        COUNT(DISTINCT s.id) AS workout_count,
+        COUNT(w.id) AS set_count,
+        COALESCE(SUM(CASE WHEN w.set_type != 'warmup' THEN w.weight_kg * w.reps ELSE 0.0 END), 0.0) AS total_volume
+      FROM workout_sessions s
+      LEFT JOIN workout_sets w ON w.session_id = s.id AND w.is_completed = 1
+      WHERE s.status = 'completed';
+      ''',
+      readsFrom: {workoutSessions, workoutSets},
+    ).getSingle();
 
-    var setCount = 0;
-    var volume = 0.0;
-    if (completedIds.isNotEmpty) {
-      final setRows = await (select(workoutSets)
-            ..where((t) =>
-                t.sessionId.isIn(completedIds) & t.isCompleted.equals(true)))
-          .get();
-      for (final set in setRows) {
-        setCount++;
-        if (set.setType != 'warmup') {
-          volume += set.weightKg * set.reps;
-        }
-      }
-    }
+    final workoutCount =
+        (statsRow.data['workout_count'] as num?)?.toInt() ?? 0;
+    final setCount = (statsRow.data['set_count'] as num?)?.toInt() ?? 0;
+    final volume = (statsRow.data['total_volume'] as num?)?.toDouble() ?? 0.0;
 
     // "Member since" anchor: earliest session that was never discarded
     // (an in-progress first workout already counts as training since).
-    final first = await (select(workoutSessions)
-          ..where((t) => t.status.isNotIn(const ['discarded'])))
-        .get();
-    final firstSessionAt = first.isEmpty
-        ? null
-        : first
-            .map((s) => s.startedAt)
-            .reduce((a, b) => a.isBefore(b) ? a : b);
+    final firstRow = await customSelect(
+      '''
+      SELECT MIN(started_at) AS first_session_at
+      FROM workout_sessions
+      WHERE status != 'discarded';
+      ''',
+      readsFrom: {workoutSessions},
+    ).getSingleOrNull();
+
+    final rawFirst = firstRow?.data['first_session_at'];
+    final DateTime? firstSessionAt;
+    if (rawFirst is int) {
+      firstSessionAt = DateTime.fromMillisecondsSinceEpoch(rawFirst * 1000);
+    } else if (rawFirst is DateTime) {
+      firstSessionAt = rawFirst;
+    } else if (rawFirst is String) {
+      firstSessionAt = DateTime.tryParse(rawFirst);
+    } else {
+      firstSessionAt = null;
+    }
 
     return LifetimeStats(
-      workoutCount: completed.length,
+      workoutCount: workoutCount,
       completedSetCount: setCount,
       totalVolumeKg: volume,
       firstSessionAt: firstSessionAt,
@@ -203,55 +213,56 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
         .asyncMap((_) => _computeWeeklyGlance());
   }
 
-  /// Recomputes both week buckets fresh from the tables. A session's
-  /// week is its effective completion date (`completedAt ?? startedAt`,
+  /// Recomputes both week buckets fresh via SQLite aggregate queries (L8).
+  /// A session's week is its effective completion date (`completedAt ?? startedAt`,
   /// the same effective date the streak counts by).
   Future<WeeklyGlance> _computeWeeklyGlance() async {
     final thisWeekStart = StreakInfo.startOfWeek(DateTime.now());
     final lastWeekStart = thisWeekStart.subtract(const Duration(days: 7));
     final thisWeekEnd = thisWeekStart.add(const Duration(days: 7));
 
-    final completed = await (select(workoutSessions)
-          ..where((t) => t.status.equals('completed')))
-        .get();
-    final completedIds = completed.map((s) => s.id).toList();
-    final setRows = completedIds.isEmpty
-        ? const <WorkoutSetRow>[]
-        : await (select(workoutSets)
-              ..where((t) =>
-                  t.sessionId.isIn(completedIds) & t.isCompleted.equals(true)))
-            .get();
-    final sessionById = {for (final s in completed) s.id: s};
+    Future<WeekStats> bucketFor(DateTime weekStart, DateTime weekEnd) async {
+      final startSec = weekStart.millisecondsSinceEpoch ~/ 1000;
+      final endSec = weekEnd.millisecondsSinceEpoch ~/ 1000;
 
-    WeekStats bucketFor(DateTime weekStart, DateTime weekEnd) {
-      var workoutCount = 0;
-      var setCount = 0;
-      var volume = 0.0;
-      for (final session in completed) {
-        final date = session.completedAt ?? session.startedAt;
-        if (date.isBefore(weekStart) || !date.isBefore(weekEnd)) continue;
-        workoutCount++;
-      }
-      for (final set in setRows) {
-        final session = sessionById[set.sessionId];
-        if (session == null) continue;
-        final date = session.completedAt ?? session.startedAt;
-        if (date.isBefore(weekStart) || !date.isBefore(weekEnd)) continue;
-        setCount++;
-        if (set.setType != 'warmup') {
-          volume += set.weightKg * set.reps;
-        }
-      }
+      final sessionRow = await customSelect(
+        '''
+        SELECT COUNT(*) AS c
+        FROM workout_sessions
+        WHERE status = 'completed'
+          AND COALESCE(completed_at, started_at) >= ?
+          AND COALESCE(completed_at, started_at) < ?;
+        ''',
+        variables: [Variable.withInt(startSec), Variable.withInt(endSec)],
+        readsFrom: {workoutSessions},
+      ).getSingle();
+
+      final setRow = await customSelect(
+        '''
+        SELECT 
+          COUNT(w.id) AS set_count,
+          COALESCE(SUM(CASE WHEN w.set_type != 'warmup' THEN w.weight_kg * w.reps ELSE 0.0 END), 0.0) AS volume
+        FROM workout_sets w
+        INNER JOIN workout_sessions s ON s.id = w.session_id
+        WHERE s.status = 'completed'
+          AND w.is_completed = 1
+          AND COALESCE(s.completed_at, s.started_at) >= ?
+          AND COALESCE(s.completed_at, s.started_at) < ?;
+        ''',
+        variables: [Variable.withInt(startSec), Variable.withInt(endSec)],
+        readsFrom: {workoutSessions, workoutSets},
+      ).getSingle();
+
       return WeekStats(
-        workoutCount: workoutCount,
-        completedSetCount: setCount,
-        volumeKg: volume,
+        workoutCount: (sessionRow.data['c'] as num?)?.toInt() ?? 0,
+        completedSetCount: (setRow.data['set_count'] as num?)?.toInt() ?? 0,
+        volumeKg: (setRow.data['volume'] as num?)?.toDouble() ?? 0.0,
       );
     }
 
     return (
-      thisWeek: bucketFor(thisWeekStart, thisWeekEnd),
-      lastWeek: bucketFor(lastWeekStart, thisWeekStart),
+      thisWeek: await bucketFor(thisWeekStart, thisWeekEnd),
+      lastWeek: await bucketFor(lastWeekStart, thisWeekStart),
     );
   }
 

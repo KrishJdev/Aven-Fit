@@ -11,6 +11,7 @@ import '../../routine/data/routine_repository.dart';
 import '../../routine/domain/routine.dart';
 import '../../routine/presentation/routine_list_controller.dart';
 import '../data/workout_repository.dart';
+import 'active_workout_controller.dart';
 import 'home_state.dart';
 
 part 'home_controller.g.dart';
@@ -103,6 +104,15 @@ class HomeController extends _$HomeController {
     final session = await ref
         .read(routineListControllerProvider.notifier)
         .startWorkoutFromRoutine(routine);
+    return session.id;
+  }
+
+  /// Starts a fresh empty workout session (FEATURES.md §5.1 / §7.1).
+  Future<String> startNewWorkout([String? name]) async {
+    final workoutRepo = ref.read(workoutRepositoryProvider);
+    final sessionName =
+        name ?? ActiveWorkoutController.generateDefaultWorkoutName();
+    final session = await workoutRepo.startWorkout(name: sessionName);
     return session.id;
   }
 }

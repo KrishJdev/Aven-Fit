@@ -19,11 +19,14 @@ class GhostPrefillService {
 
   /// Resolves the ghost suggestion for Set [setNumber] (1-based index) of [exerciseId].
   ///
-  /// Priority order per FEATURES.md §7.2:
-  /// 1. History match: If Set $N \le$ Historical Count, prefill from historical Set $N$.
-  /// 2. Active Session Previous: If $N > 1$ and Set $N-1$ exists in current session, copy from Set $N-1$.
-  /// 3. History Overflow Fallback: If $N >$ Historical Count and history exists, fall back to last historical set.
-  /// 4. Routine Targets: If started from a routine with planned targets, prefill from routine targets.
+  /// Priority order per FEATURES.md §7.2 / §8.1:
+  /// 1. Routine Targets: Used ONLY when the workout is started from the routine section
+  ///    ([routineTargetSet] or [routineExercise] explicitly provided).
+  /// 2. Historic value: If Set $N \le$ Historical Count, prefill from historical Set $N$.
+  /// 3. Last set done in exercise fallback: If historical Set $N$ is not available,
+  ///    fall back to the last set done in this exercise in the current workout (Set $N-1$ or last active set).
+  /// 4. Historical last set fallback: If $N >$ Historical Count and no active set exists,
+  ///    fall back to the last historical set.
   /// 5. None fallback: Returns empty ghost if no prior data or targets exist.
   Future<GhostSet> resolveGhostSet({
     required String exerciseId,
@@ -32,54 +35,7 @@ class GhostPrefillService {
     RoutineExercise? routineExercise,
     RoutineSet? routineTargetSet,
   }) async {
-    // 1. Fetch historical completed sets for this exercise
-    final historicalSets =
-        await _workoutRepository.getLastCompletedSetsForExercise(exerciseId);
-
-    // Branch 1: Historical Set N match (N <= history count)
-    if (historicalSets.isNotEmpty && setNumber <= historicalSets.length) {
-      final histSet = historicalSets[setNumber - 1];
-      return GhostSet(
-        weightKg: histSet.weightKg,
-        reps: histSet.reps,
-        rpe: histSet.rpe,
-        setType: histSet.type,
-        source: GhostSource.history,
-      );
-    }
-
-    // Branch 2: Previous Set N-1 in active session (for new/overflow sets)
-    if (setNumber > 1 && activeSessionSets.isNotEmpty) {
-      final prevIndex = activeSessionSets.indexWhere(
-        (s) => s.setNumber == setNumber - 1,
-      );
-      if (prevIndex != -1) {
-        final prevSet = activeSessionSets[prevIndex];
-        if (prevSet.weightKg > 0 || prevSet.reps > 0) {
-          return GhostSet(
-            weightKg: prevSet.weightKg,
-            reps: prevSet.reps,
-            rpe: prevSet.rpe,
-            setType: prevSet.type,
-            source: GhostSource.previousSet,
-          );
-        }
-      }
-    }
-
-    // Branch 3: Overflow fallback to last historical set
-    if (historicalSets.isNotEmpty) {
-      final lastHistSet = historicalSets.last;
-      return GhostSet(
-        weightKg: lastHistSet.weightKg,
-        reps: lastHistSet.reps,
-        rpe: lastHistSet.rpe,
-        setType: lastHistSet.type,
-        source: GhostSource.history,
-      );
-    }
-
-    // Branch 4: Routine Target prefill
+    // 1. Routine Target prefill (used ONLY when started from the routine section)
     if (routineTargetSet != null) {
       return GhostSet(
         weightKg: routineTargetSet.targetWeightKg,
@@ -116,7 +72,55 @@ class GhostPrefillService {
       }
     }
 
-    // Branch 5: Empty fallback
+    // 2. Fetch historical completed sets for this exercise
+    final historicalSets =
+        await _workoutRepository.getLastCompletedSetsForExercise(exerciseId);
+
+    // Branch: Historic Set N match (N <= history count)
+    if (historicalSets.isNotEmpty && setNumber <= historicalSets.length) {
+      final histSet = historicalSets[setNumber - 1];
+      return GhostSet(
+        weightKg: histSet.weightKg,
+        reps: histSet.reps,
+        rpe: histSet.rpe,
+        setType: histSet.type,
+        source: GhostSource.history,
+      );
+    }
+
+    // Branch: Fall back to last set done in the exercise in the current workout
+    if (activeSessionSets.isNotEmpty) {
+      final prevIndex = setNumber > 1
+          ? activeSessionSets.indexWhere((s) => s.setNumber == setNumber - 1)
+          : -1;
+      final prevSet = prevIndex != -1
+          ? activeSessionSets[prevIndex]
+          : activeSessionSets.last;
+
+      if (prevSet.weightKg > 0 || prevSet.reps > 0) {
+        return GhostSet(
+          weightKg: prevSet.weightKg,
+          reps: prevSet.reps,
+          rpe: prevSet.rpe,
+          setType: prevSet.type,
+          source: GhostSource.previousSet,
+        );
+      }
+    }
+
+    // Branch: Fall back to last historical set if history exists
+    if (historicalSets.isNotEmpty) {
+      final lastHistSet = historicalSets.last;
+      return GhostSet(
+        weightKg: lastHistSet.weightKg,
+        reps: lastHistSet.reps,
+        rpe: lastHistSet.rpe,
+        setType: lastHistSet.type,
+        source: GhostSource.history,
+      );
+    }
+
+    // Branch: Empty fallback
     return const GhostSet(source: GhostSource.none);
   }
 

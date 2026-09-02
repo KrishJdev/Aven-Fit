@@ -377,5 +377,81 @@ void main() {
       expect(ghosts[2].weightKg, 55.0);
       expect(ghosts[2].reps, 10);
     });
+
+    test(
+        'D1 Requirement: routine targets only used when from routine, ad-hoc uses history Set N and falls back to last set done in exercise',
+        () async {
+      // 1. History has 1 completed set: Set 1 = 75.0kg x 8
+      final pastSession = await workoutRepo.startWorkout(name: 'Past Workout');
+      final pastEx = await workoutRepo.addExerciseToSession(
+        sessionId: pastSession.id,
+        exerciseId: 'ex_bench',
+      );
+      await workoutRepo.logSet(
+        WorkoutSet(
+          id: 'ps_bench_1',
+          sessionId: pastSession.id,
+          sessionExerciseId: pastEx.id,
+          exerciseId: 'ex_bench',
+          setNumber: 1,
+          weightKg: 75.0,
+          reps: 8,
+          isCompleted: true,
+        ),
+      );
+      await workoutRepo.finishWorkout(pastSession.id);
+
+      // A routine target exists with 90kg x 5
+      const routineSet = RoutineSet(
+        id: 'rs_target',
+        routineExerciseId: 're_bench',
+        position: 1,
+        targetWeightKg: 90.0,
+        targetReps: 5,
+      );
+
+      // Test Case A: Ad-hoc workout without routine context -> MUST use historical Set 1 (75kg x 8), NOT routine
+      final adHocSet1 = await service.resolveGhostSet(
+        exerciseId: 'ex_bench',
+        setNumber: 1,
+      );
+      expect(adHocSet1.source, GhostSource.history);
+      expect(adHocSet1.weightKg, 75.0);
+      expect(adHocSet1.reps, 8);
+
+      // Test Case B: Ad-hoc workout adding Set 2 when only Set 1 is in history:
+      // Active workout has done Set 1 with 80kg x 6.
+      // Set 2 must fall back to the last set done in the exercise (80kg x 6).
+      final activeSets = [
+        const WorkoutSet(
+          id: 'act_1',
+          sessionId: 'act_sess',
+          sessionExerciseId: 'act_se',
+          exerciseId: 'ex_bench',
+          setNumber: 1,
+          weightKg: 80.0,
+          reps: 6,
+          isCompleted: true,
+        ),
+      ];
+      final adHocSet2 = await service.resolveGhostSet(
+        exerciseId: 'ex_bench',
+        setNumber: 2,
+        activeSessionSets: activeSets,
+      );
+      expect(adHocSet2.source, GhostSource.previousSet);
+      expect(adHocSet2.weightKg, 80.0);
+      expect(adHocSet2.reps, 6);
+
+      // Test Case C: Workout started from routine -> MUST use routine target (90kg x 5)
+      final routineStartedSet1 = await service.resolveGhostSet(
+        exerciseId: 'ex_bench',
+        setNumber: 1,
+        routineTargetSet: routineSet,
+      );
+      expect(routineStartedSet1.source, GhostSource.routineTarget);
+      expect(routineStartedSet1.weightKg, 90.0);
+      expect(routineStartedSet1.reps, 5);
+    });
   });
 }

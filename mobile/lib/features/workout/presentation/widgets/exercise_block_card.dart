@@ -209,8 +209,18 @@ class ExerciseBlockCard extends StatelessWidget {
                     child: TextButton.icon(
                       onPressed: () {
                         final lastSet = sets.isNotEmpty ? sets.last : null;
-                        final defaultWeight = lastSet?.weightKg ?? 60.0;
-                        final defaultReps = lastSet?.reps ?? 10;
+                        final firstGhostWeight =
+                            ghostSets.isNotEmpty ? ghostSets.first.weightKg : null;
+                        final firstGhostReps =
+                            ghostSets.isNotEmpty ? ghostSets.first.reps : null;
+                        final defaultWeight = lastSet?.weightKg ??
+                            (firstGhostWeight != null && firstGhostWeight > 0
+                                ? firstGhostWeight
+                                : 60.0);
+                        final defaultReps = lastSet?.reps ??
+                            (firstGhostReps != null && firstGhostReps > 0
+                                ? firstGhostReps
+                                : 10);
                         controller.addSet(
                           sessionExerciseId: sessionExercise.id,
                           exerciseId: sessionExercise.exerciseId,

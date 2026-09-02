@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/database/app_database.dart';
 import '../../../core/network/api_client.dart';
+import '../../../main.dart';
 import '../domain/auth_state.dart';
 import 'auth_local_source.dart';
 
@@ -62,6 +64,7 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required ApiClient apiClient,
     AuthLocalSource? localSource,
+    this.db,
   })  : _local = localSource ?? AuthLocalSource() {
     _dio = apiClient.dio;
     _dio.interceptors.add(AuthInterceptor(
@@ -75,6 +78,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   final AuthLocalSource _local;
+  final AppDatabase? db;
   late final Dio _dio;
 
   AuthState _state = const AuthState.loading();
@@ -224,6 +228,17 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthState> _applySession(Map<String, dynamic> data) async {
     final session = _sessionFrom(data);
     await _local.writeSession(session);
+
+    // Silently link guest local SQLite data to the authenticated account (FEATURES.md §5.4, §6.2)
+    if (db != null) {
+      try {
+        await db!.workoutDao.linkGuestDataToUser(session.userId);
+        await db!.routineDao.linkGuestDataToUser(session.userId);
+      } catch (_) {
+        // Silent best-effort linking — local errors never block auth state (L2)
+      }
+    }
+
     final state = _authenticatedState(session);
     _setState(state);
     return state;
@@ -329,7 +344,10 @@ class AuthRepositoryImpl implements AuthRepository {
 /// KeepAlive: the auth session lives across screens and tabs.
 @Riverpod(keepAlive: true)
 AuthRepository authRepository(Ref ref) {
-  final repository = AuthRepositoryImpl(apiClient: ref.watch(apiClientProvider));
+  final repository = AuthRepositoryImpl(
+    apiClient: ref.watch(apiClientProvider),
+    db: ref.watch(appDatabaseProvider),
+  );
   ref.onDispose(repository.dispose);
   return repository;
 }

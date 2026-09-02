@@ -423,6 +423,7 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
   /// Updates an existing set record.
   Future<int> updateSetRecord({
     required String id,
+    int? setNumber,
     required double weightKg,
     required int reps,
     required bool isCompleted,
@@ -434,6 +435,7 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
   }) {
     return (update(workoutSets)..where((tbl) => tbl.id.equals(id))).write(
       WorkoutSetsCompanion(
+        setNumber: setNumber != null ? Value(setNumber) : const Value.absent(),
         weightKg: Value(weightKg),
         reps: Value(reps),
         isCompleted: Value(isCompleted),
@@ -554,5 +556,15 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
       results.add(SessionWithExercises(session: s, exercises: exList));
     }
     return results;
+  }
+
+  /// Links unlinked guest workout sessions to the newly signed-in user (FEATURES.md §5.4).
+  Future<int> linkGuestDataToUser(String userId) {
+    return (update(workoutSessions)..where((t) => t.userId.isNull())).write(
+      WorkoutSessionsCompanion(
+        userId: Value(userId),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
   }
 }

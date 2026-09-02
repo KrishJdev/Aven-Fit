@@ -1,5 +1,6 @@
 import 'package:aven_fit/core/database/app_database.dart';
 import 'package:aven_fit/core/notifications/notification_service.dart';
+import 'package:aven_fit/core/services/workout_foreground_service.dart';
 import 'package:aven_fit/features/workout/data/workout_repository.dart';
 import 'package:aven_fit/features/workout/domain/workout_session.dart';
 import 'package:aven_fit/features/workout/domain/workout_set.dart';
@@ -16,6 +17,16 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'fake_notification_service.dart';
+
+/// Test double for the Android foreground service.
+class _TestForegroundService extends WorkoutForegroundService {
+  int stopCalls = 0;
+
+  @override
+  Future<void> stop() async {
+    stopCalls++;
+  }
+}
 
 /// Real [WorkoutRepository] for every read; the finish write-through is
 /// scriptable so the §8.1 save-error path can be forced deterministically.
@@ -420,6 +431,7 @@ void main() {
 
   group('One-session conflict rule (§8.1)', () {
     late FakeNotificationService notifications;
+    late _TestForegroundService foreground;
 
     Future<void> pumpHarness(WidgetTester tester) async {
       final router = GoRouter(
@@ -441,6 +453,7 @@ void main() {
           overrides: [
             appDatabaseProvider.overrideWithValue(db),
             notificationServiceProvider.overrideWithValue(notifications),
+            workoutForegroundServiceProvider.overrideWithValue(foreground),
           ],
           child: MaterialApp.router(routerConfig: router),
         ),
@@ -450,6 +463,7 @@ void main() {
 
     setUp(() {
       notifications = FakeNotificationService();
+      foreground = _TestForegroundService();
     });
 
     testWidgets('proceeds immediately when no session is active', (tester) async {
@@ -461,7 +475,7 @@ void main() {
       expect(find.text('SESSION IN PROGRESS'), findsNothing);
     });
 
-    testWidgets('SAVE AS COMPLETED finishes the active session and proceeds',
+    testWidgets('SAVE AS COMPLETED finishes the active session, stops foreground service, and proceeds',
         (tester) async {
       final session = await seedActiveSnapshot();
       await pumpHarness(tester);
@@ -476,6 +490,7 @@ void main() {
 
       expect(
           find.byKey(const ValueKey('conflict_result_true')), findsOneWidget);
+      expect(foreground.stopCalls, 1);
       final row = await (db.select(db.workoutSessions)
             ..where((t) => t.id.equals(session.id)))
           .getSingle();
@@ -483,7 +498,7 @@ void main() {
       expect(row.durationSeconds, isNotNull);
     });
 
-    testWidgets('DISCARD requires a destructive confirm (L7) then discards',
+    testWidgets('DISCARD requires a destructive confirm (L7), stops foreground service, then discards',
         (tester) async {
       final session = await seedActiveSnapshot();
       await pumpHarness(tester);
@@ -498,6 +513,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(
           find.byKey(const ValueKey('conflict_result_false')), findsOneWidget);
+      expect(foreground.stopCalls, 0);
 
       // Retry and confirm the discard this time.
       await tester.tap(find.byKey(const ValueKey('conflict_trigger')));
@@ -509,6 +525,7 @@ void main() {
 
       expect(
           find.byKey(const ValueKey('conflict_result_true')), findsOneWidget);
+      expect(foreground.stopCalls, 1);
       final row = await (db.select(db.workoutSessions)
             ..where((t) => t.id.equals(session.id)))
           .getSingle();

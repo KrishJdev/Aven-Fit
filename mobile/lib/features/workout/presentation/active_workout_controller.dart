@@ -167,7 +167,9 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
     final setsForExercise =
         current.sets.where((s) => s.sessionExerciseId == targetSeId).toList();
-    final nextSetNumber = setsForExercise.length + 1;
+    final nextSetNumber = setsForExercise.isEmpty
+        ? 1
+        : (setsForExercise.map((s) => s.setNumber).fold(0, max)) + 1;
 
     final newSet = WorkoutSet(
       id: 'set_${DateTime.now().microsecondsSinceEpoch}_${_setCounter++}',
@@ -225,6 +227,16 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
       );
       state = AsyncValue.data(_withSet(current, updatedSet, setIndex));
       await repository.updateSet(updatedSet);
+
+      // Self-healing PR recompute (ISSUE-03 / FEATURES.md §10.2):
+      // If the uncompleted set had an exerciseId, recompute PRs to eliminate any false records.
+      if (targetSet.exerciseId != null) {
+        try {
+          await ref
+              .read(prRepositoryProvider)
+              .recomputePRs(targetSet.exerciseId!);
+        } catch (_) {}
+      }
       return;
     }
 
@@ -298,18 +310,58 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     return current.copyWith(sets: updatedSets, exercises: updatedExercises);
   }
 
-  /// Deletes a set from the session.
+  /// Deletes a set from the session, recomputes PRs, and renumbers surviving sets.
   Future<void> deleteSet(String setId) async {
     final current = state.value;
     if (current == null) return;
 
-    final targetSet = current.sets.firstWhere((s) => s.id == setId);
-    final updatedSets = current.sets.where((s) => s.id != setId).toList();
+    final targetSetIndex = current.sets.indexWhere((s) => s.id == setId);
+    if (targetSetIndex == -1) return;
+    final targetSet = current.sets[targetSetIndex];
+
+    final repository = ref.read(workoutRepositoryProvider);
+    await repository.deleteSet(setId);
+
+    // Self-healing PR recompute (ISSUE-03 / FEATURES.md §10.2):
+    // If the deleted set had an exerciseId, recompute PRs to restore earlier valid records.
+    if (targetSet.exerciseId != null) {
+      try {
+        await ref
+            .read(prRepositoryProvider)
+            .recomputePRs(targetSet.exerciseId!);
+      } catch (_) {}
+    }
+
+    // Renumber surviving sets for this exercise monotonically (ISSUE-01)
+    final survivingForEx = current.sets
+        .where((s) =>
+            s.sessionExerciseId == targetSet.sessionExerciseId && s.id != setId)
+        .toList()
+      ..sort((a, b) => a.setNumber.compareTo(b.setNumber));
+
+    final renumberedMap = <String, WorkoutSet>{};
+    for (var i = 0; i < survivingForEx.length; i++) {
+      final expectedNumber = i + 1;
+      final set = survivingForEx[i];
+      if (set.setNumber != expectedNumber) {
+        final renumbered = set.copyWith(setNumber: expectedNumber);
+        renumberedMap[set.id] = renumbered;
+        await repository.updateSet(renumbered);
+      }
+    }
+
+    final updatedSets = current.sets
+        .where((s) => s.id != setId)
+        .map((s) => renumberedMap[s.id] ?? s)
+        .toList();
+
     final updatedExercises = current.exercises.map((se) {
       if (se.id == targetSet.sessionExerciseId) {
-        return se.copyWith(
-          sets: se.sets.where((s) => s.id != setId).toList(),
-        );
+        final newSets = se.sets
+            .where((s) => s.id != setId)
+            .map((s) => renumberedMap[s.id] ?? s)
+            .toList();
+        return se.copyWith(sets: newSets);
       }
       return se;
     }).toList();
@@ -318,9 +370,6 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
       sets: updatedSets,
       exercises: updatedExercises,
     ));
-
-    final repository = ref.read(workoutRepositoryProvider);
-    await repository.deleteSet(setId);
   }
 
   /// Updates the name of the active workout session with SQLite write-through (L7).
@@ -408,14 +457,27 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
 
     final repository = ref.read(workoutRepositoryProvider);
     await repository.updateSet(updatedSet);
+
+    // Self-healing PR recompute (ISSUE-03 / FEATURES.md §10.2):
+    // If an already-completed set was edited, recompute PRs to reflect modified values.
+    if (updatedSet.isCompleted && updatedSet.exerciseId != null) {
+      try {
+        await ref
+            .read(prRepositoryProvider)
+            .recomputePRs(updatedSet.exerciseId!);
+      } catch (_) {}
+    }
   }
 
-  /// Generates a progressive warm-up pyramid ladder (§8.1) before working sets.
+  /// Generates a progressive warm-up pyramid ladder (§8.1) immediately before working sets.
   Future<void> generateWarmupPyramid({
     required String sessionExerciseId,
     required String exerciseId,
     required double workingWeightKg,
   }) async {
+    final current = state.value;
+    if (current == null || current.session == null) return;
+
     final ladder = <({double weight, int reps})>[];
 
     if (workingWeightKg >= 40.0) {
@@ -428,15 +490,65 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
       ladder.add((weight: ((workingWeightKg * 0.75) / 2.5).round() * 2.5, reps: 4));
     }
 
-    for (final step in ladder) {
-      await addSet(
+    if (ladder.isEmpty) return;
+    final repository = ref.read(workoutRepositoryProvider);
+
+    // Shift existing sets for this exercise down by ladder.length so warmup sets precede them.
+    // Iterating in descending order of setNumber ensures no SQLite UNIQUE constraint collisions.
+    final existingForEx = current.sets
+        .where((s) => s.sessionExerciseId == sessionExerciseId)
+        .toList()
+      ..sort((a, b) => b.setNumber.compareTo(a.setNumber));
+
+    final shiftedMap = <String, WorkoutSet>{};
+    for (final s in existingForEx) {
+      final shifted = s.copyWith(setNumber: s.setNumber + ladder.length);
+      shiftedMap[s.id] = shifted;
+      await repository.updateSet(shifted);
+    }
+
+    // Insert warmup sets at positions 1..ladder.length
+    final warmupSets = <WorkoutSet>[];
+    for (var i = 0; i < ladder.length; i++) {
+      final step = ladder[i];
+      final newWarmup = WorkoutSet(
+        id: 'set_${DateTime.now().microsecondsSinceEpoch}_${_setCounter++}',
+        sessionId: current.session!.id,
         sessionExerciseId: sessionExerciseId,
         exerciseId: exerciseId,
+        setNumber: i + 1,
         weightKg: step.weight > 0 ? step.weight : 20.0,
         reps: step.reps,
         type: SetType.warmup,
+        isCompleted: false,
       );
+      warmupSets.add(newWarmup);
+      await repository.logSet(newWarmup);
     }
+
+    final updatedSets = [
+      ...current.sets.map((s) => shiftedMap[s.id] ?? s),
+      ...warmupSets,
+    ]..sort((a, b) {
+        if (a.sessionExerciseId != b.sessionExerciseId) return 0;
+        return a.setNumber.compareTo(b.setNumber);
+      });
+
+    final updatedExercises = current.exercises.map((se) {
+      if (se.id == sessionExerciseId) {
+        final newSeSets = [
+          ...se.sets.map((s) => shiftedMap[s.id] ?? s),
+          ...warmupSets,
+        ]..sort((a, b) => a.setNumber.compareTo(b.setNumber));
+        return se.copyWith(sets: newSeSets);
+      }
+      return se;
+    }).toList();
+
+    state = AsyncValue.data(current.copyWith(
+      sets: updatedSets,
+      exercises: updatedExercises,
+    ));
   }
 
   /// Generates a time-of-day default workout name per FEATURES.md §8.1 —

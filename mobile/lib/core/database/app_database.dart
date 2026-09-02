@@ -74,6 +74,12 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 4) {
             await m.createTable(sessionExercises);
+            await m.addColumn(workoutSets, workoutSets.sessionExerciseId);
+            await m.addColumn(workoutSets, workoutSets.isPr);
+            await m.addColumn(workoutSets, workoutSets.completedAt);
+            await m.addColumn(workoutSets, workoutSets.notes);
+            await m.addColumn(workoutSessions, workoutSessions.routineId);
+            await m.addColumn(workoutSessions, workoutSessions.durationSeconds);
           }
           if (from < 5) {
             await m.createTable(personalRecords);

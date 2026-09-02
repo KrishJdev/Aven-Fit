@@ -144,6 +144,13 @@ void main() {
       expect(warmupSets[3].weightKg, 85.0); // 85%
       expect(warmupSets[3].reps, 1);
 
+      // Warm-up sets must precede the working set (FEATURES.md §8.1)
+      expect(state.sets[0].type, SetType.warmup);
+      expect(state.sets[3].type, SetType.warmup);
+      expect(state.sets[4].type, SetType.normal);
+      expect(state.sets[4].weightKg, 100.0);
+      expect(state.sets[4].reps, 5);
+
       // Complete all sets
       for (final s in state.sets) {
         await controller.toggleSetCompleted(s.id);
@@ -364,6 +371,167 @@ void main() {
       expect(find.text('MUSCLES'), findsOneWidget);
       expect(find.text('LAST PERFORMANCE'), findsOneWidget);
       expect(find.text('Last: 1 set · best 80 kg × 8'), findsOneWidget);
+
+      container.dispose();
+    });
+
+    testWidgets(
+        'ISSUE-01 & ISSUE-03: Set deletion renumbers surviving sets, allows crash-free addSet, and recomputes PRs',
+        (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider
+              .overrideWithValue(FakeNotificationService()),
+        ],
+      );
+
+      final controller =
+          container.read(activeWorkoutControllerProvider.notifier);
+      await controller.startWorkout(name: 'PR & Set Test');
+      final se = await controller.addExercise('ex_bench');
+
+      // Add Set 1: 80kg x 8
+      await controller.addSet(
+        sessionExerciseId: se!.id,
+        exerciseId: 'ex_bench',
+        weightKg: 80.0,
+        reps: 8,
+      );
+
+      // Add Set 2: 100kg x 5
+      await controller.addSet(
+        sessionExerciseId: se.id,
+        exerciseId: 'ex_bench',
+        weightKg: 100.0,
+        reps: 5,
+      );
+
+      var state = container.read(activeWorkoutControllerProvider).value!;
+      expect(state.sets.length, 2);
+      expect(state.sets[0].setNumber, 1);
+      expect(state.sets[1].setNumber, 2);
+
+      // Complete Set 1 -> earns PR 80kg
+      await controller.toggleSetCompleted(state.sets[0].id);
+      // Complete Set 2 -> earns PR 100kg
+      await controller.toggleSetCompleted(state.sets[1].id);
+
+      var prRecords = await db.prDao.getRecordsForExercise('ex_bench');
+      final maxWeightRecord =
+          prRecords.firstWhere((r) => r.recordType == 'maxWeight');
+      expect(maxWeightRecord.value, 100.0);
+
+      // Delete Set 1: tests ISSUE-01 (deleting Set 1 leaves Set 2)
+      final set1Id = state.sets[0].id;
+      await controller.deleteSet(set1Id);
+
+      state = container.read(activeWorkoutControllerProvider).value!;
+      expect(state.sets.length, 1);
+      // Surviving set must be renumbered to Set 1
+      expect(state.sets[0].setNumber, 1);
+      expect(state.sets[0].weightKg, 100.0);
+
+      // Now tap addSet: this used to crash with UNIQUE constraint failed
+      await controller.addSet(
+        sessionExerciseId: se.id,
+        exerciseId: 'ex_bench',
+        weightKg: 105.0,
+        reps: 3,
+      );
+
+      state = container.read(activeWorkoutControllerProvider).value!;
+      expect(state.sets.length, 2);
+      expect(state.sets[0].setNumber, 1);
+      expect(state.sets[1].setNumber, 2);
+
+      // Now uncomplete Set 1 (which holds the 100kg PR) -> ISSUE-03
+      await controller.toggleSetCompleted(state.sets[0].id);
+      prRecords = await db.prDao.getRecordsForExercise('ex_bench');
+      // 100kg PR should be cleanly removed because no completed working set remains
+      expect(prRecords.where((r) => r.recordType == 'maxWeight'), isEmpty);
+
+      container.dispose();
+    });
+
+    testWidgets(
+        'ISSUE-06: Swiping uncompleted set deletes immediately, completed set requires confirmation dialog (L7)',
+        (tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(db),
+          workoutRepositoryProvider.overrideWithValue(workoutRepo),
+          notificationServiceProvider
+              .overrideWithValue(FakeNotificationService()),
+        ],
+      );
+
+      final controller =
+          container.read(activeWorkoutControllerProvider.notifier);
+      await controller.startWorkout(name: 'Swipe Test');
+      final se = await controller.addExercise('ex_bench');
+
+      // Add Set 1 (uncompleted) and Set 2 (will be completed)
+      await controller.addSet(
+        sessionExerciseId: se!.id,
+        exerciseId: 'ex_bench',
+        weightKg: 60.0,
+        reps: 10,
+      );
+      await controller.addSet(
+        sessionExerciseId: se.id,
+        exerciseId: 'ex_bench',
+        weightKg: 70.0,
+        reps: 8,
+      );
+
+      final stateBefore =
+          container.read(activeWorkoutControllerProvider).value!;
+      final set1Id = stateBefore.sets[0].id;
+      final set2Id = stateBefore.sets[1].id;
+
+      // Complete Set 2
+      await controller.toggleSetCompleted(set2Id);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const MaterialApp(home: ActiveWorkoutScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Swipe uncompleted Set 1 -> dismisses immediately without dialog
+      await tester.drag(
+          find.byKey(Key('dismiss_$set1Id')), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+
+      expect(find.text('DELETE COMPLETED SET?'), findsNothing);
+      expect(find.byKey(Key('dismiss_$set1Id')), findsNothing);
+
+      // Swipe completed Set 2 -> dialog appears
+      await tester.drag(
+          find.byKey(Key('dismiss_$set2Id')), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+
+      expect(find.text('DELETE COMPLETED SET?'), findsOneWidget);
+
+      // Tap CANCEL -> set remains
+      await tester.tap(find.text('CANCEL'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('DELETE COMPLETED SET?'), findsNothing);
+      expect(find.byKey(Key('dismiss_$set2Id')), findsOneWidget);
+
+      // Swipe again and tap DELETE -> set is deleted
+      await tester.drag(
+          find.byKey(Key('dismiss_$set2Id')), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('DELETE'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(Key('dismiss_$set2Id')), findsNothing);
 
       container.dispose();
     });

@@ -207,7 +207,10 @@ class _StartSessionButton extends ConsumerWidget {
 
   Future<void> _start(BuildContext context, WidgetRef ref) async {
     final mayStart = await resolveOneSessionRule(context, ref);
-    if (mayStart && context.mounted) {
+    if (!mayStart || !context.mounted) return;
+
+    await ref.read(homeControllerProvider.notifier).startNewWorkout();
+    if (context.mounted) {
       context.push('/workout/active');
     }
   }

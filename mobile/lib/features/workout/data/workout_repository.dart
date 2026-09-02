@@ -236,6 +236,7 @@ class WorkoutRepositoryImpl implements WorkoutRepository {
   Future<void> updateSet(WorkoutSet set) async {
     await _dao.updateSetRecord(
       id: set.id,
+      setNumber: set.setNumber,
       weightKg: set.weightKg,
       reps: set.reps,
       isCompleted: set.isCompleted,
