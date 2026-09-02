@@ -58,44 +58,75 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppTheme.oledBlack,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'AVEN FIT',
-                style: AppTheme.num(28, weight: FontWeight.w600, color: AppTheme.neonCyan),
+        child: Column(
+          children: [
+            // Header (§7.1): wordmark + profile entry — Profile/Settings
+            // is reached from the Home header, never a tab.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    'AVEN FIT',
+                    style: AppTheme.num(
+                      28,
+                      weight: FontWeight.w600,
+                      color: AppTheme.neonCyan,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    key: const ValueKey('home_profile_avatar'),
+                    tooltip: 'Profile',
+                    onPressed: () => context.push('/profile'),
+                    icon: const Icon(
+                      LucideIcons.circleUserRound,
+                      size: 26,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              const Text('Foundation online — offline-first.', style: TextStyle(color: AppTheme.textSecondary)),
-              const SizedBox(height: 24),
-              // Resume banner (§7.1, conditional): cyan-bordered, never
-              // buried, renders from local SQLite within 1s of returning
-              // home (L2/L7) — restores the exact in-progress state.
-              activeSessionAsync.whenOrNull(
-                    data: (session) => session == null
-                        ? null
-                        : _ResumeBanner(session: session),
-                  ) ??
-                  const SizedBox.shrink(),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () async {
-                  // One-session rule (§8.1): never silently discards data.
-                  final mayStart = await resolveOneSessionRule(context, ref);
-                  if (mayStart && context.mounted) {
-                    context.push('/workout/active');
-                  }
-                },
-                child: const Text('START NEW SESSION'),
+            ),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('Foundation online — offline-first.',
+                        style: TextStyle(color: AppTheme.textSecondary)),
+                    const SizedBox(height: 24),
+                    // Resume banner (§7.1, conditional): cyan-bordered, never
+                    // buried, renders from local SQLite within 1s of returning
+                    // home (L2/L7) — restores the exact in-progress state.
+                    activeSessionAsync.whenOrNull(
+                          data: (session) => session == null
+                              ? null
+                              : _ResumeBanner(session: session),
+                        ) ??
+                        const SizedBox.shrink(),
+                    const SizedBox(height: 12),
+                    FilledButton(
+                      onPressed: () async {
+                        // One-session rule (§8.1): never silently discards data.
+                        final mayStart =
+                            await resolveOneSessionRule(context, ref);
+                        if (mayStart && context.mounted) {
+                          context.push('/workout/active');
+                        }
+                      },
+                      child: const Text('START NEW SESSION'),
+                    ),
+                    const SizedBox(height: 16),
+                    // Glance stats (§5.2): "X of Y" forgiving-streak progress +
+                    // current streak, reactive from SQLite (WU-X.2). The streak
+                    // chip is omitted at 0 — a fact, never a shaming verdict (L4).
+                    const _GlanceStatsRow(),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              // Glance stats (§5.2): "X of Y" forgiving-streak progress +
-              // current streak, reactive from SQLite (WU-X.2). The streak
-              // chip is omitted at 0 — a fact, never a shaming verdict (L4).
-              const _GlanceStatsRow(),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

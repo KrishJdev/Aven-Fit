@@ -78,7 +78,7 @@ final class OtpVerificationControllerProvider
 }
 
 String _$otpVerificationControllerHash() =>
-    r'e35b72dbce23160841ddea191a0a4ddd781616fe';
+    r'35210dab0c319b451578b948daf4b57bb06454dc';
 
 /// Riverpod controller for the OTP verification screen (WU-5.2,
 /// FEATURES.md §6.2).

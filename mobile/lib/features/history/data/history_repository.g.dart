@@ -174,3 +174,51 @@ final class WatchWorkoutHistoryProvider
 
 String _$watchWorkoutHistoryHash() =>
     r'b022ef44f5703f802a68d6eb3e18718039413ab0';
+
+/// Reactive lifetime stats for the Profile screen (WU-5.3): drift
+/// re-emits whenever the session/set tables change — zero polling (L8).
+
+@ProviderFor(watchLifetimeStats)
+final watchLifetimeStatsProvider = WatchLifetimeStatsProvider._();
+
+/// Reactive lifetime stats for the Profile screen (WU-5.3): drift
+/// re-emits whenever the session/set tables change — zero polling (L8).
+
+final class WatchLifetimeStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<LifetimeStats>,
+          LifetimeStats,
+          Stream<LifetimeStats>
+        >
+    with $FutureModifier<LifetimeStats>, $StreamProvider<LifetimeStats> {
+  /// Reactive lifetime stats for the Profile screen (WU-5.3): drift
+  /// re-emits whenever the session/set tables change — zero polling (L8).
+  WatchLifetimeStatsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'watchLifetimeStatsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$watchLifetimeStatsHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<LifetimeStats> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<LifetimeStats> create(Ref ref) {
+    return watchLifetimeStats(ref);
+  }
+}
+
+String _$watchLifetimeStatsHash() =>
+    r'4dd10f53f6f11f582a33b3d0b338fb01b1060360';

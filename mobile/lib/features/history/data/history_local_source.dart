@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../core/database/app_database.dart';
 import '../../routine/data/routine_tables.dart';
 import '../../workout/data/workout_tables.dart';
+import '../domain/lifetime_stats.dart';
 import '../domain/workout_history_item.dart';
 
 part 'history_local_source.g.dart';
@@ -127,6 +128,63 @@ class HistoryDao extends DatabaseAccessor<AppDatabase> with _$HistoryDaoMixin {
 
     items.sort((a, b) => b.date.compareTo(a.date));
     return items;
+  }
+
+  /// Reactive lifetime aggregate for the Profile screen (WU-5.3,
+  /// FEATURES.md §12.1). The cheap tracked query re-executes whenever
+  /// either workout table changes (`readsFrom` covers both), and every
+  /// re-emission recomputes the totals fresh from the tables — derived
+  /// state is never stored, so edits/deletes self-heal (L7/L8).
+  Stream<LifetimeStats> watchLifetimeStats() {
+    return customSelect(
+      'SELECT COUNT(*) AS session_count FROM workout_sessions',
+      readsFrom: {workoutSessions, workoutSets},
+    )
+        .watchSingle()
+        .asyncMap((_) => _computeLifetimeStats());
+  }
+
+  /// Recomputes the lifetime aggregate from the session/set tables. Set
+  /// and volume semantics mirror the history feed exactly (confirmed
+  /// sets only; warm-ups excluded from working volume, L1).
+  Future<LifetimeStats> _computeLifetimeStats() async {
+    final completed = await (select(workoutSessions)
+          ..where((t) => t.status.equals('completed')))
+        .get();
+    final completedIds = completed.map((s) => s.id).toList();
+
+    var setCount = 0;
+    var volume = 0.0;
+    if (completedIds.isNotEmpty) {
+      final setRows = await (select(workoutSets)
+            ..where((t) =>
+                t.sessionId.isIn(completedIds) & t.isCompleted.equals(true)))
+          .get();
+      for (final set in setRows) {
+        setCount++;
+        if (set.setType != 'warmup') {
+          volume += set.weightKg * set.reps;
+        }
+      }
+    }
+
+    // "Member since" anchor: earliest session that was never discarded
+    // (an in-progress first workout already counts as training since).
+    final first = await (select(workoutSessions)
+          ..where((t) => t.status.isNotIn(const ['discarded'])))
+        .get();
+    final firstSessionAt = first.isEmpty
+        ? null
+        : first
+            .map((s) => s.startedAt)
+            .reduce((a, b) => a.isBefore(b) ? a : b);
+
+    return LifetimeStats(
+      workoutCount: completed.length,
+      completedSetCount: setCount,
+      totalVolumeKg: volume,
+      firstSessionAt: firstSessionAt,
+    );
   }
 
   /// Repeats a completed workout (§8.7): creates a new active session

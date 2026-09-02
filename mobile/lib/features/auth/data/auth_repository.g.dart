@@ -53,3 +53,48 @@ final class AuthRepositoryProvider
 }
 
 String _$authRepositoryHash() => r'e47643a52cc719fe265d1cef674300d7883450ee';
+
+/// KeepAlive reactive auth union (WU-5.3): replays the boot state, then
+/// follows every transition — the Profile screen renders from this and
+/// re-emits live on sign-in/sign-out (L8, zero polling).
+
+@ProviderFor(watchAuthState)
+final watchAuthStateProvider = WatchAuthStateProvider._();
+
+/// KeepAlive reactive auth union (WU-5.3): replays the boot state, then
+/// follows every transition — the Profile screen renders from this and
+/// re-emits live on sign-in/sign-out (L8, zero polling).
+
+final class WatchAuthStateProvider
+    extends
+        $FunctionalProvider<AsyncValue<AuthState>, AuthState, Stream<AuthState>>
+    with $FutureModifier<AuthState>, $StreamProvider<AuthState> {
+  /// KeepAlive reactive auth union (WU-5.3): replays the boot state, then
+  /// follows every transition — the Profile screen renders from this and
+  /// re-emits live on sign-in/sign-out (L8, zero polling).
+  WatchAuthStateProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'watchAuthStateProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$watchAuthStateHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<AuthState> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
+
+  @override
+  Stream<AuthState> create(Ref ref) {
+    return watchAuthState(ref);
+  }
+}
+
+String _$watchAuthStateHash() => r'038379698fdc2236a5c16e5bb566f2ab09b6c3bf';

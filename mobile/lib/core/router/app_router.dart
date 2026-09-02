@@ -10,6 +10,7 @@ import 'package:aven_fit/features/history/presentation/workout_detail_screen.dar
 import 'package:aven_fit/features/nutrition/presentation/food_detail_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/food_search_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
+import 'package:aven_fit/features/profile/presentation/profile_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_detail_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_editor_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routines_screen.dart';
@@ -121,6 +122,10 @@ final appRouter = GoRouter(
     // Auth (WU-5.2) — reachable only by explicit navigation (Profile in
     // WU-5.3), never a gate: guest mode works without ever seeing these
     // screens (L2).
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
+    ),
     GoRoute(
       path: '/auth/login',
       builder: (context, state) => const LoginScreen(),

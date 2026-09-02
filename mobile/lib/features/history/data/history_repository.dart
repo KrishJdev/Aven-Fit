@@ -4,6 +4,7 @@ import '../../../main.dart';
 import '../../progress/data/pr_repository.dart';
 import '../../workout/data/workout_repository.dart';
 import '../../workout/domain/workout_session.dart';
+import '../domain/lifetime_stats.dart';
 import '../domain/workout_history_item.dart';
 import 'history_local_source.dart';
 
@@ -22,6 +23,11 @@ abstract class HistoryRepository {
     int limit = 50,
     int offset = 0,
   });
+
+  /// Reactive lifetime aggregate (WU-5.3, §12.1): total completed
+  /// workouts, confirmed sets, working volume (warm-ups excluded, L1)
+  /// and the "member since" anchor — recomputed on every history change.
+  Stream<LifetimeStats> watchLifetimeStats();
 
   /// Full read-only breakdown (exercises with names + every set).
   Future<WorkoutSession?> getWorkoutDetail(String sessionId);
@@ -66,6 +72,11 @@ class HistoryRepositoryImpl implements HistoryRepository {
     int offset = 0,
   }) {
     return _dao.getCompletedWorkouts(limit: limit, offset: offset);
+  }
+
+  @override
+  Stream<LifetimeStats> watchLifetimeStats() {
+    return _dao.watchLifetimeStats();
   }
 
   @override
@@ -132,4 +143,11 @@ Stream<List<WorkoutHistoryItem>> watchWorkoutHistory(Ref ref) {
   return ref.watch(historyRepositoryProvider).watchCompletedWorkouts(
         limit: limit,
       );
+}
+
+/// Reactive lifetime stats for the Profile screen (WU-5.3): drift
+/// re-emits whenever the session/set tables change — zero polling (L8).
+@riverpod
+Stream<LifetimeStats> watchLifetimeStats(Ref ref) {
+  return ref.watch(historyRepositoryProvider).watchLifetimeStats();
 }

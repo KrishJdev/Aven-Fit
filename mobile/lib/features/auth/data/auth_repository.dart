@@ -333,3 +333,11 @@ AuthRepository authRepository(Ref ref) {
   ref.onDispose(repository.dispose);
   return repository;
 }
+
+/// KeepAlive reactive auth union (WU-5.3): replays the boot state, then
+/// follows every transition — the Profile screen renders from this and
+/// re-emits live on sign-in/sign-out (L8, zero polling).
+@Riverpod(keepAlive: true)
+Stream<AuthState> watchAuthState(Ref ref) {
+  return ref.watch(authRepositoryProvider).watchAuthState();
+}
