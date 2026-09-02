@@ -16,6 +16,15 @@ class PRReplaySet {
   const PRReplaySet({required this.set, required this.effectiveAt});
 }
 
+/// One vault row (WU-X.3): a stored PR joined with its exercise name —
+/// the display payload for the Progress preview and the full vault.
+class PRVaultEntry {
+  final PersonalRecordRow record;
+  final String exerciseName;
+
+  const PRVaultEntry({required this.record, required this.exerciseName});
+}
+
 /// DAO providing PR record storage and the working-set history replay input
 /// for the PR detection engine (WU-3.6, FEATURES.md §10.2).
 @DriftAccessor(tables: [
@@ -38,6 +47,33 @@ class PrDao extends DatabaseAccessor<AppDatabase> with _$PrDaoMixin {
   /// All stored PR rows across every exercise.
   Future<List<PersonalRecordRow>> getAllRecords() =>
       select(personalRecords).get();
+
+  /// Reactive vault view (WU-X.3, §10.2): every PR row joined with its
+  /// exercise name, newest achievement first. Re-emits on any record
+  /// change — the Progress preview and the vault share one stream (L8).
+  /// The outer join is belt-and-braces: FK cascade (L7) already removes
+  /// rows when an exercise dies.
+  Stream<List<PRVaultEntry>> watchVault() {
+    final query = select(personalRecords).join([
+      leftOuterJoin(
+        exercises,
+        exercises.id.equalsExp(personalRecords.exerciseId),
+      ),
+    ])
+      ..orderBy([OrderingTerm.desc(personalRecords.achievedAt)]);
+
+    return query.watch().map(
+          (rows) => rows
+              .map(
+                (row) => PRVaultEntry(
+                  record: row.readTable(personalRecords),
+                  exerciseName:
+                      row.readTableOrNull(exercises)?.name ?? 'Unknown exercise',
+                ),
+              )
+              .toList(),
+        );
+  }
 
   /// Finds the current best record for (exercise, record type).
   ///

@@ -11,6 +11,7 @@ import 'package:aven_fit/features/nutrition/presentation/food_detail_screen.dart
 import 'package:aven_fit/features/nutrition/presentation/food_search_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
 import 'package:aven_fit/features/profile/presentation/profile_screen.dart';
+import 'package:aven_fit/features/progress/presentation/pr_vault_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_detail_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routine_editor_screen.dart';
 import 'package:aven_fit/features/routine/presentation/routines_screen.dart';
@@ -125,6 +126,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/progress/prs',
+      builder: (context, state) => const PrVaultScreen(),
     ),
     GoRoute(
       path: '/auth/login',

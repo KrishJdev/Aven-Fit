@@ -30,6 +30,21 @@ enum RecordType {
         (t) => t.name == value || t.name.toUpperCase() == value.toUpperCase(),
         orElse: () => RecordType.maxWeight,
       );
+
+  /// Human value display for the vault surfaces (WU-X.3, §10.2): the
+  /// weight-keyed reps record reads "N reps @ W kg", the e1RM reads with
+  /// its unit, the rest as kilograms. Trims trailing ".0".
+  String formatValue(double value, {double? weightKg}) {
+    String trim(double v) =>
+        v % 1 == 0 ? v.toInt().toString() : v.toStringAsFixed(1);
+    return switch (this) {
+      RecordType.maxWeight => '${trim(value)} kg',
+      RecordType.epley1rm => '${trim(value)} kg e1RM',
+      RecordType.maxRepsAtWeight =>
+        '${value.round()} reps @ ${trim(weightKg ?? 0)} kg',
+      RecordType.volume => '${trim(value)} kg',
+    };
+  }
 }
 
 /// Pure immutable domain entity representing a personal record (PR).

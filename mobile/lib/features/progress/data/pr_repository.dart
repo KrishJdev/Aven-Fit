@@ -35,6 +35,11 @@ abstract class PRRepository {
 
   /// Current best records across all exercises.
   Future<List<PRRecord>> getAllRecords();
+
+  /// Reactive vault view (WU-X.3): every PR joined with its exercise
+  /// name, newest achievement first — the Progress preview and the
+  /// full vault share this one stream.
+  Stream<List<PRVaultEntry>> watchVault();
 }
 
 /// Production implementation of [PRRepository] backed by Drift SQLite DAO.
@@ -132,6 +137,9 @@ class PRRepositoryImpl implements PRRepository {
       }
     });
   }
+
+  @override
+  Stream<List<PRVaultEntry>> watchVault() => _dao.watchVault();
 
   @override
   Future<List<PRRecord>> getRecordsForExercise(String exerciseId) async {
