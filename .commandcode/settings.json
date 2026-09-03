@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(flutter:*)",
+      "Shell(dart:*)",
+      "Shell(git add HANDOFF.md mobile/android mobile/lib mobile/test mobile/pubspec.yaml mobile/pubspec.lock && git commit -F - <<'EOF' feat(workout): implement epoch-based rest timer with rest countdown notifications (WU-3.5) - NotificationService (core/notifications): silent rest-timer channel, just-in-time POST_NOTIFICATIONS priming with session latch (never re-nagged), in-place countdown updates with progress + \"+15s\" action, silent completion notice; all platform calls guarded so denial never breaks the flow (L2/L4) - RestTimerController: keepAlive epoch-based countdown (L8 - Stream.periodic used only for UI/notification ticks, values recomputed from the deadline), auto-start on set confirmation (90s default, per-exercise restSeconds override), +/-15s on the epoch deadline, restart at original duration, instant cancel (mutually exclusive rest/lift, any checkmark replaces the countdown), warm-up sets never rest - RestTimerBar: slim animated bar under the session header with +/-15s, restart, and one-tap dismiss (never blocks content, section 8.3) - Active workout integration: replaced legacy Timer.periodic rest logic, manual rest start from the header, JIT permission primer dialog before the OS prompt - Tests: 13 new rest-timer tests (epoch math, adjustments, primer flows, fake-async completion, widget interactions); suite at 93/93 passing, analyzer clean Co-authored-by: CommandCodeBot <noreply@commandcode.ai> EOF)",
+      "Shell(git:*)"
+    ],
+    "deny": [],
+    "defaultMode": "default"
+  }
+}
