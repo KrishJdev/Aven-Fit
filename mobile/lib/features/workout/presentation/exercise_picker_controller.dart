@@ -17,6 +17,9 @@ class ExercisePickerController extends _$ExercisePickerController {
     final exerciseRepo = ref.watch(exerciseRepositoryProvider);
     final workoutRepo = ref.watch(workoutRepositoryProvider);
 
+    // Ensure database is seeded on first load
+    await exerciseRepo.seedInitialData();
+
     final allExercises = await exerciseRepo.searchExercises();
     final muscleGroups = await exerciseRepo.getMuscleGroups();
     final recentExercises = await workoutRepo.getRecentExercises(limit: 10);

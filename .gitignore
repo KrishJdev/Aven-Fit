@@ -24,3 +24,4 @@ archive/react-native-frontend/node_modules/
 mobile/node_modules/
 mobile/.dart_tool/
 mobile/build/
+mobile/android/build/
