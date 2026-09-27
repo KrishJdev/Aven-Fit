@@ -399,4 +399,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'SOMETHING WENT WRONG';
+
+  @override
+  String get historyTitle => 'WORKOUT HISTORY';
+
+  @override
+  String get historyLoadMore => 'LOAD MORE';
+
+  @override
+  String get historyBucketToday => 'TODAY';
+
+  @override
+  String get historyBucketYesterday => 'YESTERDAY';
+
+  @override
+  String get historyBucketThisWeek => 'THIS WEEK';
+
+  @override
+  String get historyEmptyTitle => 'NO WORKOUTS YET';
+
+  @override
+  String get historyEmptyMessage =>
+      'Your history will appear here once you complete your first workout.';
+
+  @override
+  String get historyStartWorkout => 'START WORKOUT';
+
+  @override
+  String get historyErrorTitle => 'COULD NOT LOAD HISTORY';
+
+  @override
+  String get workoutDetailTitle => 'WORKOUT';
+
+  @override
+  String workoutDetailCompleted(String date) {
+    return 'COMPLETED · $date';
+  }
+
+  @override
+  String get saveAsRoutineMenu => 'Save as routine';
+
+  @override
+  String get deleteWorkoutMenu => 'Delete workout';
+
+  @override
+  String get repeatWorkout => 'REPEAT WORKOUT';
+
+  @override
+  String get saveAsRoutineTitle => 'SAVE AS ROUTINE';
+
+  @override
+  String get routineNameHint => 'Routine name...';
+
+  @override
+  String get savedToRoutines => 'Saved to your routines';
+
+  @override
+  String get couldNotSaveAsRoutine => 'Could not save as routine';
+
+  @override
+  String get deleteWorkoutTitle => 'DELETE WORKOUT';
+
+  @override
+  String get deleteWorkoutMessage =>
+      'Delete this workout and all of its sets? This can\'t be undone.';
+
+  @override
+  String get deleteWorkoutConfirm => 'DELETE';
+
+  @override
+  String get deleteWorkoutCancel => 'KEEP';
+
+  @override
+  String get statDuration => 'DURATION';
+
+  @override
+  String get statPrs => 'PRS';
+
+  @override
+  String get noSetsLoggedDetail => 'No sets logged';
+
+  @override
+  String get noExercisesNote => 'This workout had no logged exercises.';
+
+  @override
+  String get workoutNotFoundTitle => 'WORKOUT NOT FOUND';
+
+  @override
+  String get workoutNotFoundMessage => 'This workout may have been deleted.';
+
+  @override
+  String get backToHistory => 'BACK TO HISTORY';
 }

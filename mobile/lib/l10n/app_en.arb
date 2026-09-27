@@ -157,5 +157,37 @@
   "restartRestTooltip": "Restart rest",
   "skipRestTooltip": "Skip rest",
 
-  "somethingWentWrong": "SOMETHING WENT WRONG"
+  "somethingWentWrong": "SOMETHING WENT WRONG",
+
+  "historyTitle": "WORKOUT HISTORY",
+  "historyLoadMore": "LOAD MORE",
+  "historyBucketToday": "TODAY",
+  "historyBucketYesterday": "YESTERDAY",
+  "historyBucketThisWeek": "THIS WEEK",
+  "historyEmptyTitle": "NO WORKOUTS YET",
+  "historyEmptyMessage": "Your history will appear here once you complete your first workout.",
+  "historyStartWorkout": "START WORKOUT",
+  "historyErrorTitle": "COULD NOT LOAD HISTORY",
+
+  "workoutDetailTitle": "WORKOUT",
+  "workoutDetailCompleted": "COMPLETED · {date}",
+  "@workoutDetailCompleted": {"placeholders": {"date": {"type": "String"}}},
+  "saveAsRoutineMenu": "Save as routine",
+  "deleteWorkoutMenu": "Delete workout",
+  "repeatWorkout": "REPEAT WORKOUT",
+  "saveAsRoutineTitle": "SAVE AS ROUTINE",
+  "routineNameHint": "Routine name...",
+  "savedToRoutines": "Saved to your routines",
+  "couldNotSaveAsRoutine": "Could not save as routine",
+  "deleteWorkoutTitle": "DELETE WORKOUT",
+  "deleteWorkoutMessage": "Delete this workout and all of its sets? This can't be undone.",
+  "deleteWorkoutConfirm": "DELETE",
+  "deleteWorkoutCancel": "KEEP",
+  "statDuration": "DURATION",
+  "statPrs": "PRS",
+  "noSetsLoggedDetail": "No sets logged",
+  "noExercisesNote": "This workout had no logged exercises.",
+  "workoutNotFoundTitle": "WORKOUT NOT FOUND",
+  "workoutNotFoundMessage": "This workout may have been deleted.",
+  "backToHistory": "BACK TO HISTORY"
 }

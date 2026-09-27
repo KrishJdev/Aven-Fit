@@ -1,8 +1,10 @@
+import 'package:aven_fit/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../data/history_repository.dart';
@@ -31,7 +33,7 @@ class HistoryListScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'WORKOUT HISTORY',
+          l10nOf(context).historyTitle,
           style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
       ),
@@ -61,10 +63,11 @@ class _HistoryFeed extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     final now = DateTime.now();
     final groups = <String, List<WorkoutHistoryItem>>{};
     for (final item in items) {
-      groups.putIfAbsent(_groupLabel(item.date, now), () => []).add(item);
+      groups.putIfAbsent(_groupLabel(l10n, item.date, now), () => []).add(item);
     }
 
     return ListView.builder(
@@ -79,9 +82,9 @@ class _HistoryFeed extends ConsumerWidget {
               onPressed: () => ref
                   .read(historyFeedLimitProvider.notifier)
                   .loadMore(),
-              child: const Text(
-                'LOAD MORE',
-                style: TextStyle(color: AppTheme.primary, fontSize: 13),
+              child: Text(
+                l10n.historyLoadMore,
+                style: const TextStyle(color: AppTheme.primary, fontSize: 13),
               ),
             ),
           );
@@ -112,16 +115,18 @@ class _HistoryFeed extends ConsumerWidget {
   }
 
   /// Date buckets (§8.6: grouped by week/month): TODAY · YESTERDAY ·
-  /// THIS WEEK · month name for anything older.
-  String _groupLabel(DateTime date, DateTime now) {
+  /// THIS WEEK · month name for anything older. The first three are UI
+  /// labels (localized); the month-year format is domain-derived date
+  /// formatting, deferred to the V1.1 plural-aware i18n pass.
+  String _groupLabel(AppLocalizations l10n, DateTime date, DateTime now) {
     final today = DateTime(now.year, now.month, now.day);
     final day = DateTime(date.year, date.month, date.day);
     final diff = today.difference(day).inDays;
-    if (diff == 0) return 'TODAY';
-    if (diff == 1) return 'YESTERDAY';
+    if (diff == 0) return l10n.historyBucketToday;
+    if (diff == 1) return l10n.historyBucketYesterday;
     final weekStart = today.subtract(Duration(days: today.weekday - 1));
     if (day.isAfter(weekStart.subtract(const Duration(days: 1)))) {
-      return 'THIS WEEK';
+      return l10n.historyBucketThisWeek;
     }
     const months = [
       'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
@@ -137,6 +142,7 @@ class _HistoryEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
@@ -146,20 +152,20 @@ class _HistoryEmptyState extends StatelessWidget {
             const Icon(LucideIcons.history, size: 56, color: AppTheme.textSecondary),
             const SizedBox(height: AppTheme.spaceLg),
             Text(
-              'NO WORKOUTS YET',
+              l10n.historyEmptyTitle,
               style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: AppTheme.spaceSm),
-            const Text(
-              'Your history will appear here once you complete your first workout.',
+            Text(
+              l10n.historyEmptyMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: AppTheme.spaceXxl),
             FilledButton.icon(
               onPressed: () => context.push('/workout/active'),
               icon: const Icon(LucideIcons.play, size: 16),
-              label: const Text('START WORKOUT'),
+              label: Text(l10n.historyStartWorkout),
               style: FilledButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 foregroundColor: AppTheme.textOnPrimary,
@@ -180,6 +186,7 @@ class _HistoryErrorState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spaceXxl),
@@ -189,7 +196,7 @@ class _HistoryErrorState extends ConsumerWidget {
             const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.warning),
             const SizedBox(height: AppTheme.spaceLg),
             Text(
-              'COULD NOT LOAD HISTORY',
+              l10n.historyErrorTitle,
               style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: AppTheme.spaceSm),
@@ -201,7 +208,7 @@ class _HistoryErrorState extends ConsumerWidget {
             const SizedBox(height: AppTheme.spaceXl),
             OutlinedButton(
               onPressed: () => ref.invalidate(watchWorkoutHistoryProvider),
-              child: const Text('RETRY'),
+              child: Text(l10n.retry),
             ),
           ],
         ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/loading_state_widget.dart';
@@ -24,6 +25,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     final sessionAsync = ref.watch(workoutDetailControllerProvider(sessionId));
     final controller =
         ref.read(workoutDetailControllerProvider(sessionId).notifier);
@@ -40,7 +42,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
         title: sessionAsync.whenOrNull(
               data: (session) => session == null
                   ? Text(
-                      'WORKOUT',
+                      l10n.workoutDetailTitle,
                       style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
                     )
                   : GestureDetector(
@@ -78,25 +80,25 @@ class WorkoutDetailScreen extends ConsumerWidget {
                           }
                         },
                         itemBuilder: (ctx) => [
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'save_routine',
                             child: Row(
                               children: [
-                                Icon(LucideIcons.bookmark, size: 16, color: AppTheme.primary),
-                                SizedBox(width: AppTheme.spaceSm),
-                                Text('Save as routine',
-                                    style: TextStyle(color: AppTheme.textPrimary, fontSize: 13)),
+                                const Icon(LucideIcons.bookmark, size: 16, color: AppTheme.primary),
+                                const SizedBox(width: AppTheme.spaceSm),
+                                Text(l10n.saveAsRoutineMenu,
+                                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13)),
                               ],
                             ),
                           ),
-                          const PopupMenuItem(
+                          PopupMenuItem(
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
-                                SizedBox(width: AppTheme.spaceSm),
-                                Text('Delete workout',
-                                    style: TextStyle(color: AppTheme.warning, fontSize: 13)),
+                                const Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
+                                const SizedBox(width: AppTheme.spaceSm),
+                                Text(l10n.deleteWorkoutMenu,
+                                    style: const TextStyle(color: AppTheme.warning, fontSize: 13)),
                               ],
                             ),
                           ),
@@ -134,13 +136,14 @@ class WorkoutDetailScreen extends ConsumerWidget {
     WorkoutSession session,
     WorkoutDetailController controller,
   ) {
+    final l10n = l10nOf(context);
     final completedAt = session.completedAt ?? session.startedAt;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXxl),
       children: [
         Text(
-          'COMPLETED · ${_formatDate(completedAt)}',
+          l10n.workoutDetailCompleted(_formatDate(completedAt)),
           style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
         ),
         const SizedBox(height: AppTheme.spaceMd),
@@ -161,6 +164,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     WorkoutDetailController controller,
   ) {
+    final l10n = l10nOf(context);
     return Container(
       color: AppTheme.background,
       padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceLg),
@@ -173,7 +177,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
             key: const ValueKey('repeat_workout_button'),
             onPressed: () => _repeatWorkout(context, ref, controller),
             icon: const Icon(LucideIcons.rotateCcw, size: 18),
-            label: const Text('REPEAT WORKOUT'),
+            label: Text(l10n.repeatWorkout),
             style: FilledButton.styleFrom(
               backgroundColor: AppTheme.secondary,
               foregroundColor: AppTheme.textOnPrimary,
@@ -205,25 +209,26 @@ class WorkoutDetailScreen extends ConsumerWidget {
     WorkoutDetailController controller,
     String currentName,
   ) {
+    final l10n = l10nOf(context);
     final textController = TextEditingController(text: currentName);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('RENAME WORKOUT',
+        title: Text(l10n.renameWorkoutTitle,
             style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary)),
         content: TextField(
           controller: textController,
           autofocus: true,
           style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
           decoration: InputDecoration(
-            hintText: 'Workout name...',
+            hintText: l10n.workoutNameHint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(l10n.dialogCancel, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () {
@@ -234,7 +239,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
               backgroundColor: AppTheme.primary,
               foregroundColor: AppTheme.textOnPrimary,
             ),
-            child: const Text('SAVE'),
+            child: Text(l10n.dialogSave),
           ),
         ],
       ),
@@ -246,25 +251,26 @@ class WorkoutDetailScreen extends ConsumerWidget {
     WorkoutDetailController controller,
     String defaultName,
   ) {
+    final l10n = l10nOf(context);
     final textController = TextEditingController(text: defaultName);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('SAVE AS ROUTINE',
+        title: Text(l10n.saveAsRoutineTitle,
             style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary)),
         content: TextField(
           controller: textController,
           autofocus: true,
           style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
           decoration: InputDecoration(
-            hintText: 'Routine name...',
+            hintText: l10n.routineNameHint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(l10n.dialogCancel, style: const TextStyle(color: AppTheme.textSecondary)),
           ),
           FilledButton(
             onPressed: () async {
@@ -275,8 +281,8 @@ class WorkoutDetailScreen extends ConsumerWidget {
                   SnackBar(
                     content: Text(
                       routineId != null
-                          ? 'Saved to your routines'
-                          : 'Could not save as routine',
+                          ? l10n.savedToRoutines
+                          : l10n.couldNotSaveAsRoutine,
                     ),
                     backgroundColor: AppTheme.surfaceElevated,
                   ),
@@ -287,7 +293,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
               backgroundColor: AppTheme.primary,
               foregroundColor: AppTheme.textOnPrimary,
             ),
-            child: const Text('SAVE'),
+            child: Text(l10n.dialogSave),
           ),
         ],
       ),
@@ -298,13 +304,14 @@ class WorkoutDetailScreen extends ConsumerWidget {
     BuildContext context,
     WorkoutDetailController controller,
   ) {
+    final l10n = l10nOf(context);
     showDialog<void>(
       context: context,
       builder: (ctx) => ConfirmDialog(
-        title: 'DELETE WORKOUT',
-        message: "Delete this workout and all of its sets? This can't be undone.",
-        confirmLabel: 'DELETE',
-        cancelLabel: 'KEEP',
+        title: l10n.deleteWorkoutTitle,
+        message: l10n.deleteWorkoutMessage,
+        confirmLabel: l10n.deleteWorkoutConfirm,
+        cancelLabel: l10n.deleteWorkoutCancel,
         style: ConfirmStyle.destructive,
         onConfirm: () async {
           await controller.deleteWorkout();
@@ -336,6 +343,7 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final duration = _formatDuration(session.elapsedSecondsNow());
     final volume = session.totalVolumeKg % 1 == 0
         ? session.totalVolumeKg.toInt().toString()
@@ -352,16 +360,16 @@ class _StatsGrid extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _StatCell(label: 'DURATION', value: duration),
-              _StatCell(label: 'WORKING VOLUME', value: '$volume kg', highlight: true),
+              _StatCell(label: l10n.statDuration, value: duration),
+              _StatCell(label: l10n.statWorkingVolume, value: '$volume kg', highlight: true),
             ],
           ),
           const SizedBox(height: AppTheme.spaceMd),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _StatCell(label: 'SETS', value: '${session.completedSetsCount}'),
-              _StatCell(label: 'PRS', value: '${_prCount(session)}'),
+              _StatCell(label: l10n.statSets, value: '${session.completedSetsCount}'),
+              _StatCell(label: l10n.statPrs, value: '${_prCount(session)}'),
             ],
           ),
         ],
@@ -411,6 +419,7 @@ class _ExerciseBreakdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final sets = exercise.sets;
 
     return Container(
@@ -429,9 +438,9 @@ class _ExerciseBreakdownCard extends StatelessWidget {
           ),
           const SizedBox(height: AppTheme.spaceSm),
           if (sets.isEmpty)
-            const Text(
-              'No sets logged',
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+            Text(
+              l10n.noSetsLoggedDetail,
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
             )
           else
             ...sets.map((set) => _SetRow(set: set)),
@@ -511,15 +520,16 @@ class _NoExercisesNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceLg),
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
-      child: const Text(
-        'This workout had no logged exercises.',
-        style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+      child: Text(
+        l10n.noExercisesNote,
+        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
       ),
     );
   }
@@ -534,6 +544,7 @@ class _ErrorState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spaceXxl),
@@ -543,7 +554,7 @@ class _ErrorState extends ConsumerWidget {
             const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.warning),
             const SizedBox(height: AppTheme.spaceLg),
             Text(
-              'COULD NOT LOAD WORKOUT',
+              l10n.couldNotLoadWorkout,
               style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: AppTheme.spaceSm),
@@ -557,7 +568,7 @@ class _ErrorState extends ConsumerWidget {
               onPressed: () => ref.invalidate(
                 workoutDetailControllerProvider(sessionId),
               ),
-              child: const Text('RETRY'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -572,6 +583,7 @@ class _NotFoundState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
@@ -581,19 +593,19 @@ class _NotFoundState extends StatelessWidget {
             const Icon(LucideIcons.circleQuestionMark, size: 52, color: AppTheme.textSecondary),
             const SizedBox(height: AppTheme.spaceLg),
             Text(
-              'WORKOUT NOT FOUND',
+              l10n.workoutNotFoundTitle,
               style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
             const SizedBox(height: AppTheme.spaceSm),
-            const Text(
-              'This workout may have been deleted.',
+            Text(
+              l10n.workoutNotFoundMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
             const SizedBox(height: AppTheme.spaceXxl),
             FilledButton(
               onPressed: () => context.pop(),
-              child: const Text('BACK TO HISTORY'),
+              child: Text(l10n.backToHistory),
             ),
           ],
         ),

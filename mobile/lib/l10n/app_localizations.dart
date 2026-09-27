@@ -804,6 +804,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SOMETHING WENT WRONG'**
   String get somethingWentWrong;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WORKOUT HISTORY'**
+  String get historyTitle;
+
+  /// No description provided for @historyLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'LOAD MORE'**
+  String get historyLoadMore;
+
+  /// No description provided for @historyBucketToday.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY'**
+  String get historyBucketToday;
+
+  /// No description provided for @historyBucketYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'YESTERDAY'**
+  String get historyBucketYesterday;
+
+  /// No description provided for @historyBucketThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'THIS WEEK'**
+  String get historyBucketThisWeek;
+
+  /// No description provided for @historyEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NO WORKOUTS YET'**
+  String get historyEmptyTitle;
+
+  /// No description provided for @historyEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your history will appear here once you complete your first workout.'**
+  String get historyEmptyMessage;
+
+  /// No description provided for @historyStartWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'START WORKOUT'**
+  String get historyStartWorkout;
+
+  /// No description provided for @historyErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'COULD NOT LOAD HISTORY'**
+  String get historyErrorTitle;
+
+  /// No description provided for @workoutDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WORKOUT'**
+  String get workoutDetailTitle;
+
+  /// No description provided for @workoutDetailCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'COMPLETED · {date}'**
+  String workoutDetailCompleted(String date);
+
+  /// No description provided for @saveAsRoutineMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as routine'**
+  String get saveAsRoutineMenu;
+
+  /// No description provided for @deleteWorkoutMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete workout'**
+  String get deleteWorkoutMenu;
+
+  /// No description provided for @repeatWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'REPEAT WORKOUT'**
+  String get repeatWorkout;
+
+  /// No description provided for @saveAsRoutineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE AS ROUTINE'**
+  String get saveAsRoutineTitle;
+
+  /// No description provided for @routineNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine name...'**
+  String get routineNameHint;
+
+  /// No description provided for @savedToRoutines.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to your routines'**
+  String get savedToRoutines;
+
+  /// No description provided for @couldNotSaveAsRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save as routine'**
+  String get couldNotSaveAsRoutine;
+
+  /// No description provided for @deleteWorkoutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE WORKOUT'**
+  String get deleteWorkoutTitle;
+
+  /// No description provided for @deleteWorkoutMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this workout and all of its sets? This can\'t be undone.'**
+  String get deleteWorkoutMessage;
+
+  /// No description provided for @deleteWorkoutConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get deleteWorkoutConfirm;
+
+  /// No description provided for @deleteWorkoutCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'KEEP'**
+  String get deleteWorkoutCancel;
+
+  /// No description provided for @statDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'DURATION'**
+  String get statDuration;
+
+  /// No description provided for @statPrs.
+  ///
+  /// In en, this message translates to:
+  /// **'PRS'**
+  String get statPrs;
+
+  /// No description provided for @noSetsLoggedDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'No sets logged'**
+  String get noSetsLoggedDetail;
+
+  /// No description provided for @noExercisesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This workout had no logged exercises.'**
+  String get noExercisesNote;
+
+  /// No description provided for @workoutNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WORKOUT NOT FOUND'**
+  String get workoutNotFoundTitle;
+
+  /// No description provided for @workoutNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This workout may have been deleted.'**
+  String get workoutNotFoundMessage;
+
+  /// No description provided for @backToHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'BACK TO HISTORY'**
+  String get backToHistory;
 }
 
 class _AppLocalizationsDelegate
