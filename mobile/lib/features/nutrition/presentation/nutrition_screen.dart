@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../domain/logged_meal_item.dart' show LoggedMealItem;
 import '../domain/nutrition_log_entry.dart';
 import 'nutrition_dashboard_controller.dart';
@@ -148,41 +149,13 @@ class NutritionScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(
-          'Remove item?',
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-          ),
-        ),
-        content: Text(
-          'Remove "${entry.food.name}" from this meal?',
-          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.warning),
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              'REMOVE',
-              style: TextStyle(
-                color: AppTheme.warning,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: 'Remove item?',
+        message: 'Remove "${entry.food.name}" from this meal?',
+        confirmLabel: 'REMOVE',
+        cancelLabel: 'CANCEL',
+        style: ConfirmStyle.destructive,
+        onConfirm: () {},
       ),
     );
 

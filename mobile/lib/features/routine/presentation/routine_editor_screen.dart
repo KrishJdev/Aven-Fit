@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../../exercise/presentation/exercise_list_screen.dart';
@@ -648,41 +649,13 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
   ) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(
-          'Remove Exercise?',
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'Remove "$exerciseName" from this routine?',
-          style: const TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 13,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.warning,
-              foregroundColor: AppTheme.textPrimary,
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              controller.removeExercise(index);
-            },
-            child: const Text('REMOVE'),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: 'Remove Exercise?',
+        message: 'Remove "$exerciseName" from this routine?',
+        confirmLabel: 'REMOVE',
+        cancelLabel: 'CANCEL',
+        style: ConfirmStyle.destructive,
+        onConfirm: () => controller.removeExercise(index),
       ),
     );
   }

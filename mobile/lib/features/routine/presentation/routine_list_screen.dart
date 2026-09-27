@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/routine.dart';
@@ -492,43 +493,18 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   void _confirmDelete(BuildContext context, Routine routine) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(
-          'Delete Routine?',
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'Are you sure you want to delete "${routine.name}"? Historical workouts logged from this routine will remain intact.',
-          style: const TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 13,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.warning,
-              foregroundColor: AppTheme.textPrimary,
-            ),
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await ref
-                  .read(routineListControllerProvider.notifier)
-                  .deleteRoutine(routine.id);
-            },
-            child: const Text('DELETE'),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: 'Delete Routine?',
+        message:
+            'Are you sure you want to delete "${routine.name}"? Historical workouts logged from this routine will remain intact.',
+        confirmLabel: 'DELETE',
+        cancelLabel: 'CANCEL',
+        style: ConfirmStyle.destructive,
+        onConfirm: () async {
+          await ref
+              .read(routineListControllerProvider.notifier)
+              .deleteRoutine(routine.id);
+        },
       ),
     );
   }

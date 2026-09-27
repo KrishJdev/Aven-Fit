@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/muscle_group.dart';
@@ -309,45 +310,14 @@ class ExerciseDetailScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(
-          'Delete Exercise?',
-          style: TextStyle(
-            color: AppTheme.textPrimary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        content: const Text(
-          'This will permanently delete this custom exercise. Previously logged workout sessions and historical records will remain intact.',
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 14,
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-          ),
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.warning),
-              shape: const RoundedRectangleBorder(),
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(
-              'DELETE',
-              style: TextStyle(
-                color: AppTheme.warning,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: 'Delete Exercise?',
+        message:
+            'This will permanently delete this custom exercise. Previously logged workout sessions and historical records will remain intact.',
+        confirmLabel: 'DELETE',
+        cancelLabel: 'CANCEL',
+        style: ConfirmStyle.destructive,
+        onConfirm: () {},
       ),
     );
 

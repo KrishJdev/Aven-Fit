@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../../workout/domain/session_exercise.dart';
 import '../../workout/domain/workout_session.dart';
@@ -298,35 +299,18 @@ class WorkoutDetailScreen extends ConsumerWidget {
   ) {
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'DELETE WORKOUT',
-          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.warning),
-        ),
-        content: const Text(
-          'Delete this workout and all of its sets? This can\'t be undone.',
-          style: TextStyle(color: AppTheme.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('KEEP', style: TextStyle(color: AppTheme.textSecondary)),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await controller.deleteWorkout();
-              if (context.mounted) {
-                context.pop();
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.warning,
-              foregroundColor: AppTheme.textPrimary,
-            ),
-            child: const Text('DELETE'),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: 'DELETE WORKOUT',
+        message: "Delete this workout and all of its sets? This can't be undone.",
+        confirmLabel: 'DELETE',
+        cancelLabel: 'KEEP',
+        style: ConfirmStyle.destructive,
+        onConfirm: () async {
+          await controller.deleteWorkout();
+          if (context.mounted) {
+            context.pop();
+          }
+        },
       ),
     );
   }
