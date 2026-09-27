@@ -47,9 +47,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
     final controller = ref.read(exerciseListControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         title: Row(
           children: [
@@ -62,20 +62,20 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                 letterSpacing: 1.0,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
             stateAsync.when(
               data: (state) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonCyan.withValues(alpha: 0.15),
-                  border: Border.all(color: AppTheme.neonCyan.withValues(alpha: 0.4)),
+                  color: AppTheme.primary.withValues(alpha: 0.15),
+                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   '${state.exercises.length}',
                   style: AppTheme.num(
                     12,
                     weight: FontWeight.w700,
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                   ),
                 ),
               ),
@@ -86,7 +86,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.plus, color: AppTheme.neonCyan),
+            icon: const Icon(LucideIcons.plus, color: AppTheme.primary),
             tooltip: 'Create Custom Exercise',
             onPressed: () => context.push('/exercises/new'),
           ),
@@ -98,7 +98,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             children: [
               // Search Bar
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXs),
                 child: ExerciseSearchBar(
                   controller: _searchController,
                   onChanged: (val) => controller.setSearchQuery(val),
@@ -121,7 +121,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               ),
 
               const Divider(
-                color: AppTheme.glassBorder,
+                color: AppTheme.border,
                 height: 1,
               ),
 
@@ -137,7 +137,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                       )
                     : ListView.builder(
                         itemCount: state.exercises.length,
-                        padding: const EdgeInsets.only(top: 8, bottom: 24),
+                        padding: const EdgeInsets.only(top: AppTheme.spaceSm, bottom: AppTheme.spaceXxl),
                         itemBuilder: (context, index) {
                           final exercise = state.exercises[index];
                           return ExerciseListTile(
@@ -169,25 +169,25 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
             children: [
               const Icon(
                 LucideIcons.alertTriangle,
-                color: AppTheme.burntOrange,
+                color: AppTheme.warning,
                 size: 32,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               Text(
                 'Failed to load exercises: $err',
                 style: const TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceLg),
               OutlinedButton(
                 onPressed: () => ref.refresh(exerciseListControllerProvider),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.neonCyan),
+                  side: const BorderSide(color: AppTheme.primary),
                   shape: const RoundedRectangleBorder(),
                 ),
                 child: const Text(
                   'RETRY',
-                  style: TextStyle(color: AppTheme.neonCyan),
+                  style: TextStyle(color: AppTheme.primary),
                 ),
               ),
             ],
@@ -211,7 +211,7 @@ class _EmptyStateView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -220,7 +220,7 @@ class _EmptyStateView extends StatelessWidget {
               size: 48,
               color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               hasFilters
                   ? 'No exercises match the selected filters.'
@@ -232,7 +232,7 @@ class _EmptyStateView extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'Try adjusting your search query or removing active muscle/equipment filters.',
               style: TextStyle(
@@ -242,18 +242,18 @@ class _EmptyStateView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             if (hasFilters) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: AppTheme.spaceXl),
               OutlinedButton(
                 onPressed: onClearFilters,
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.neonCyan),
+                  side: const BorderSide(color: AppTheme.primary),
                   shape: const RoundedRectangleBorder(),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceMd),
                 ),
                 child: const Text(
                   'CLEAR ALL FILTERS',
                   style: TextStyle(
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),

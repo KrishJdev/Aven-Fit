@@ -67,9 +67,9 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         _syncControllers(state);
 
         return Scaffold(
-          backgroundColor: AppTheme.oledBlack,
+          backgroundColor: AppTheme.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.oledBlack,
+            backgroundColor: AppTheme.background,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(LucideIcons.arrowLeft,
@@ -94,42 +94,42 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppTheme.neonCyan,
+                          color: AppTheme.primary,
                         ),
                       )
                     : const Text(
                         'SAVE',
                         style: TextStyle(
-                          color: AppTheme.neonCyan,
+                          color: AppTheme.primary,
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
                           letterSpacing: 0.8,
                         ),
                       ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.spaceSm),
             ],
             bottom: const PreferredSize(
               preferredSize: Size.fromHeight(1),
-              child: Divider(color: AppTheme.glassBorder, height: 1),
+              child: Divider(color: AppTheme.border, height: 1),
             ),
           ),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceLg, 100),
               children: [
                 if (state.errorMessage != null) ...[
                   _buildErrorBanner(state.errorMessage!),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.spaceLg),
                 ],
                 _buildMetadataSection(controller, state),
-                const SizedBox(height: 20),
+                const SizedBox(height: AppTheme.spaceXl),
                 _buildSummaryBadges(state),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.spaceXxl),
                 _buildExercisesHeader(context, controller, state),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppTheme.spaceMd),
                 _buildExercisesList(context, controller, state),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spaceLg),
                 _buildAddExerciseButton(context, controller),
               ],
             ),
@@ -138,7 +138,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         );
       },
       loading: () => const Scaffold(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         body: Center(
           child: SingleChildScrollView(
             child: LoadingStateWidget(),
@@ -146,7 +146,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         ),
       ),
       error: (err, stack) => Scaffold(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         body: ErrorStateWidget(
           error: err,
           onRetry: () => ref
@@ -160,10 +160,10 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppTheme.burntOrange.withValues(alpha: 0.15),
+        color: AppTheme.warning.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: AppTheme.burntOrange.withValues(alpha: 0.4),
+          color: AppTheme.warning.withValues(alpha: 0.4),
           width: 1,
         ),
       ),
@@ -171,7 +171,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         children: [
           const Icon(
             LucideIcons.alertCircle,
-            color: AppTheme.burntOrange,
+            color: AppTheme.warning,
             size: 18,
           ),
           const SizedBox(width: 10),
@@ -179,7 +179,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             child: Text(
               message,
               style: const TextStyle(
-                color: AppTheme.burntOrange,
+                color: AppTheme.warning,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -195,11 +195,10 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     RoutineEditorState state,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,7 +212,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               color: AppTheme.textSecondary,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           TextField(
             controller: _nameController,
             onChanged: controller.updateName,
@@ -233,25 +232,25 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                 color: AppTheme.textSecondary.withValues(alpha: 0.3),
                 fontSize: 14,
               ),
-              fillColor: const Color(0xFF141416),
+              fillColor: AppTheme.surfaceElevated,
               filled: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppTheme.glassBorder),
+                borderSide: const BorderSide(color: AppTheme.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppTheme.glassBorder),
+                borderSide: const BorderSide(color: AppTheme.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppTheme.neonCyan),
+                borderSide: const BorderSide(color: AppTheme.primary),
               ),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           TextField(
             controller: _descController,
             onChanged: controller.updateDescription,
@@ -268,22 +267,22 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                 color: AppTheme.textSecondary.withValues(alpha: 0.3),
                 fontSize: 13,
               ),
-              fillColor: const Color(0xFF141416),
+              fillColor: AppTheme.surfaceElevated,
               filled: true,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppTheme.glassBorder),
+                borderSide: const BorderSide(color: AppTheme.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppTheme.glassBorder),
+                borderSide: const BorderSide(color: AppTheme.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppTheme.neonCyan),
+                borderSide: const BorderSide(color: AppTheme.primary),
               ),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
             ),
           ),
         ],
@@ -298,7 +297,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
           child: _buildBadgeCard(
             label: 'EXERCISES',
             value: '${state.exercises.length}',
-            color: AppTheme.neonCyan,
+            color: AppTheme.primary,
           ),
         ),
         const SizedBox(width: 10),
@@ -314,7 +313,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
           child: _buildBadgeCard(
             label: 'EST. TIME',
             value: '${state.estimatedDurationMinutes} MIN',
-            color: AppTheme.voltGreen,
+            color: AppTheme.secondary,
           ),
         ),
       ],
@@ -327,11 +326,10 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceMd, horizontal: AppTheme.spaceSm),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: AppTheme.glassBorder),
       ),
       child: Column(
         children: [
@@ -344,7 +342,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               color: AppTheme.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.spaceXs),
           Text(
             value,
             style: AppTheme.num(
@@ -394,11 +392,10 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
   ) {
     if (state.exercises.isEmpty) {
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXxxl, horizontal: AppTheme.spaceXl),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Column(
           children: [
@@ -407,7 +404,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               size: 32,
               color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.spaceMd),
             const Text(
               'No exercises added yet',
               style: TextStyle(
@@ -416,7 +413,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppTheme.spaceXs),
             Text(
               'Tap below to browse the catalog and add exercises to your routine.',
               textAlign: TextAlign.center,
@@ -463,9 +460,8 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
       key: key,
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: InkWell(
         onTap: () async {
@@ -477,7 +473,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             controller.updateExercise(index, updated);
           }
         },
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Row(
@@ -487,7 +483,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: AppTheme.neonCyan.withValues(alpha: 0.15),
+                  color: AppTheme.primary.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -496,11 +492,11 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                   style: AppTheme.num(
                     12,
                     weight: FontWeight.w800,
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppTheme.spaceMd),
               // Exercise Info & Targets
               Expanded(
                 child: Column(
@@ -516,7 +512,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.spaceXs),
                     Text(
                       '${exercise.setsCount} sets · ${exercise.targetSummary} · ${exercise.restSeconds}s rest',
                       style: AppTheme.num(
@@ -533,13 +529,13 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                 size: 16,
                 color: AppTheme.textSecondary,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.spaceSm),
               // Delete button (Law L7)
               IconButton(
                 icon: const Icon(
                   LucideIcons.trash2,
                   size: 16,
-                  color: AppTheme.burntOrange,
+                  color: AppTheme.warning,
                 ),
                 onPressed: () => _confirmRemoveExercise(context, index, exName, controller),
                 visualDensity: VisualDensity.compact,
@@ -548,7 +544,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               ReorderableDragStartListener(
                 index: index,
                 child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  padding: EdgeInsets.symmetric(horizontal: AppTheme.spaceXs, vertical: AppTheme.spaceSm),
                   child: Icon(
                     LucideIcons.gripVertical,
                     size: 18,
@@ -570,8 +566,8 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     return OutlinedButton.icon(
       onPressed: () => _openExercisePicker(context, controller),
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppTheme.neonCyan,
-        side: const BorderSide(color: AppTheme.neonCyan, width: 1.2),
+        foregroundColor: AppTheme.primary,
+        side: const BorderSide(color: AppTheme.primary, width: 1.2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         padding: const EdgeInsets.symmetric(vertical: 14),
       ),
@@ -588,8 +584,8 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     RoutineEditorState state,
   ) {
     return Container(
-      color: const Color(0xFF101012),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      color: AppTheme.surfaceElevated,
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceMd, AppTheme.spaceLg, AppTheme.spaceLg),
       child: SafeArea(
         top: false,
         child: SizedBox(
@@ -598,8 +594,8 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
           child: ElevatedButton(
             onPressed: state.isSaving ? null : () => _handleSave(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.neonCyan,
-              foregroundColor: AppTheme.oledBlack,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.background,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
@@ -607,11 +603,11 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             ),
             child: state.isSaving
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: AppTheme.spaceXl,
+                    height: AppTheme.spaceXl,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppTheme.oledBlack,
+                      color: AppTheme.background,
                     ),
                   )
                 : Text(
@@ -653,11 +649,6 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141416),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppTheme.glassBorder),
-        ),
         title: const Text(
           'Remove Exercise?',
           style: TextStyle(
@@ -682,7 +673,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.burntOrange,
+              backgroundColor: AppTheme.warning,
               foregroundColor: AppTheme.textPrimary,
             ),
             onPressed: () {

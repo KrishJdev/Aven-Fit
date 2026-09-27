@@ -241,7 +241,7 @@ class ActiveWorkoutController extends _$ActiveWorkoutController {
     }
 
     // Write-through FIRST, then UI lock (L7): the confirmed values hit SQLite
-    // synchronously before the row renders Volt-Green locked.
+    // synchronously before the row renders secondary-color locked.
     var updatedSet = targetSet.copyWith(
       isCompleted: true,
       completedAt: DateTime.now(),

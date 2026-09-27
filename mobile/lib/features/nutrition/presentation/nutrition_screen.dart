@@ -29,13 +29,13 @@ class NutritionScreen extends ConsumerWidget {
     final isToday = state.day == today;
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Column(
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceMd, AppTheme.spaceLg, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -52,7 +52,7 @@ class NutritionScreen extends ConsumerWidget {
 
             // Day navigation (§11.1): ← Today → ; the future is unreachable.
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm, vertical: AppTheme.spaceXs),
               child: Row(
                 children: [
                   IconButton(
@@ -81,7 +81,7 @@ class NutritionScreen extends ConsumerWidget {
                     icon: Icon(
                       LucideIcons.chevronRight,
                       color: isToday
-                          ? AppTheme.glassBorder
+                          ? AppTheme.border
                           : AppTheme.textPrimary,
                       size: 20,
                     ),
@@ -91,11 +91,11 @@ class NutritionScreen extends ConsumerWidget {
               ),
             ),
 
-            const Divider(color: AppTheme.glassBorder, height: 1),
+            const Divider(color: AppTheme.border, height: 1),
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceMd, AppTheme.spaceLg, AppTheme.spaceXxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -103,7 +103,7 @@ class NutritionScreen extends ConsumerWidget {
                     // goals are set, never a nag (L4).
                     if (state.hasCalorieGoal) ...[
                       _CaloriesCard(state: state),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.spaceLg),
                     ],
 
                     // Four meal sections (§11.1).
@@ -124,7 +124,7 @@ class NutritionScreen extends ConsumerWidget {
                         onRemoveItem: (entry) =>
                             _confirmRemove(context, ref, entry),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppTheme.spaceMd),
                     ],
 
                     // Daily totals summary (§11.1).
@@ -149,10 +149,6 @@ class NutritionScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.oledBlack,
-        shape: const RoundedRectangleBorder(
-          side: BorderSide(color: AppTheme.glassBorder),
-        ),
         title: const Text(
           'Remove item?',
           style: TextStyle(
@@ -175,14 +171,13 @@ class NutritionScreen extends ConsumerWidget {
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.burntOrange),
-              shape: const RoundedRectangleBorder(),
+              side: const BorderSide(color: AppTheme.warning),
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: const Text(
               'REMOVE',
               style: TextStyle(
-                color: AppTheme.burntOrange,
+                color: AppTheme.warning,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -219,10 +214,9 @@ class _CaloriesCard extends StatelessWidget {
       key: const ValueKey('calories_remaining_card'),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -234,7 +228,7 @@ class _CaloriesCard extends StatelessWidget {
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.spaceSm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -243,7 +237,7 @@ class _CaloriesCard extends StatelessWidget {
                 style: AppTheme.num(
                   32,
                   weight: FontWeight.w700,
-                  color: AppTheme.neonCyan,
+                  color: AppTheme.primary,
                 ),
               ),
               const SizedBox(width: 6),
@@ -270,7 +264,7 @@ class _CaloriesCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppTheme.spaceLg),
           // Protein first-class (§11.1/§11.9), then carbs and fat. Bars
           // render only for set targets — a percentage of nothing would be
           // a fake verdict (L4/L6).
@@ -312,10 +306,9 @@ class _DailyTotalsCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -341,7 +334,7 @@ class _DailyTotalsCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -350,12 +343,12 @@ class _DailyTotalsCard extends StatelessWidget {
                 style: AppTheme.num(
                   28,
                   weight: FontWeight.w700,
-                  color: AppTheme.neonCyan,
+                  color: AppTheme.primary,
                 ),
               ),
               const SizedBox(width: 6),
               const Padding(
-                padding: EdgeInsets.only(bottom: 4),
+                padding: EdgeInsets.only(bottom: AppTheme.spaceXs),
                 child: Text(
                   'kcal',
                   style: TextStyle(
@@ -366,7 +359,7 @@ class _DailyTotalsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           _TotalsRow(label: 'PROTEIN', grams: totals?.proteinG ?? 0),
           _TotalsRow(label: 'CARBS', grams: totals?.carbsG ?? 0),
           _TotalsRow(label: 'FAT', grams: totals?.fatG ?? 0),

@@ -89,40 +89,48 @@ class _WarmupPyramidSheetState extends State<WarmupPyramidSheet> {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: const EdgeInsets.fromLTRB(
+          AppTheme.spaceXl,
+          AppTheme.spaceLg,
+          AppTheme.spaceXl,
+          AppTheme.spaceXxl,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(LucideIcons.flame, color: AppTheme.burntOrange, size: 22),
-                const SizedBox(width: 8),
+                const Icon(LucideIcons.flame, color: AppTheme.warning, size: 22),
+                const SizedBox(width: AppTheme.spaceSm),
                 Text(
                   'WARM-UP PYRAMID',
-                  style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
+                  style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(LucideIcons.x, color: AppTheme.textSecondary, size: 20),
+                  icon: const Icon(LucideIcons.x, color: AppTheme.textSecondary, size: AppTheme.iconAction),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'Auto-generates progressive warm-up sets. Excluded from working volume & PRs.',
               style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
 
             // Target Working Weight Field
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spaceMd + 2,
+                vertical: AppTheme.spaceSm,
+              ),
               decoration: BoxDecoration(
-                color: AppTheme.glassFill,
-                border: Border.all(color: AppTheme.glassBorder),
-                borderRadius: BorderRadius.circular(8),
+                color: AppTheme.surface,
+                border: Border.all(color: AppTheme.border),
+                borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
               ),
               child: Row(
                 children: [
@@ -141,7 +149,7 @@ class _WarmupPyramidSheetState extends State<WarmupPyramidSheet> {
                       controller: _weightController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       textAlign: TextAlign.right,
-                      style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.neonCyan),
+                      style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.primary),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         suffixText: ' kg',
@@ -163,40 +171,45 @@ class _WarmupPyramidSheetState extends State<WarmupPyramidSheet> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
 
             // Ladder Preview Table
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF16191D),
-                border: Border.all(color: AppTheme.glassBorder),
-                borderRadius: BorderRadius.circular(8),
+                color: AppTheme.surfaceElevated,
+                borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
               ),
               child: Column(
                 children: [
                   ...ladder.map((step) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spaceMd + 2,
+                          vertical: AppTheme.spaceSm,
+                        ),
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppTheme.spaceXs + 2,
+                                vertical: AppTheme.spaceXxs,
+                              ),
                               decoration: BoxDecoration(
-                                color: AppTheme.burntOrange.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(4),
+                                color: AppTheme.warningMuted,
+                                borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
                               ),
                               child: Text(
                                 'W${step.step}',
                                 style: const TextStyle(
-                                  color: AppTheme.burntOrange,
+                                  color: AppTheme.warning,
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: AppTheme.spaceMd),
                             Text(
                               '${step.weight} kg × ${step.reps}',
-                              style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
+                              style: AppTheme.num(14, weight: FontWeight.w700, color: AppTheme.textPrimary),
                             ),
                             const Spacer(),
                             Text(
@@ -213,23 +226,22 @@ class _WarmupPyramidSheetState extends State<WarmupPyramidSheet> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
 
             // Insert Button
             SizedBox(
               width: double.infinity,
-              height: 46,
+              height: AppTheme.buttonHeight - 2,
               child: FilledButton.icon(
                 onPressed: () {
                   widget.onGenerate(_workingWeight);
                   Navigator.of(context).pop();
                 },
-                icon: const Icon(LucideIcons.plus, size: 18),
+                icon: const Icon(LucideIcons.plus, size: AppTheme.iconSmall),
                 label: const Text('INSERT WARM-UP SETS'),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.burntOrange,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  backgroundColor: AppTheme.warning,
+                  foregroundColor: AppTheme.textOnPrimary,
                 ),
               ),
             ),

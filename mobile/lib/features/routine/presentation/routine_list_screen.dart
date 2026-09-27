@@ -36,7 +36,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
     final routinesAsync = ref.watch(routineListControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -82,10 +82,10 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppTheme.neonCyan,
-        foregroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.background,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
         icon: const Icon(LucideIcons.plus, size: 20),
         label: const Text(
           'NEW ROUTINE',
@@ -98,11 +98,11 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceLg),
       decoration: const BoxDecoration(
-        color: AppTheme.oledBlack,
+        color: AppTheme.background,
         border: Border(
-          bottom: BorderSide(color: AppTheme.glassBorder, width: 1),
+          bottom: BorderSide(color: AppTheme.border, width: 1),
         ),
       ),
       child: Column(
@@ -123,7 +123,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     'Workout splits & templates',
                     style: TextStyle(
@@ -137,13 +137,13 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 onPressed: () => context.push('/exercises'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.textSecondary,
-                  side: const BorderSide(color: AppTheme.glassBorder),
+                  side: const BorderSide(color: AppTheme.border),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: AppTheme.spaceMd,
+                    vertical: AppTheme.spaceSm,
                   ),
                 ),
                 icon: const Icon(LucideIcons.dumbbell, size: 16),
@@ -158,13 +158,13 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           Container(
             height: 44,
             decoration: BoxDecoration(
-              color: AppTheme.glassFill,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppTheme.glassBorder),
+              border: Border.all(color: AppTheme.border),
             ),
             child: TextField(
               controller: _searchController,
@@ -196,8 +196,8 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                     : null,
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
+                  horizontal: AppTheme.spaceMd,
+                  vertical: AppTheme.spaceMd,
                 ),
               ),
             ),
@@ -209,9 +209,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
 
   Widget _buildRoutinesList(BuildContext context, List<Routine> routines) {
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceLg, 88),
       itemCount: routines.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      separatorBuilder: (context, index) => const SizedBox(height: AppTheme.spaceMd),
       itemBuilder: (context, index) {
         final routine = routines[index];
         return _buildRoutineCard(context, routine);
@@ -222,15 +222,14 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   Widget _buildRoutineCard(BuildContext context, Routine routine) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder, width: 1),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: InkWell(
         onTap: () => context.push('/routines/${routine.id}'),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppTheme.spaceLg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -252,7 +251,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                         ),
                         if (routine.description != null &&
                             routine.description!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
+                          const SizedBox(height: AppTheme.spaceXs),
                           Text(
                             routine.description!,
                             maxLines: 2,
@@ -269,7 +268,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                   _buildRoutineMenu(context, routine),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               // Tags Row
               Wrap(
                 spacing: 8,
@@ -277,7 +276,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 children: [
                   _buildMetricTag(
                     label: '${routine.exerciseCount} EXERCISES',
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                   ),
                   _buildMetricTag(
                     label: '${routine.totalSets} SETS',
@@ -286,26 +285,26 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                   _buildMetricTag(
                     icon: LucideIcons.clock,
                     label: '${routine.estimatedDurationMinutes} MIN',
-                    color: AppTheme.voltGreen,
+                    color: AppTheme.secondary,
                   ),
                 ],
               ),
               if (routine.exercises.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                const Divider(color: AppTheme.glassBorder, height: 1),
+                const SizedBox(height: AppTheme.spaceMd),
+                const Divider(color: AppTheme.border, height: 1),
                 const SizedBox(height: 10),
                 ...routine.exercises.take(3).map((e) {
                   final exName = e.exerciseName ??
                       e.exercise?.name ??
                       'Exercise';
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.only(bottom: AppTheme.spaceXs),
                     child: Row(
                       children: [
                         const Text(
                           '• ',
                           style: TextStyle(
-                            color: AppTheme.neonCyan,
+                            color: AppTheme.primary,
                             fontSize: 13,
                           ),
                         ),
@@ -332,7 +331,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                   );
                 }),
                 if (routine.exercises.length > 3) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     '+ ${routine.exercises.length - 3} more exercises',
                     style: TextStyle(
@@ -351,8 +350,8 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () => _handleStartWorkout(context, routine),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.neonCyan,
-                    foregroundColor: AppTheme.oledBlack,
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: AppTheme.background,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
@@ -382,7 +381,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm, vertical: AppTheme.spaceXs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
@@ -393,7 +392,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
         children: [
           if (icon != null) ...[
             Icon(icon, size: 12, color: color),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppTheme.spaceXs),
           ],
           Text(
             label,
@@ -415,10 +414,10 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
         color: AppTheme.textSecondary,
         size: 18,
       ),
-      color: const Color(0xFF141416),
+      color: AppTheme.surfaceElevated,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6),
-        side: const BorderSide(color: AppTheme.glassBorder),
+        side: const BorderSide(color: AppTheme.border),
       ),
       onSelected: (action) {
         if (action == 'edit') {
@@ -454,9 +453,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
           value: 'delete',
           child: Row(
             children: [
-              Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
+              Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
               SizedBox(width: 10),
-              Text('Delete', style: TextStyle(color: AppTheme.burntOrange)),
+              Text('Delete', style: TextStyle(color: AppTheme.warning)),
             ],
           ),
         ),
@@ -483,7 +482,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Duplicated "${routine.name}"'),
-          backgroundColor: const Color(0xFF1F1F24),
+          backgroundColor: AppTheme.surfaceElevated,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -494,11 +493,6 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141416),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppTheme.glassBorder),
-        ),
         title: const Text(
           'Delete Routine?',
           style: TextStyle(
@@ -523,7 +517,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.burntOrange,
+              backgroundColor: AppTheme.warning,
               foregroundColor: AppTheme.textPrimary,
             ),
             onPressed: () async {
@@ -542,7 +536,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl, vertical: AppTheme.spaceXxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -550,20 +544,20 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppTheme.neonCyan.withValues(alpha: 0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppTheme.neonCyan.withValues(alpha: 0.3),
+                  color: AppTheme.primary.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
               child: const Icon(
                 LucideIcons.dumbbell,
                 size: 36,
-                color: AppTheme.neonCyan,
+                color: AppTheme.primary,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             const Text(
               'NO ROUTINES YET',
               style: TextStyle(
@@ -573,7 +567,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 color: AppTheme.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'Create unlimited custom routines and workout splits to streamline your gym sessions.',
               textAlign: TextAlign.center,
@@ -583,15 +577,15 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 height: 1.4,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             SizedBox(
               width: 220,
               height: 44,
               child: ElevatedButton.icon(
                 onPressed: () => context.push('/routines/new'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.neonCyan,
-                  foregroundColor: AppTheme.oledBlack,
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.background,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -615,7 +609,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   Widget _buildNoSearchResults(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.spaceXxxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -633,7 +627,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             TextButton(
               onPressed: () {
                 _searchController.clear();
@@ -641,7 +635,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
               },
               child: const Text(
                 'CLEAR SEARCH',
-                style: TextStyle(color: AppTheme.neonCyan, fontSize: 13),
+                style: TextStyle(color: AppTheme.primary, fontSize: 13),
               ),
             ),
           ],

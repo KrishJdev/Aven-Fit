@@ -50,9 +50,9 @@ class _CreateCustomExerciseScreenState
         ref.watch(createCustomExerciseControllerProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
@@ -78,31 +78,31 @@ class _CreateCustomExerciseScreenState
           return Form(
             key: _formKey,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppTheme.spaceLg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (_errorMessage != null) ...[
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(AppTheme.spaceMd),
                       decoration: BoxDecoration(
-                        color: AppTheme.burntOrange.withValues(alpha: 0.15),
-                        border: Border.all(color: AppTheme.burntOrange),
+                        color: AppTheme.warning.withValues(alpha: 0.15),
+                        border: Border.all(color: AppTheme.warning),
                       ),
                       child: Row(
                         children: [
                           const Icon(
                             LucideIcons.alertCircle,
                             size: 18,
-                            color: AppTheme.burntOrange,
+                            color: AppTheme.warning,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppTheme.spaceSm),
                           Expanded(
                             child: Text(
                               _errorMessage!,
                               style: const TextStyle(
-                                color: AppTheme.burntOrange,
+                                color: AppTheme.warning,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -111,12 +111,12 @@ class _CreateCustomExerciseScreenState
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppTheme.spaceLg),
                   ],
 
                   // Exercise Name
                   _SectionHeader(title: 'EXERCISE NAME *'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.spaceSm),
                   TextFormField(
                     controller: _nameController,
                     style: const TextStyle(color: AppTheme.textPrimary),
@@ -131,21 +131,21 @@ class _CreateCustomExerciseScreenState
                     },
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.spaceXl),
 
                   // Primary Muscle Group
                   _SectionHeader(title: 'PRIMARY MUSCLE DRIVER *'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.spaceSm),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
                     decoration: BoxDecoration(
-                      color: AppTheme.glassFill,
-                      border: Border.all(color: AppTheme.glassBorder),
+                      color: AppTheme.surface,
+                      border: Border.all(color: AppTheme.border),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _selectedPrimaryMuscleId,
-                        dropdownColor: const Color(0xFF1A1A1A),
+                        dropdownColor: AppTheme.surfaceActive,
                         isExpanded: true,
                         icon: const Icon(
                           LucideIcons.chevronDown,
@@ -172,11 +172,11 @@ class _CreateCustomExerciseScreenState
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.spaceXl),
 
                   // Secondary Muscle Groups (Optional)
                   _SectionHeader(title: 'SECONDARY MUSCLES / STABILIZERS (OPTIONAL)'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.spaceSm),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -188,17 +188,17 @@ class _CreateCustomExerciseScreenState
                       return FilterChip(
                         label: Text(mg.name),
                         selected: isSelected,
-                        selectedColor: AppTheme.neonCyan.withValues(alpha: 0.2),
-                        checkmarkColor: AppTheme.neonCyan,
-                        backgroundColor: AppTheme.glassFill,
+                        selectedColor: AppTheme.primary.withValues(alpha: 0.2),
+                        checkmarkColor: AppTheme.primary,
+                        backgroundColor: AppTheme.surface,
                         side: BorderSide(
                           color: isSelected
-                              ? AppTheme.neonCyan
-                              : AppTheme.glassBorder,
+                              ? AppTheme.primary
+                              : AppTheme.border,
                         ),
                         labelStyle: TextStyle(
                           color: isSelected
-                              ? AppTheme.neonCyan
+                              ? AppTheme.primary
                               : AppTheme.textSecondary,
                           fontSize: 12,
                         ),
@@ -216,7 +216,7 @@ class _CreateCustomExerciseScreenState
                     }).toList(),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.spaceXl),
 
                   // Equipment & Category
                   Row(
@@ -227,11 +227,11 @@ class _CreateCustomExerciseScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _SectionHeader(title: 'EQUIPMENT *'),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppTheme.spaceSm),
                             _buildDropdownContainer(
                               child: DropdownButton<Equipment>(
                                 value: _selectedEquipment,
-                                dropdownColor: const Color(0xFF1A1A1A),
+                                dropdownColor: AppTheme.surfaceActive,
                                 isExpanded: true,
                                 icon: const Icon(
                                   LucideIcons.chevronDown,
@@ -259,7 +259,7 @@ class _CreateCustomExerciseScreenState
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppTheme.spaceMd),
 
                       // Category Dropdown
                       Expanded(
@@ -267,11 +267,11 @@ class _CreateCustomExerciseScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _SectionHeader(title: 'CATEGORY *'),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppTheme.spaceSm),
                             _buildDropdownContainer(
                               child: DropdownButton<ExerciseCategory>(
                                 value: _selectedCategory,
-                                dropdownColor: const Color(0xFF1A1A1A),
+                                dropdownColor: AppTheme.surfaceActive,
                                 isExpanded: true,
                                 icon: const Icon(
                                   LucideIcons.chevronDown,
@@ -302,11 +302,11 @@ class _CreateCustomExerciseScreenState
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.spaceXl),
 
                   // Instructions / Notes
                   _SectionHeader(title: 'INSTRUCTIONS / FORM NOTES (OPTIONAL)'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppTheme.spaceSm),
                   TextFormField(
                     controller: _instructionsController,
                     maxLines: 3,
@@ -316,7 +316,7 @@ class _CreateCustomExerciseScreenState
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppTheme.spaceXl),
 
                   // Tracking Modes (Time-based / Cardio)
                   Row(
@@ -329,8 +329,8 @@ class _CreateCustomExerciseScreenState
                             style: TextStyle(color: AppTheme.textPrimary, fontSize: 13),
                           ),
                           value: _isTimeBased,
-                          activeColor: AppTheme.neonCyan,
-                          checkColor: AppTheme.oledBlack,
+                          activeColor: AppTheme.primary,
+                          checkColor: AppTheme.background,
                           controlAffinity: ListTileControlAffinity.leading,
                           onChanged: (val) {
                             setState(() => _isTimeBased = val ?? false);
@@ -345,8 +345,8 @@ class _CreateCustomExerciseScreenState
                             style: TextStyle(color: AppTheme.textPrimary, fontSize: 13),
                           ),
                           value: _isCardio,
-                          activeColor: AppTheme.neonCyan,
-                          checkColor: AppTheme.oledBlack,
+                          activeColor: AppTheme.primary,
+                          checkColor: AppTheme.background,
                           controlAffinity: ListTileControlAffinity.leading,
                           onChanged: (val) {
                             setState(() => _isCardio = val ?? false);
@@ -356,7 +356,7 @@ class _CreateCustomExerciseScreenState
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppTheme.spaceXxl),
 
                   // Save Button
                   SizedBox(
@@ -365,8 +365,8 @@ class _CreateCustomExerciseScreenState
                     child: ElevatedButton(
                       onPressed: _isSaving ? null : _saveExercise,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.neonCyan,
-                        foregroundColor: AppTheme.oledBlack,
+                        backgroundColor: AppTheme.primary,
+                        foregroundColor: AppTheme.background,
                         shape: const RoundedRectangleBorder(),
                       ),
                       child: _isSaving
@@ -375,7 +375,7 @@ class _CreateCustomExerciseScreenState
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppTheme.oledBlack,
+                                color: AppTheme.background,
                               ),
                             )
                           : const Text(
@@ -412,8 +412,8 @@ class _CreateCustomExerciseScreenState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.border),
       ),
       child: DropdownButtonHideUnderline(child: child),
     );
@@ -424,22 +424,22 @@ class _CreateCustomExerciseScreenState
       hintText: hintText,
       hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
       filled: true,
-      fillColor: AppTheme.glassFill,
-      enabledBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.glassBorder),
-        borderRadius: BorderRadius.zero,
+      fillColor: AppTheme.surface,
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: AppTheme.border),
+        borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
       ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.neonCyan),
-        borderRadius: BorderRadius.zero,
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: AppTheme.primary),
+        borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
       ),
-      errorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.burntOrange),
-        borderRadius: BorderRadius.zero,
+      errorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: AppTheme.warning),
+        borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
       ),
-      focusedErrorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: AppTheme.burntOrange),
-        borderRadius: BorderRadius.zero,
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: AppTheme.warning),
+        borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
       ),
     );
   }

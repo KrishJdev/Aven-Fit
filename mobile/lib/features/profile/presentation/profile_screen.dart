@@ -25,35 +25,35 @@ class ProfileScreen extends ConsumerWidget {
     final auth = state.auth;
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white, size: 22),
+          icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.textPrimary, size: 22),
           onPressed: () => context.pop(),
         ),
         title: Text(
           l10nOf(context).profileTitle,
-          style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXxl),
         children: [
           _IdentityHeader(auth: auth),
           // Guest upgrade banner (§5.4/§12.1): informative, never a wall.
           // A broken auth store renders like Guest (L2).
           if (auth is AuthGuest || auth is AuthError) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.spaceMd),
             const _GuestUpgradeBanner(),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           _LifetimeStatsGrid(stats: state.stats),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           const _QuickLinks(),
           if (auth is AuthAuthenticated) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.spaceMd),
             _SignOutTile(onConfirm: () async {
               await ref.read(profileControllerProvider.notifier).signOut();
             }),
@@ -119,11 +119,10 @@ class _IdentityHeader extends StatelessWidget {
 
     return Container(
       key: const ValueKey('profile_identity_card'),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Row(
         children: [
@@ -132,15 +131,15 @@ class _IdentityHeader extends StatelessWidget {
             height: 56,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: AppTheme.glassFill,
+              color: AppTheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: AppTheme.glassBorder),
+              border: Border.all(color: AppTheme.border),
             ),
             child: identity.initial != null
                 ? Text(
                     identity.initial!,
                     style: AppTheme.num(22, weight: FontWeight.w700,
-                        color: AppTheme.neonCyan),
+                        color: AppTheme.primary),
                   )
                 : const Icon(
                     LucideIcons.userRound,
@@ -164,7 +163,7 @@ class _IdentityHeader extends StatelessWidget {
                   ),
                 ),
                 if (identity.subtitle.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     identity.subtitle,
                     style: const TextStyle(
@@ -194,14 +193,14 @@ class _GuestUpgradeBanner extends StatelessWidget {
       key: const ValueKey('profile_upgrade_banner'),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.neonCyan.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.neonCyan),
+        color: AppTheme.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.primary),
       ),
       child: Row(
         children: [
-          const Icon(LucideIcons.shieldCheck, size: 20, color: AppTheme.neonCyan),
-          const SizedBox(width: 12),
+          const Icon(LucideIcons.shieldCheck, size: 20, color: AppTheme.primary),
+          const SizedBox(width: AppTheme.spaceMd),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,9 +208,9 @@ class _GuestUpgradeBanner extends StatelessWidget {
                 Text(
                   l10n.profileBannerTitle,
                   style: AppTheme.num(11, weight: FontWeight.w700,
-                      color: AppTheme.neonCyan),
+                      color: AppTheme.primary),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.spaceXxs),
                 Text(
                   l10n.profileBannerMessage,
                   style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
@@ -226,8 +225,8 @@ class _GuestUpgradeBanner extends StatelessWidget {
               key: const ValueKey('profile_sign_in_button'),
               onPressed: () => context.push('/auth/login'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.neonCyan,
-                foregroundColor: AppTheme.oledBlack,
+                backgroundColor: AppTheme.primary,
+                foregroundColor: AppTheme.background,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 shape: const RoundedRectangleBorder(),
               ),
@@ -301,7 +300,7 @@ class _LifetimeStatsGrid extends StatelessWidget {
   }
 }
 
-/// Single glass stat cell — tabular numerals so stacked columns align.
+/// Single surface stat cell — tabular numerals so stacked columns align.
 class _StatCell extends StatelessWidget {
   const _StatCell({
     required this.label,
@@ -316,11 +315,10 @@ class _StatCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,7 +329,7 @@ class _StatCell extends StatelessWidget {
             style: AppTheme.num(10, weight: FontWeight.w700,
                 color: AppTheme.textSecondary),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.spaceXs),
           Text(
             key: ValueKey(valueKey),
             value,
@@ -356,7 +354,7 @@ class _QuickLinks extends StatelessWidget {
         SnackBar(
           key: const ValueKey('profile_snackbar'),
           content: Text(message),
-          backgroundColor: const Color(0xFF1A1A1A),
+          backgroundColor: AppTheme.surfaceActive,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -367,12 +365,10 @@ class _QuickLinks extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: const RoundedRectangleBorder(),
         title: Text(
           'AVEN FIT',
           style: AppTheme.num(18, weight: FontWeight.w700,
-              color: AppTheme.neonCyan),
+              color: AppTheme.primary),
         ),
         content: Text(
           l10n.aboutMessage,
@@ -394,9 +390,8 @@ class _QuickLinks extends StatelessWidget {
     return Container(
       key: const ValueKey('profile_quick_links'),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         children: [
@@ -406,14 +401,14 @@ class _QuickLinks extends StatelessWidget {
             label: l10n.linkSettings,
             onTap: () => _showNotice(context, l10n.settingsComingSoon),
           ),
-          const Divider(height: 1, color: AppTheme.glassBorder),
+          const Divider(height: 1, color: AppTheme.border),
           _LinkRow(
             key: const ValueKey('profile_link_export'),
             icon: LucideIcons.download,
             label: l10n.linkDataExport,
             onTap: () => _showNotice(context, l10n.dataExportComingSoon),
           ),
-          const Divider(height: 1, color: AppTheme.glassBorder),
+          const Divider(height: 1, color: AppTheme.border),
           _LinkRow(
             key: const ValueKey('profile_link_about'),
             icon: LucideIcons.info,
@@ -426,7 +421,7 @@ class _QuickLinks extends StatelessWidget {
   }
 }
 
-/// Single glass quick-link row.
+/// Single surface quick-link row.
 class _LinkRow extends StatelessWidget {
   const _LinkRow({
     required this.icon,
@@ -443,13 +438,13 @@ class _LinkRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         child: Row(
           children: [
             Icon(icon, size: 18, color: AppTheme.textSecondary),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppTheme.spaceMd),
             Expanded(
               child: Text(
                 label,
@@ -483,8 +478,6 @@ class _SignOutTile extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A1A),
-        shape: const RoundedRectangleBorder(),
         title: Text(
           l10n.signOutTitle,
           style: AppTheme.num(16, weight: FontWeight.w700,
@@ -503,7 +496,7 @@ class _SignOutTile extends StatelessWidget {
           TextButton(
             key: const ValueKey('profile_sign_out_confirm'),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppTheme.burntOrange),
+            style: TextButton.styleFrom(foregroundColor: AppTheme.warning),
             child: Text(
               l10n.signOutConfirm,
               style: const TextStyle(fontWeight: FontWeight.w700),
@@ -522,25 +515,25 @@ class _SignOutTile extends StatelessWidget {
     final l10n = l10nOf(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.border),
       ),
       child: InkWell(
         key: const ValueKey('profile_sign_out_button'),
         onTap: () => _confirmAndSignOut(context),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
           child: Row(
             children: [
-              const Icon(LucideIcons.logOut, size: 18, color: AppTheme.burntOrange),
-              const SizedBox(width: 12),
+              const Icon(LucideIcons.logOut, size: 18, color: AppTheme.warning),
+              const SizedBox(width: AppTheme.spaceMd),
               Expanded(
                 child: Text(
                   l10n.signOutConfirm,
                   style: const TextStyle(
-                    color: AppTheme.burntOrange,
+                    color: AppTheme.warning,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,

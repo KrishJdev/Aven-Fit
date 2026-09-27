@@ -30,7 +30,7 @@ mobile/lib/
 │   ├── network/                    # Dio HTTP client, interceptors & error handlers
 │   ├── router/                     # GoRouter declarative routing & shell navigation
 │   ├── sync/                       # WorkManager background dispatcher
-│   └── theme/                      # Sharp Glassmorphism design tokens & typography
+│   └── theme/                      # Design tokens & typography (see docs/UI_UX_DESIGN_SYSTEM.md)
 │
 └── features/                       # Self-contained vertical feature slices
     ├── workout/                    # Active workout engine & session tracking
@@ -110,7 +110,7 @@ flowchart TD
 - **Components:**
   - **UI State (`@freezed`):** Pure immutable state record representing the complete visual state of a screen (e.g. current session, set list, rest timer countdown, loading state, error banners).
   - **Store / Controller (`@riverpod` / `AsyncNotifier`):** Unidirectional state container. Listens to repository streams, processes user actions, updates state immutably, and triggers write operations.
-  - **Declarative View (`ConsumerWidget`):** Fast, stateless or lifecycle-aware widgets observing Riverpod providers and styling widgets with Sharp Glassmorphism design tokens (`AppTheme`).
+  - **Declarative View (`ConsumerWidget`):** Fast, stateless or lifecycle-aware widgets observing Riverpod providers and styling widgets with design tokens from `AppTheme` (see `docs/UI_UX_DESIGN_SYSTEM.md`).
 - **Rule:** Explicitly NO legacy `ChangeNotifier`, two-way binding, or state mutations inside widgets.
 
 ---
@@ -191,5 +191,5 @@ Step 5: Verification & Codegen
 - **Model Generation:** Freezed 4 (`freezed: ^4.0.1`, `freezed_annotation: ^3.1.0`)
 - **Networking:** Dio 5.8+ (`dio: ^5.8.0+1`)
 - **Background Tasks:** WorkManager 0.10+ (`workmanager: ^0.10.9`)
-- **UI Design Token System:** Sharp Glassmorphism OLED Black (`AppTheme.oledBlack`, `AppTheme.neonCyan`, `AppTheme.voltGreen`, `AppTheme.burntOrange`)
+- **UI Design System:** See `docs/UI_UX_DESIGN_SYSTEM.md` for the authoritative visual token system, component patterns, and design review checklists
 - **Icons:** `lucide_icons_flutter: ^3.1.17`

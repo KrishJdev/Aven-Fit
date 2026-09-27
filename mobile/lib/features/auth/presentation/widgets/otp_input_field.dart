@@ -139,11 +139,11 @@ class _OtpInputFieldState extends State<OtpInputField>
                 height: 56,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppTheme.glassFill,
+                  color: AppTheme.surface,
                   border: Border.all(
                     color: filled || focused
-                        ? AppTheme.neonCyan
-                        : AppTheme.glassBorder,
+                        ? AppTheme.primary
+                        : AppTheme.border,
                     width: filled || focused ? 1.5 : 1,
                   ),
                 ),

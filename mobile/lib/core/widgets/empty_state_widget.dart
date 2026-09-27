@@ -6,7 +6,8 @@ import '../theme/app_theme.dart';
 /// optional explainer + optional action button — a list is never blank.
 ///
 /// Adherence-neutral by design (L4): the copy states the fact and, when
-/// an action exists, offers it once — no nags.
+/// an action exists, offers it once — no nags. v2 design system: solid
+/// [AppTheme.surface] fill, [AppTheme.radiusMd], no border (§11.5).
 class EmptyStateWidget extends StatelessWidget {
   const EmptyStateWidget({
     required this.icon,
@@ -26,55 +27,43 @@ class EmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceXxl),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.all(Radius.circular(AppTheme.radiusMd)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 28, color: AppTheme.textSecondary),
-          const SizedBox(height: 10),
+          Icon(icon, size: AppTheme.iconEmpty, color: AppTheme.textMuted),
+          const SizedBox(height: AppTheme.spaceSm),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: AppTheme.num(
-              12,
-              weight: FontWeight.w700,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
               color: AppTheme.textSecondary,
             ),
           ),
           if (message != null) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: AppTheme.spaceXs),
             Text(
               message!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12.5,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppTheme.textMuted),
             ),
           ],
           if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: 14),
-            SizedBox(
-              height: 38,
-              child: FilledButton(
-                onPressed: onAction,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  shape: const RoundedRectangleBorder(),
-                ),
-                child: Text(
-                  actionLabel!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.8,
-                  ),
-                ),
+            const SizedBox(height: AppTheme.spaceMd),
+            FilledButton(
+              onPressed: onAction,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg),
+              ),
+              child: Text(
+                actionLabel!.toUpperCase(),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.3),
               ),
             ),
           ],

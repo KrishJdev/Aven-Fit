@@ -54,9 +54,9 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
@@ -84,7 +84,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                     size: 48,
                     color: AppTheme.textSecondary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.spaceLg),
                   const Text(
                     'FOOD NOT FOUND',
                     style: TextStyle(
@@ -93,16 +93,16 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.spaceLg),
                   OutlinedButton(
                     onPressed: () => context.pop(),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppTheme.neonCyan),
+                      side: const BorderSide(color: AppTheme.primary),
                       shape: const RoundedRectangleBorder(),
                     ),
                     child: const Text(
                       'BACK TO SEARCH',
-                      style: TextStyle(color: AppTheme.neonCyan),
+                      style: TextStyle(color: AppTheme.primary),
                     ),
                   ),
                 ],
@@ -116,7 +116,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
+                      horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceMd),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -139,7 +139,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                         ],
                       ),
                       if (state.food.brand != null) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppTheme.spaceXs),
                         Text(
                           state.food.brand!,
                           style: const TextStyle(
@@ -149,7 +149,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                         ),
                       ],
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppTheme.spaceXl),
 
                       // Serving selector
                       _GlassCard(
@@ -168,18 +168,18 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                     letterSpacing: 0.8,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: AppTheme.spaceMd),
                                 if (state.unitOptions.length > 1)
                                   DropdownButton<String>(
                                     value: state.unit,
-                                    dropdownColor: AppTheme.oledBlack,
+                                    dropdownColor: AppTheme.background,
                                     style: const TextStyle(
                                       color: AppTheme.textPrimary,
                                       fontSize: 13,
                                     ),
                                     underline: Container(
                                       height: 1,
-                                      color: AppTheme.glassBorder,
+                                      color: AppTheme.border,
                                     ),
                                     items: state.unitOptions
                                         .map(
@@ -214,7 +214,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppTheme.spaceMd),
                             Wrap(
                               spacing: 8,
                               runSpacing: 8,
@@ -237,7 +237,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.spaceLg),
 
                       // Nutrition panel
                       _GlassCard(
@@ -253,7 +253,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                   style: AppTheme.num(
                                     32,
                                     weight: FontWeight.w700,
-                                    color: AppTheme.neonCyan,
+                                    color: AppTheme.primary,
                                   ),
                                 ),
                                 const SizedBox(width: 6),
@@ -269,7 +269,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: AppTheme.spaceMd),
                             _MacroRow(
                                 label: 'PROTEIN', grams: macros.proteinG),
                             _MacroRow(label: 'CARBS', grams: macros.carbsG),
@@ -282,7 +282,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppTheme.spaceLg),
 
                       // Meal selector
                       _GlassCard(
@@ -316,7 +316,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
               // Sticky log action
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceMd),
                   child: SizedBox(
                     width: double.infinity,
                     child: state.isLogging
@@ -324,7 +324,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                             onPressed: null,
                             style: ButtonStyle(
                               side: WidgetStatePropertyAll(
-                                BorderSide(color: AppTheme.glassBorder),
+                                BorderSide(color: AppTheme.border),
                               ),
                               shape: WidgetStatePropertyAll(
                                 RoundedRectangleBorder(),
@@ -346,7 +346,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                             onPressed: () => _log(context, controller),
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(
-                                color: AppTheme.voltGreen,
+                                color: AppTheme.secondary,
                               ),
                               shape: const RoundedRectangleBorder(),
                               padding:
@@ -355,7 +355,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                             child: Text(
                               'LOG TO ${state.mealType.label}',
                               style: const TextStyle(
-                                color: AppTheme.voltGreen,
+                                color: AppTheme.secondary,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
                               ),
@@ -408,10 +408,6 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
     final parsed = await showDialog<double>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.oledBlack,
-        shape: const RoundedRectangleBorder(
-          side: BorderSide(color: AppTheme.glassBorder),
-        ),
         title: Text(
           'Custom quantity (${_unitLabel(current.unit)})',
           style: const TextStyle(
@@ -444,7 +440,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.neonCyan),
+              side: const BorderSide(color: AppTheme.primary),
               shape: const RoundedRectangleBorder(),
             ),
             onPressed: () {
@@ -455,7 +451,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
             child: const Text(
               'APPLY',
               style: TextStyle(
-                color: AppTheme.neonCyan,
+                color: AppTheme.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -486,17 +482,16 @@ class _GlassCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: AppTheme.neonCyan),
-              const SizedBox(width: 8),
+              Icon(icon, size: 16, color: AppTheme.primary),
+              const SizedBox(width: AppTheme.spaceSm),
               Text(
                 title,
                 style: const TextStyle(
@@ -508,7 +503,7 @@ class _GlassCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           child,
         ],
       ),
@@ -532,19 +527,19 @@ class _QuantityChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppTheme.neonCyan.withValues(alpha: 0.15)
-              : AppTheme.glassFill,
+              ? AppTheme.primary.withValues(alpha: 0.15)
+              : AppTheme.surface,
           border: Border.all(
-            color: isSelected ? AppTheme.neonCyan : AppTheme.glassBorder,
+            color: isSelected ? AppTheme.primary : AppTheme.border,
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? AppTheme.neonCyan : AppTheme.textSecondary,
+            color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
             fontSize: 12,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),
@@ -568,7 +563,7 @@ class _MacroRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXs),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

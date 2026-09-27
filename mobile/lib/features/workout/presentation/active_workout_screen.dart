@@ -42,12 +42,12 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronDown, color: Colors.white, size: 22),
+          icon: const Icon(LucideIcons.chevronDown, color: AppTheme.textPrimary, size: 22),
           onPressed: () => context.pop(),
         ),
         title: stateAsync.whenOrNull(
@@ -65,7 +65,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                             child: Text(
                               state.session?.name ?? 'ACTIVE WORKOUT',
                               overflow: TextOverflow.ellipsis,
-                              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+                              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -75,7 +75,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                     )
                   : Text(
                       l10nOf(context).activeWorkoutTitle,
-                      style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.neonCyan),
+                      style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.primary),
                     ),
             ) ??
             const SizedBox.shrink(),
@@ -95,7 +95,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                                   : LucideIcons.pause,
                               size: 20,
                               color: state.session?.isPaused == true
-                                  ? AppTheme.voltGreen
+                                  ? AppTheme.secondary
                                   : AppTheme.textSecondary,
                             ),
                             tooltip: state.session?.isPaused == true
@@ -120,13 +120,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                               style: AppTheme.num(
                                 14,
                                 weight: FontWeight.w700,
-                                color: AppTheme.voltGreen,
+                                color: AppTheme.secondary,
                               ),
                             ),
                           ),
                           PopupMenuButton<String>(
                             icon: const Icon(LucideIcons.ellipsisVertical, color: AppTheme.textSecondary, size: 20),
-                            color: const Color(0xFF1B1F24),
+                            color: AppTheme.surfaceElevated,
                             onSelected: (val) {
                               if (val == 'cancel') {
                                 _confirmCancelWorkout(context, controller);
@@ -137,9 +137,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                                 value: 'cancel',
                                 child: Row(
                                   children: [
-                                    const Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
-                                    const SizedBox(width: 8),
-                                    Text(l10nOf(context).discardWorkout, style: const TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
+                                    const Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
+                                    const SizedBox(width: AppTheme.spaceSm),
+                                    Text(l10nOf(context).discardWorkout, style: const TextStyle(color: AppTheme.warning, fontSize: 13)),
                                   ],
                                 ),
                               ),
@@ -180,32 +180,32 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(LucideIcons.dumbbell, size: 64, color: AppTheme.textSecondary),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               l10n.noActiveWorkoutTitle,
-              style: AppTheme.num(20, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(20, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               l10n.noActiveWorkoutMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             FilledButton.icon(
               onPressed: () => controller.startWorkout(name: defaultName),
               icon: const Icon(LucideIcons.play, size: 18),
               label: Text(l10n.startEmptyWorkout),
               style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.neonCyan,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                backgroundColor: AppTheme.primary,
+                foregroundColor: AppTheme.textOnPrimary,
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxl, vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
               ),
             ),
           ],
@@ -222,23 +222,23 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     final l10n = l10nOf(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppTheme.spaceXxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.burntOrange),
-            const SizedBox(height: 16),
+            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.warning),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               l10n.couldNotLoadWorkout,
-              style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               error.toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             OutlinedButton(
               onPressed: () => controller.startWorkout(),
               child: Text(l10n.retry),
@@ -283,7 +283,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           child: exercises.isEmpty
               ? _buildNoExercisesPlaceholder(context, ref, controller)
               : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                  padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, 80),
                   itemCount: exercises.length,
                   itemBuilder: (context, index) {
                     final se = exercises[index];
@@ -320,31 +320,31 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     final l10n = l10nOf(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.spaceXxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(LucideIcons.plusCircle, size: 52, color: AppTheme.textSecondary),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               l10n.addYourFirstExercise,
-              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               l10n.addYourFirstExerciseMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             FilledButton.icon(
               onPressed: () => _openExercisePicker(context, controller),
               icon: const Icon(LucideIcons.plus, size: 16),
               label: Text(l10n.addExercise),
               style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.neonCyan,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                backgroundColor: AppTheme.primary,
+                foregroundColor: AppTheme.textOnPrimary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
               ),
             ),
           ],
@@ -359,21 +359,21 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     ActiveWorkoutState state,
   ) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+      margin: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, 0),
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceMd, AppTheme.spaceSm, AppTheme.spaceXs, AppTheme.spaceSm),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.neonCyan),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.primary),
       ),
       child: Row(
         children: [
-          const Icon(LucideIcons.rotateCcw, size: 16, color: AppTheme.neonCyan),
+          const Icon(LucideIcons.rotateCcw, size: 16, color: AppTheme.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               l10nOf(context).workoutResumedBanner(_formatElapsed(state.elapsedSeconds)),
-              style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.neonCyan),
+              style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.primary),
             ),
           ),
           IconButton(
@@ -394,12 +394,11 @@ class ActiveWorkoutScreen extends ConsumerWidget {
         : state.totalVolumeKg.toStringAsFixed(1);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceSm),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceMd),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -435,13 +434,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppTheme.spaceXs),
         Text(
           value,
           style: AppTheme.num(
             14,
             weight: FontWeight.w700,
-            color: isHighlight ? AppTheme.voltGreen : Colors.white,
+            color: isHighlight ? AppTheme.secondary : AppTheme.textPrimary,
           ),
         ),
       ],
@@ -456,11 +455,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           l10n.lockScreenCountdownTitle,
-          style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
         content: Text(
           l10n.lockScreenCountdownMessage,
@@ -480,8 +477,8 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               restNotifier.resolvePermissionPrimer(enable: true);
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.neonCyan,
-              foregroundColor: Colors.black,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.textOnPrimary,
             ),
             child: Text(l10n.allow),
           ),
@@ -497,8 +494,8 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     ActiveWorkoutController controller,
   ) {
     return Container(
-      color: AppTheme.oledBlack,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      color: AppTheme.background,
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceLg),
       child: SafeArea(
         top: false,
         child: Row(
@@ -511,14 +508,14 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                   icon: const Icon(LucideIcons.plus, size: 18),
                   label: Text(l10nOf(context).addExercise),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.neonCyan,
-                    side: const BorderSide(color: AppTheme.neonCyan),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    foregroundColor: AppTheme.primary,
+                    side: const BorderSide(color: AppTheme.primary),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppTheme.spaceMd),
             Expanded(
               child: SizedBox(
                 height: 48,
@@ -527,9 +524,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                   icon: const Icon(LucideIcons.check, size: 18),
                   label: Text(l10nOf(context).finish),
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.voltGreen,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: AppTheme.secondary,
+                    foregroundColor: AppTheme.textOnPrimary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                   ),
                 ),
               ),
@@ -562,15 +559,14 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
-        title: Text(l10n.renameWorkoutTitle, style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
+        title: Text(l10n.renameWorkoutTitle, style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary)),
         content: TextField(
           controller: textController,
           autofocus: true,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
           decoration: InputDecoration(
             hintText: l10n.workoutNameHint,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
           ),
         ),
         actions: [
@@ -585,7 +581,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               }
               Navigator.of(ctx).pop();
             },
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.neonCyan, foregroundColor: Colors.black),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: AppTheme.textOnPrimary),
             child: Text(l10n.dialogSave),
           ),
         ],
@@ -616,13 +612,12 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             l10nOf(context).finishSaveError,
             style: const TextStyle(color: AppTheme.textPrimary),
           ),
-          backgroundColor: const Color(0xFF16191D),
           behavior: SnackBarBehavior.floating,
           duration: const Duration(seconds: 6),
           action: SnackBarAction(
             key: const ValueKey('finish_save_error_retry'),
             label: l10nOf(context).retry,
-            textColor: AppTheme.neonCyan,
+            textColor: AppTheme.primary,
             onPressed: () => _finishAndNavigate(context, controller),
           ),
         ),
@@ -634,11 +629,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           l10n.finishWorkoutTitle,
-          style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
+          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
         content: Text(
           l10n.finishWorkoutMessage,
@@ -654,7 +647,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
               await _finishAndNavigate(context, controller);
             },
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.voltGreen, foregroundColor: Colors.black),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.secondary, foregroundColor: AppTheme.textOnPrimary),
             child: Text(l10n.finishAndSave),
           ),
         ],
@@ -667,11 +660,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           l10n.discardWorkoutTitle,
-          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.burntOrange),
+          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.warning),
         ),
         content: Text(
           l10n.discardWorkoutMessage,
@@ -687,7 +678,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
               controller.cancelWorkout();
             },
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.burntOrange, foregroundColor: Colors.white),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.warning, foregroundColor: AppTheme.textPrimary),
             child: Text(l10n.discard),
           ),
         ],
@@ -766,10 +757,10 @@ class _ElapsedStatColumnState extends State<_ElapsedStatColumn> {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppTheme.spaceXs),
         Text(
           ActiveWorkoutScreen._formatElapsed(seconds),
-          style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
+          style: AppTheme.num(14, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
       ],
     );

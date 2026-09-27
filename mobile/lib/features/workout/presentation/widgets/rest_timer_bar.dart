@@ -19,26 +19,31 @@ class RestTimerBar extends ConsumerWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFF11222C),
-      padding: const EdgeInsets.fromLTRB(16, 6, 8, 8),
+      color: AppTheme.surfaceElevated,
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.spaceLg,
+        AppTheme.spaceSm,
+        AppTheme.spaceSm,
+        AppTheme.spaceSm,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.timer, size: 18, color: AppTheme.neonCyan),
-              const SizedBox(width: 8),
+              const Icon(LucideIcons.timer, size: AppTheme.iconSection, color: AppTheme.primary),
+              const SizedBox(width: AppTheme.spaceSm),
               Text(
                 l10nOf(context).restTimerLabel,
-                style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.neonCyan),
+                style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.primary),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppTheme.spaceXs + 2),
               Text(
                 restState.remainingDisplay,
-                style: AppTheme.num(15, weight: FontWeight.w700, color: Colors.white),
+                style: AppTheme.num(15, weight: FontWeight.w700, color: AppTheme.textPrimary),
               ),
               if (restState.exerciseName != null) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.spaceSm),
                 Flexible(
                   child: Text(
                     restState.exerciseName!,
@@ -58,26 +63,26 @@ class RestTimerBar extends ConsumerWidget {
               ),
               IconButton(
                 onPressed: restNotifier.restart,
-                icon: const Icon(LucideIcons.rotateCcw, size: 16, color: AppTheme.textSecondary),
+                icon: const Icon(LucideIcons.rotateCcw, size: AppTheme.iconSmall, color: AppTheme.textSecondary),
                 tooltip: l10nOf(context).restartRestTooltip,
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
                 onPressed: restNotifier.cancel,
-                icon: const Icon(LucideIcons.x, size: 16, color: AppTheme.textSecondary),
+                icon: const Icon(LucideIcons.x, size: AppTheme.iconSmall, color: AppTheme.textSecondary),
                 tooltip: l10nOf(context).skipRestTooltip,
                 visualDensity: VisualDensity.compact,
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.spaceXs),
           ClipRRect(
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusFull)),
             child: LinearProgressIndicator(
               value: restState.progressFraction,
               minHeight: 3,
-              backgroundColor: Colors.white.withValues(alpha: 0.08),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.neonCyan),
+              backgroundColor: AppTheme.border,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
             ),
           ),
         ],
@@ -97,12 +102,12 @@ class _RestAdjustButton extends StatelessWidget {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm),
         minimumSize: const Size(0, 36),
       ),
       child: Text(
         label,
-        style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.neonCyan),
+        style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.primary),
       ),
     );
   }

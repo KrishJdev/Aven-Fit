@@ -266,7 +266,7 @@ void main() {
           container: container,
           child: MaterialApp.router(
             theme: ThemeData.dark()
-                .copyWith(scaffoldBackgroundColor: AppTheme.oledBlack),
+                .copyWith(scaffoldBackgroundColor: AppTheme.background),
             routerConfig: router,
           ),
         ),

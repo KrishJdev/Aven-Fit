@@ -83,7 +83,7 @@ void main() {
           ],
           child: MaterialApp(
             theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppTheme.oledBlack,
+              scaffoldBackgroundColor: AppTheme.background,
             ),
             home: const ExerciseDetailScreen(exerciseId: benchId),
           ),
@@ -163,7 +163,7 @@ void main() {
           ],
           child: MaterialApp(
             theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppTheme.oledBlack,
+              scaffoldBackgroundColor: AppTheme.background,
             ),
             home: const CreateCustomExerciseScreen(),
           ),

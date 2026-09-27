@@ -5,7 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../domain/meal_type.dart';
 import '../../domain/nutrition_log_entry.dart';
 
-/// One meal section (WU-4.5, FEATURES.md §11.1/§11.2): a glass card
+/// One meal section (WU-4.5, FEATURES.md §11.1/§11.2): a surface card
 /// listing the meal's logged foods (name, serving, kcal, protein) with
 /// inline quantity steppers, a per-meal kcal subtotal, and the "Add Food"
 /// affordance → Food Database Search.
@@ -40,10 +40,9 @@ class MealSectionCard extends StatelessWidget {
       key: ValueKey('meal_section_${mealType.name}'),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -59,7 +58,7 @@ class MealSectionCard extends StatelessWidget {
                   letterSpacing: 0.8,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.spaceSm),
               if (entries.isNotEmpty)
                 Text(
                   '${entries.length} item${entries.length == 1 ? '' : 's'}',
@@ -74,7 +73,7 @@ class MealSectionCard extends StatelessWidget {
                 style: AppTheme.num(
                   13,
                   weight: FontWeight.w700,
-                  color: AppTheme.neonCyan,
+                  color: AppTheme.primary,
                 ),
               ),
             ],
@@ -96,7 +95,7 @@ class MealSectionCard extends StatelessWidget {
                 onStep: (delta) => onQuantityStep(entry, delta),
                 onRemove: () => onRemoveItem(entry),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.spaceSm),
             ],
 
           const SizedBox(height: 6),
@@ -161,7 +160,7 @@ class _LoggedItemRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppTheme.spaceSm),
         _StepButton(
           key: ValueKey('step_down_${item.id}'),
           icon: LucideIcons.minus,
@@ -180,13 +179,13 @@ class _LoggedItemRow extends StatelessWidget {
           icon: LucideIcons.plus,
           onTap: () => onStep(0.5),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppTheme.spaceXs),
         Text(
           _fmtNum(item.calculatedKcal),
           style: AppTheme.num(
             13,
             weight: FontWeight.w700,
-            color: AppTheme.neonCyan,
+            color: AppTheme.primary,
           ),
         ),
         GestureDetector(
@@ -222,10 +221,10 @@ class _StepButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(AppTheme.spaceXs),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          border: Border.all(color: AppTheme.border),
         ),
         child: Icon(icon, size: 12, color: AppTheme.textPrimary),
       ),
@@ -247,17 +246,17 @@ class _AddFoodButton extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          border: Border.all(color: AppTheme.glassBorder),
+          border: Border.all(color: AppTheme.border),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.plus, size: 14, color: AppTheme.neonCyan),
+            Icon(LucideIcons.plus, size: 14, color: AppTheme.primary),
             SizedBox(width: 6),
             Text(
               'ADD FOOD',
               style: TextStyle(
-                color: AppTheme.neonCyan,
+                color: AppTheme.primary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.6,

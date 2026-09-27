@@ -49,25 +49,25 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
     final controller = ref.read(exercisePickerControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.x, color: Colors.white, size: 20),
+          icon: const Icon(LucideIcons.x, color: AppTheme.textPrimary, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'ADD EXERCISE',
-          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.neonCyan),
+          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.primary),
         ),
         actions: [
           TextButton.icon(
             onPressed: () => context.push('/exercises/new'),
-            icon: const Icon(LucideIcons.plus, size: 16, color: AppTheme.voltGreen),
+            icon: const Icon(LucideIcons.plus, size: 16, color: AppTheme.secondary),
             label: Text(
               'CUSTOM',
-              style: AppTheme.num(13, weight: FontWeight.w700, color: AppTheme.voltGreen),
+              style: AppTheme.num(13, weight: FontWeight.w700, color: AppTheme.secondary),
             ),
           ),
         ],
@@ -95,7 +95,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
       children: [
         // Search Bar
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXs),
           child: ExerciseSearchBar(
             controller: _searchController,
             onChanged: controller.updateSearchQuery,
@@ -112,7 +112,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
 
         // Header Count Badge
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: 6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -135,21 +135,21 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                   },
                   child: Text(
                     'RESET',
-                    style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.burntOrange),
+                    style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.warning),
                   ),
                 ),
             ],
           ),
         ),
 
-        const Divider(color: AppTheme.glassBorder, height: 1),
+        const Divider(color: AppTheme.divider, height: 1),
 
         // Exercise List or Designed Empty State
         Expanded(
           child: exercises.isEmpty
               ? _buildEmptyState(context, state, controller)
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceSm),
                   itemCount: exercises.length,
                   itemBuilder: (context, index) {
                     final exercise = exercises[index];
@@ -172,7 +172,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   ) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: 6),
       child: Row(
         children: [
           // Recent Filter Chip
@@ -181,9 +181,9 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               label: '⚡ Recent (${state.recentExercises.length})',
               isSelected: state.showRecentOnly,
               onTap: controller.toggleRecentOnly,
-              activeColor: AppTheme.neonCyan,
+              activeColor: AppTheme.primary,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
           ],
 
           // Favourites Chip
@@ -191,20 +191,20 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
             label: '★ Favourites',
             isSelected: state.favouritesOnly,
             onTap: controller.toggleFavouritesOnly,
-            activeColor: AppTheme.voltGreen,
+            activeColor: AppTheme.secondary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.spaceSm),
 
           // Muscle Group Chips
           ...state.muscleGroups.map((mg) {
             final isSelected = state.selectedMuscleGroupId == mg.id;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppTheme.spaceSm),
               child: _PickerChip(
                 label: mg.name,
                 isSelected: isSelected,
                 onTap: () => controller.setMuscleGroup(mg.id),
-                activeColor: AppTheme.neonCyan,
+                activeColor: AppTheme.primary,
               ),
             );
           }),
@@ -215,12 +215,12 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               .map((eq) {
             final isSelected = state.selectedEquipment == eq;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppTheme.spaceSm),
               child: _PickerChip(
                 label: eq.name.toUpperCase(),
                 isSelected: isSelected,
                 onTap: () => controller.setEquipment(eq),
-                activeColor: AppTheme.neonCyan,
+                activeColor: AppTheme.primary,
               ),
             );
           }),
@@ -237,26 +237,26 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
     final hasQuery = state.searchQuery.isNotEmpty;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppTheme.spaceXxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(LucideIcons.dumbbell, size: 56, color: AppTheme.textSecondary),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               hasQuery
                   ? 'NO EXERCISE FOUND FOR "${state.searchQuery}"'
                   : 'NO EXERCISES MATCH FILTERS',
               textAlign: TextAlign.center,
-              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'Create a custom exercise with your specific muscles and equipment.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -267,20 +267,20 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                       controller.clearFilters();
                     },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppTheme.glassBorder),
-                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: AppTheme.border),
+                      foregroundColor: AppTheme.textPrimary,
                     ),
                     child: const Text('CLEAR FILTERS'),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppTheme.spaceMd),
                 ],
                 FilledButton.icon(
                   onPressed: () => context.push('/exercises/new'),
                   icon: const Icon(LucideIcons.plus, size: 16),
                   label: const Text('CREATE CUSTOM'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppTheme.voltGreen,
-                    foregroundColor: Colors.black,
+                    backgroundColor: AppTheme.secondary,
+                    foregroundColor: AppTheme.textOnPrimary,
                   ),
                 ),
               ],
@@ -294,23 +294,23 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   Widget _buildErrorState(Object error, ExercisePickerController controller) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppTheme.spaceXxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.burntOrange),
-            const SizedBox(height: 16),
+            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.warning),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               'COULD NOT LOAD EXERCISES',
-              style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               error.toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             OutlinedButton(
               onPressed: () => ref.invalidate(exercisePickerControllerProvider),
               child: const Text('RETRY'),
@@ -360,13 +360,13 @@ class _PickerChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
               ? activeColor.withValues(alpha: 0.15)
-              : AppTheme.glassFill,
+              : AppTheme.surface,
           border: Border.all(
-            color: isSelected ? activeColor : AppTheme.glassBorder,
+            color: isSelected ? activeColor : AppTheme.border,
           ),
           borderRadius: BorderRadius.circular(4),
         ),

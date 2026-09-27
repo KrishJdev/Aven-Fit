@@ -59,17 +59,17 @@ class _PrVaultScreenState extends ConsumerState<PrVaultScreen> {
     final l10n = l10nOf(context);
     final vaultAsync = ref.watch(prVaultStreamProvider);
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white, size: 22),
+          icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.textPrimary, size: 22),
           onPressed: () => context.pop(),
         ),
         title: Text(
           l10n.prVaultTitle,
-          style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
       ),
       body: vaultAsync.when(
@@ -136,7 +136,7 @@ class _VaultControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceXs, AppTheme.spaceLg, AppTheme.spaceXs),
       child: Row(
         children: [
           // Exercise filter — hidden when a single exercise covers all rows
@@ -147,15 +147,15 @@ class _VaultControls extends StatelessWidget {
                 height: 36,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: AppTheme.glassFill,
-                  border: Border.all(color: AppTheme.glassBorder),
+                  color: AppTheme.surface,
+                  border: Border.all(color: AppTheme.border),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     key: const ValueKey('pr_vault_exercise_filter'),
                     value: exerciseFilter,
                     isExpanded: true,
-                    dropdownColor: const Color(0xFF16191D),
+                    dropdownColor: AppTheme.surfaceElevated,
                     icon: const Icon(
                       LucideIcons.chevronDown,
                       size: 14,
@@ -193,8 +193,8 @@ class _VaultControls extends StatelessWidget {
               height: 36,
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                color: AppTheme.glassFill,
-                border: Border.all(color: AppTheme.glassBorder),
+                color: AppTheme.surface,
+                border: Border.all(color: AppTheme.border),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -204,7 +204,7 @@ class _VaultControls extends StatelessWidget {
                         ? LucideIcons.calendar
                         : LucideIcons.arrowDownWideNarrow,
                     size: 13,
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                   ),
                   const SizedBox(width: 6),
                   Text(
@@ -247,7 +247,7 @@ class _VaultList extends StatelessWidget {
   Widget build(BuildContext context) {
     final groups = groupByExercise(entries);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXxl),
       children: [
         for (final exerciseName in groups.keys)
           _ExercisePrGroup(
@@ -271,12 +271,11 @@ class _ExercisePrGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: ValueKey('pr_vault_group_$exerciseName'),
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(bottom: AppTheme.spaceMd),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,7 +289,7 @@ class _ExercisePrGroup extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.spaceSm),
           for (final entry in records)
             _PrRow(
               key: ValueKey('pr_vault_row_${entry.record.id}'),
@@ -333,9 +332,9 @@ class _PrRow extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
             decoration: BoxDecoration(
-              color: AppTheme.neonCyan.withValues(alpha: 0.1),
+              color: AppTheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -343,7 +342,7 @@ class _PrRow extends StatelessWidget {
               style: AppTheme.num(
                 9.5,
                 weight: FontWeight.w700,
-                color: AppTheme.neonCyan,
+                color: AppTheme.primary,
               ),
             ),
           ),

@@ -64,7 +64,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ..showSnackBar(
             SnackBar(
               content: Text(next),
-              backgroundColor: const Color(0xFF1A1A1A),
+              backgroundColor: AppTheme.surfaceActive,
               behavior: SnackBarBehavior.floating,
             ),
           );
@@ -73,14 +73,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxl, vertical: AppTheme.spaceXxxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 24),
+              const SizedBox(height: AppTheme.spaceXxl),
               const Text(
                 'AVEN FIT',
                 textAlign: TextAlign.center,
@@ -91,7 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   letterSpacing: 4,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.spaceSm),
               const Text(
                 'Train offline. Track everything.',
                 textAlign: TextAlign.center,
@@ -105,21 +105,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               // Phone input: country code + 10-digit Indian validation.
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.glassFill,
+                  color: AppTheme.surface,
                   border: Border.all(
                     color: state.inlineError != null
-                        ? AppTheme.burntOrange
-                        : AppTheme.glassBorder,
+                        ? AppTheme.warning
+                        : AppTheme.border,
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
                 child: Row(
                   children: [
                     DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         key: const ValueKey('country_code_selector'),
                         value: state.countryCode,
-                        dropdownColor: const Color(0xFF1A1A1A),
+                        dropdownColor: AppTheme.surfaceActive,
                         icon: const Icon(
                           LucideIcons.chevronDown,
                           size: 16,
@@ -148,9 +148,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    Container(width: 1, height: 24, color: AppTheme.glassBorder),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppTheme.spaceXs),
+                    Container(width: 1, height: 24, color: AppTheme.border),
+                    const SizedBox(width: AppTheme.spaceMd),
                     Expanded(
                       child: TextField(
                         key: const ValueKey('phone_field'),
@@ -186,12 +186,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 alignment: Alignment.topLeft,
                 child: state.inlineError != null
                     ? Padding(
-                        padding: const EdgeInsets.only(top: 8, left: 2),
+                        padding: const EdgeInsets.only(top: AppTheme.spaceSm, left: AppTheme.spaceXxs),
                         child: Text(
                           key: const ValueKey('phone_inline_error'),
                           state.inlineError!,
                           style: const TextStyle(
-                            color: AppTheme.burntOrange,
+                            color: AppTheme.warning,
                             fontSize: 12.5,
                             fontWeight: FontWeight.w500,
                           ),
@@ -201,17 +201,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
 
               // Send OTP — the primary action (§6.1 Continue).
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceLg),
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
                   key: const ValueKey('send_otp_button'),
                   onPressed: state.sendingOtp ? null : _sendOtp,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.neonCyan,
-                    foregroundColor: AppTheme.oledBlack,
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: AppTheme.background,
                     disabledBackgroundColor:
-                        AppTheme.neonCyan.withValues(alpha: 0.5),
+                        AppTheme.primary.withValues(alpha: 0.5),
                     shape: const RoundedRectangleBorder(),
                   ),
                   child: state.sendingOtp
@@ -220,7 +220,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppTheme.oledBlack,
+                            color: AppTheme.background,
                           ),
                         )
                       : const Text(
@@ -240,25 +240,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: state.sendError != null
                     ? Container(
                         key: const ValueKey('send_error_banner'),
-                        margin: const EdgeInsets.only(top: 12),
-                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.only(top: AppTheme.spaceMd),
+                        padding: const EdgeInsets.all(AppTheme.spaceMd),
                         decoration: BoxDecoration(
-                          color: AppTheme.burntOrange.withValues(alpha: 0.12),
-                          border: Border.all(color: AppTheme.burntOrange),
+                          color: AppTheme.warning.withValues(alpha: 0.12),
+                          border: Border.all(color: AppTheme.warning),
                         ),
                         child: Row(
                           children: [
                             const Icon(
                               LucideIcons.wifiOff,
                               size: 16,
-                              color: AppTheme.burntOrange,
+                              color: AppTheme.warning,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppTheme.spaceSm),
                             Expanded(
                               child: Text(
                                 state.sendError!,
                                 style: const TextStyle(
-                                  color: AppTheme.burntOrange,
+                                  color: AppTheme.warning,
                                   fontSize: 12.5,
                                 ),
                               ),
@@ -268,13 +268,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               onPressed: _sendOtp,
                               style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                                  horizontal: AppTheme.spaceSm,
                                 ),
                               ),
                               child: const Text(
                                 'RETRY',
                                 style: TextStyle(
-                                  color: AppTheme.neonCyan,
+                                  color: AppTheme.primary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12,
                                 ),
@@ -286,9 +286,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     : const SizedBox.shrink(),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               const _OrDivider(),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
 
               // Google (secondary).
               SizedBox(
@@ -299,7 +299,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       .read(loginControllerProvider.notifier)
                       .signInWithGoogle(),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppTheme.glassBorder),
+                    side: const BorderSide(color: AppTheme.border),
                     foregroundColor: AppTheme.textPrimary,
                     shape: const RoundedRectangleBorder(),
                   ),
@@ -314,7 +314,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
 
               // Guest — prominent first-class exit (L2).
               SizedBox(
@@ -323,7 +323,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   key: const ValueKey('guest_button'),
                   onPressed: _continueAsGuest,
                   style: TextButton.styleFrom(
-                    foregroundColor: AppTheme.voltGreen,
+                    foregroundColor: AppTheme.secondary,
                     shape: const RoundedRectangleBorder(),
                   ),
                   child: const Text(
@@ -337,7 +337,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppTheme.spaceXxxl),
               // DPDP transparency (§6.1) — placeholder destinations for P0.
               const Text(
                 'By continuing you agree to our Terms of Service and '
@@ -365,9 +365,9 @@ class _OrDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        Expanded(child: Divider(color: AppTheme.glassBorder, thickness: 1)),
+        Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
           child: Text(
             'OR',
             style: TextStyle(
@@ -378,7 +378,7 @@ class _OrDivider extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(child: Divider(color: AppTheme.glassBorder, thickness: 1)),
+        Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
       ],
     );
   }

@@ -9,7 +9,8 @@ import '../theme/app_theme.dart';
 ///
 /// [onRetry] re-executes the failing async read (typically
 /// `ref.invalidate(provider)`); local reads recover instantly, and the
-/// user is never left staring at a broken screen (L2).
+/// user is never left staring at a broken screen (L2). v2 tokens: warning
+/// icon, [AppTheme.surfaceElevated] scrim, [AppTheme.radiusSm] retry.
 class ErrorStateWidget extends StatelessWidget {
   const ErrorStateWidget({
     required this.error,
@@ -24,45 +25,41 @@ class ErrorStateWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppTheme.spaceXxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
               LucideIcons.triangleAlert,
-              size: 40,
-              color: AppTheme.burntOrange,
+              size: AppTheme.iconEmpty,
+              color: AppTheme.warning,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppTheme.spaceMd),
             Text(
               l10nOf(context).somethingWentWrong,
-              style: AppTheme.num(
-                14,
-                weight: FontWeight.w700,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: AppTheme.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               '$error',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppTheme.textSecondary),
             ),
             if (onRetry != null) ...[
-              const SizedBox(height: 18),
+              const SizedBox(height: AppTheme.spaceXl),
               OutlinedButton(
                 key: const ValueKey('error_state_retry'),
                 onPressed: onRetry,
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.neonCyan),
-                  shape: const RoundedRectangleBorder(),
-                ),
                 child: Text(
                   l10nOf(context).retry,
                   style: const TextStyle(
-                    color: AppTheme.neonCyan,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12.5,
+                    color: AppTheme.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
                   ),
                 ),
               ),

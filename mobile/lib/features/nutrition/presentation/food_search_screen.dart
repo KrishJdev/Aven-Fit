@@ -44,9 +44,9 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
     final controller = ref.read(foodSearchControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
@@ -63,21 +63,21 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                 letterSpacing: 1.0,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
             stateAsync.when(
               data: (state) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonCyan.withValues(alpha: 0.15),
+                  color: AppTheme.primary.withValues(alpha: 0.15),
                   border:
-                      Border.all(color: AppTheme.neonCyan.withValues(alpha: 0.4)),
+                      Border.all(color: AppTheme.primary.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   '${state.foods.length}',
                   style: AppTheme.num(
                     12,
                     weight: FontWeight.w700,
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                   ),
                 ),
               ),
@@ -93,7 +93,7 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
             children: [
               // Search Bar
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXs),
                 child: _SearchBar(
                   controller: _searchController,
                   onChanged: controller.setSearchQuery,
@@ -107,7 +107,7 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
               // Filter Chips (FSSAI veg + §11.10 satvik)
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceSm),
                 child: Row(
                   children: [
                     _FilterChip(
@@ -115,18 +115,18 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                       isSelected: state.vegOnly,
                       onTap: controller.toggleVegOnly,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppTheme.spaceSm),
                     _FilterChip(
                       label: 'SATVIK',
                       isSelected: state.satvikOnly,
                       onTap: controller.toggleSatvikOnly,
-                      activeColor: AppTheme.voltGreen,
+                      activeColor: AppTheme.secondary,
                     ),
                   ],
                 ),
               ),
 
-              const Divider(color: AppTheme.glassBorder, height: 1),
+              const Divider(color: AppTheme.border, height: 1),
 
               // Food List / Empty State
               Expanded(
@@ -140,7 +140,7 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                       )
                     : ListView.builder(
                         itemCount: state.foods.length,
-                        padding: const EdgeInsets.only(top: 8, bottom: 24),
+                        padding: const EdgeInsets.only(top: AppTheme.spaceSm, bottom: AppTheme.spaceXxl),
                         itemBuilder: (context, index) {
                           final food = state.foods[index];
                           return _FoodTile(
@@ -168,25 +168,25 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
             children: [
               const Icon(
                 LucideIcons.alertTriangle,
-                color: AppTheme.burntOrange,
+                color: AppTheme.warning,
                 size: 32,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               Text(
                 'Failed to load foods: $err',
                 style: const TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceLg),
               OutlinedButton(
                 onPressed: () => ref.refresh(foodSearchControllerProvider),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.neonCyan),
+                  side: const BorderSide(color: AppTheme.primary),
                   shape: const RoundedRectangleBorder(),
                 ),
                 child: const Text(
                   'RETRY',
-                  style: TextStyle(color: AppTheme.neonCyan),
+                  style: TextStyle(color: AppTheme.primary),
                 ),
               ),
             ],
@@ -214,10 +214,10 @@ class _SearchBar extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.border),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
       child: Row(
         children: [
           const Icon(
@@ -250,7 +250,7 @@ class _SearchBar extends StatelessWidget {
             GestureDetector(
               onTap: onClear,
               child: const Padding(
-                padding: EdgeInsets.all(4),
+                padding: EdgeInsets.all(AppTheme.spaceXs),
                 child: Icon(
                   LucideIcons.x,
                   size: 16,
@@ -278,15 +278,14 @@ class _FoodTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceXs),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppTheme.spaceMd),
           child: Row(
             children: [
               VegMark(isVeg: food.isVeg),
@@ -303,7 +302,7 @@ class _FoodTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.spaceXs),
                     Text(
                       _servingLine(food),
                       style: const TextStyle(
@@ -320,7 +319,7 @@ class _FoodTile extends StatelessWidget {
                           if (food.isSatvik)
                             const _Badge(
                               label: 'SATVIK',
-                              color: AppTheme.voltGreen,
+                              color: AppTheme.secondary,
                             ),
                           if (food.isCustom)
                             const _Badge(
@@ -333,13 +332,13 @@ class _FoodTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppTheme.spaceSm),
               Text(
                 '${_fmtNum(food.caloriesKcal)} kcal',
                 style: AppTheme.num(
                   13,
                   weight: FontWeight.w700,
-                  color: AppTheme.neonCyan,
+                  color: AppTheme.primary,
                 ),
               ),
             ],
@@ -373,7 +372,7 @@ class VegMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isVeg ? AppTheme.voltGreen : AppTheme.burntOrange;
+    final color = isVeg ? AppTheme.secondary : AppTheme.warning;
     return Container(
       width: size,
       height: size,
@@ -417,7 +416,7 @@ class _FilterChip extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
-    this.activeColor = AppTheme.neonCyan,
+    this.activeColor = AppTheme.primary,
   });
 
   final String label;
@@ -430,13 +429,13 @@ class _FilterChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
               ? activeColor.withValues(alpha: 0.15)
-              : AppTheme.glassFill,
+              : AppTheme.surface,
           border: Border.all(
-            color: isSelected ? activeColor : AppTheme.glassBorder,
+            color: isSelected ? activeColor : AppTheme.border,
           ),
         ),
         child: Text(
@@ -465,7 +464,7 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         border: Border.all(color: color.withValues(alpha: 0.3)),
@@ -496,7 +495,7 @@ class _EmptyStateView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -505,7 +504,7 @@ class _EmptyStateView extends StatelessWidget {
               size: 48,
               color: AppTheme.textSecondary,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               hasFilters
                   ? 'No foods match your search.'
@@ -517,7 +516,7 @@ class _EmptyStateView extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'Try a shorter query — "dal", "paneer", "roti" — or clear the veg/satvik filters.',
               style: TextStyle(
@@ -527,19 +526,19 @@ class _EmptyStateView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             if (hasFilters) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: AppTheme.spaceXl),
               OutlinedButton(
                 onPressed: onClearFilters,
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.neonCyan),
+                  side: const BorderSide(color: AppTheme.primary),
                   shape: const RoundedRectangleBorder(),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceMd),
                 ),
                 child: const Text(
                   'CLEAR FILTERS',
                   style: TextStyle(
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),

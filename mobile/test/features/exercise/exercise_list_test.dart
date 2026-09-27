@@ -143,7 +143,7 @@ void main() {
           ],
           child: MaterialApp(
             theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppTheme.oledBlack,
+              scaffoldBackgroundColor: AppTheme.background,
             ),
             home: const ExerciseListScreen(),
           ),

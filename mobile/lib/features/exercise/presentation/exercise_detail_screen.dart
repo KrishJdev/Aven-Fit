@@ -28,9 +28,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
         ref.read(exerciseDetailControllerProvider(exerciseId).notifier);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
@@ -54,7 +54,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                               ? LucideIcons.star
                               : LucideIcons.star,
                           color: exercise.isFavourite
-                              ? AppTheme.voltGreen
+                              ? AppTheme.secondary
                               : AppTheme.textSecondary,
                         ),
                         onPressed: controller.toggleFavourite,
@@ -76,7 +76,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     size: 48,
                     color: AppTheme.textSecondary,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.spaceLg),
                   const Text(
                     'Exercise not found',
                     style: TextStyle(
@@ -85,16 +85,16 @@ class ExerciseDetailScreen extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppTheme.spaceLg),
                   OutlinedButton(
                     onPressed: () => context.pop(),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppTheme.neonCyan),
+                      side: const BorderSide(color: AppTheme.primary),
                       shape: const RoundedRectangleBorder(),
                     ),
                     child: const Text(
                       'BACK TO DIRECTORY',
-                      style: TextStyle(color: AppTheme.neonCyan),
+                      style: TextStyle(color: AppTheme.primary),
                     ),
                   ),
                 ],
@@ -103,7 +103,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceMd),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -127,7 +127,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     if (exercise.primaryMuscle != null)
                       _DetailBadge(
                         label: exercise.primaryMuscle!,
-                        color: AppTheme.neonCyan,
+                        color: AppTheme.primary,
                       ),
                     if (exercise.equipment != Equipment.none)
                       _DetailBadge(
@@ -141,12 +141,12 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     if (exercise.isCustom)
                       const _DetailBadge(
                         label: 'CUSTOM',
-                        color: AppTheme.voltGreen,
+                        color: AppTheme.secondary,
                       ),
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.spaceXxl),
 
                 // Instructions Card
                 _GlassCard(
@@ -165,7 +165,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spaceLg),
 
                 // Target Muscles Card
                 _GlassCard(
@@ -184,11 +184,11 @@ class ExerciseDetailScreen extends ConsumerWidget {
                                 fontSize: 13,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppTheme.spaceSm),
                             Text(
                               exercise.primaryMuscle!,
                               style: const TextStyle(
-                                color: AppTheme.neonCyan,
+                                color: AppTheme.primary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -197,7 +197,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                         ),
                       ],
                       if (exercise.secondaryMuscles.isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppTheme.spaceSm),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -208,7 +208,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                                 fontSize: 13,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppTheme.spaceSm),
                             Expanded(
                               child: Text(
                                 exercise.secondaryMuscles.join(', '),
@@ -226,7 +226,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spaceLg),
 
                 // Performance History Placeholder
                 _GlassCard(
@@ -264,18 +264,18 @@ class ExerciseDetailScreen extends ConsumerWidget {
                       icon: const Icon(
                         LucideIcons.trash2,
                         size: 16,
-                        color: AppTheme.burntOrange,
+                        color: AppTheme.warning,
                       ),
                       label: const Text(
                         'DELETE CUSTOM EXERCISE',
                         style: TextStyle(
-                          color: AppTheme.burntOrange,
+                          color: AppTheme.warning,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppTheme.burntOrange),
+                        side: const BorderSide(color: AppTheme.warning),
                         shape: const RoundedRectangleBorder(),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
@@ -310,10 +310,6 @@ class ExerciseDetailScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.oledBlack,
-        shape: const RoundedRectangleBorder(
-          side: BorderSide(color: AppTheme.glassBorder),
-        ),
         title: const Text(
           'Delete Exercise?',
           style: TextStyle(
@@ -339,14 +335,14 @@ class ExerciseDetailScreen extends ConsumerWidget {
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.burntOrange),
+              side: const BorderSide(color: AppTheme.warning),
               shape: const RoundedRectangleBorder(),
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: const Text(
               'DELETE',
               style: TextStyle(
-                color: AppTheme.burntOrange,
+                color: AppTheme.warning,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -380,17 +376,16 @@ class _GlassCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: AppTheme.neonCyan),
-              const SizedBox(width: 8),
+              Icon(icon, size: 16, color: AppTheme.primary),
+              const SizedBox(width: AppTheme.spaceSm),
               Text(
                 title,
                 style: const TextStyle(
@@ -402,7 +397,7 @@ class _GlassCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           child,
         ],
       ),
@@ -422,7 +417,7 @@ class _DetailBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm, vertical: AppTheme.spaceXs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         border: Border.all(color: color.withValues(alpha: 0.4)),

@@ -21,7 +21,7 @@ Both agents are equal collaborators across the entire project. Agent selection f
 
 Responsibilities are **flexible and collaborative across both agents** rather than rigid silos. Either agent may be tasked with:
 
-- **Frontend (Flutter + Dart):** UI/UX, Glassmorphism design system, screens, Riverpod state management, and local SQLite persistence via **Drift** (reactive, compile-safe queries).
+- **Frontend (Flutter + Dart):** UI/UX per `docs/UI_UX_DESIGN_SYSTEM.md` (authoritative design system), screens, Riverpod state management, and local SQLite persistence via **Drift** (reactive, compile-safe queries).
 - **Backend (Spring Boot 3.3 + Java 21):** JPA entities, services, controllers, Flyway migrations, and PostgreSQL schemas.
 - **Product & Architecture:** Feature interpretation against `FEATURES.md`, system design, sync strategy, and security.
 - **Review & Quality:** Reviewing work, writing tests, refactoring, and maintaining documentation.
@@ -69,6 +69,7 @@ Every agent MUST perform these baseline checks before starting work:
 
 **Context Documents (Consult As Needed):**
 - **`ARCHITECTURE.md`:** Consult when starting new feature slices, implementing layers (`domain`/`data`/`presentation`), adding Drift tables/DAOs, creating Riverpod stores, or building backend APIs. Skip for isolated bug fixes or minor tweaks to conserve tokens.
+- **`docs/UI_UX_DESIGN_SYSTEM.md`:** **MANDATORY for all frontend/UI work.** The authoritative design system — color tokens, typography, spacing, component patterns, and review checklists. Supersedes all prior visual conventions (Sharp Glassmorphism is retired). Read before touching any screen or widget.
 
 > [!IMPORTANT]
 > **No Redundant Implementation Plans Rule:**  
@@ -157,6 +158,7 @@ Agents communicate through the repository:
 | `AGENTS.md` | Protocol updates & architecture rules (this file) |
 | `ARCHITECTURE.md` | System design, layer anatomy, data flow diagrams & code patterns |
 | `FEATURES.md` | Feature specifications, screen maps, and phase alignment |
+| `docs/UI_UX_DESIGN_SYSTEM.md` | **Authoritative UI/UX design system** — visual tokens, components, patterns, and review checklists (supersedes all prior design conventions) |
 | Git commit messages | Change documentation |
 | Code comments | Implementation context |
 

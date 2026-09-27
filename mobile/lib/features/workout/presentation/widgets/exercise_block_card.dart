@@ -39,18 +39,22 @@ class ExerciseBlockCard extends StatelessWidget {
     final exerciseName = sessionExercise.exerciseName ?? l10n.exerciseFallbackName;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.glassBorder),
+      margin: const EdgeInsets.only(bottom: AppTheme.spaceLg),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.all(Radius.circular(AppTheme.radiusMd)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Block Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.spaceLg,
+              AppTheme.spaceMd,
+              AppTheme.spaceSm,
+              AppTheme.spaceSm,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -64,23 +68,28 @@ class ExerciseBlockCard extends StatelessWidget {
                           exerciseName,
                           style: const TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textPrimary,
                           ),
                         ),
                         if (sessionExercise.exercise?.primaryMuscle != null)
                           Padding(
-                            padding: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.only(top: AppTheme.spaceXs),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppTheme.spaceXs + 2,
+                                vertical: AppTheme.spaceXxs,
+                              ),
                               decoration: BoxDecoration(
-                                color: AppTheme.neonCyan.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
+                                color: AppTheme.primaryMuted,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(AppTheme.radiusSm),
+                                ),
                               ),
                               child: Text(
                                 sessionExercise.exercise!.primaryMuscle!,
                                 style: const TextStyle(
-                                  color: AppTheme.neonCyan,
+                                  color: AppTheme.primary,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -93,16 +102,18 @@ class ExerciseBlockCard extends StatelessWidget {
                 ),
                 // Warm-up pyramid quick action
                 IconButton(
-                  icon: const Icon(LucideIcons.flame, size: 18, color: AppTheme.burntOrange),
+                  icon: const Icon(LucideIcons.flame, size: AppTheme.iconSection, color: AppTheme.warning),
                   tooltip: l10n.warmupPyramidTooltip,
                   onPressed: () => _openWarmupPyramidSheet(context),
                   visualDensity: VisualDensity.compact,
                 ),
                 // 3-dots options menu
                 PopupMenuButton<String>(
-                  icon: const Icon(LucideIcons.ellipsisVertical, size: 18, color: AppTheme.textSecondary),
-                  color: const Color(0xFF1B1F24),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  icon: const Icon(LucideIcons.ellipsisVertical, size: AppTheme.iconSection, color: AppTheme.textSecondary),
+                  color: AppTheme.surfaceElevated,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
+                  ),
                   onSelected: (val) {
                     if (val == 'warmup') {
                       _openWarmupPyramidSheet(context);
@@ -115,9 +126,9 @@ class ExerciseBlockCard extends StatelessWidget {
                       value: 'warmup',
                       child: Row(
                         children: [
-                          const Icon(LucideIcons.flame, size: 16, color: AppTheme.burntOrange),
-                          const SizedBox(width: 8),
-                          Text(l10n.warmupPyramidMenu, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                          const Icon(LucideIcons.flame, size: AppTheme.iconSmall, color: AppTheme.warning),
+                          const SizedBox(width: AppTheme.spaceSm),
+                          Text(l10n.warmupPyramidMenu, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13)),
                         ],
                       ),
                     ),
@@ -125,9 +136,9 @@ class ExerciseBlockCard extends StatelessWidget {
                       value: 'remove',
                       child: Row(
                         children: [
-                          const Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
-                          const SizedBox(width: 8),
-                          Text(l10n.removeExerciseMenu, style: const TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
+                          const Icon(LucideIcons.trash2, size: AppTheme.iconSmall, color: AppTheme.warning),
+                          const SizedBox(width: AppTheme.spaceSm),
+                          Text(l10n.removeExerciseMenu, style: const TextStyle(color: AppTheme.warning, fontSize: 13)),
                         ],
                       ),
                     ),
@@ -137,11 +148,14 @@ class ExerciseBlockCard extends StatelessWidget {
             ),
           ),
 
-          const Divider(color: AppTheme.glassBorder, height: 1),
+          const Divider(color: AppTheme.divider, height: 1),
 
           // Sets Table Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spaceLg,
+              vertical: AppTheme.spaceSm,
+            ),
             child: Row(
               children: [
                 SizedBox(
@@ -156,12 +170,12 @@ class ExerciseBlockCard extends StatelessWidget {
                   flex: 4,
                   child: Text(l10n.kgColumn, style: _tableHeaderStyle, textAlign: TextAlign.center),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppTheme.spaceXs),
                 Expanded(
                   flex: 4,
                   child: Text(l10n.repsColumn, style: _tableHeaderStyle, textAlign: TextAlign.center),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppTheme.spaceSm),
                 SizedBox(
                   width: 38,
                   child: Text('✓', textAlign: TextAlign.center, style: _tableHeaderStyle),
@@ -173,7 +187,7 @@ class ExerciseBlockCard extends StatelessWidget {
           // Set Rows List
           if (sets.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
+              padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXl),
               child: Center(
                 child: Text(
                   l10n.noSetsLogged,
@@ -200,7 +214,12 @@ class ExerciseBlockCard extends StatelessWidget {
 
           // Action Footer (+ ADD SET button)
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.spaceMd,
+              AppTheme.spaceSm,
+              AppTheme.spaceMd,
+              AppTheme.spaceMd,
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -228,18 +247,20 @@ class ExerciseBlockCard extends StatelessWidget {
                           reps: defaultReps > 0 ? defaultReps : 10,
                         );
                       },
-                      icon: const Icon(LucideIcons.plus, size: 16, color: AppTheme.neonCyan),
+                      icon: const Icon(LucideIcons.plus, size: AppTheme.iconSmall, color: AppTheme.primary),
                       label: Text(
                         l10n.addSet,
                         style: const TextStyle(
-                          color: AppTheme.neonCyan,
+                          color: AppTheme.primary,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
                       ),
                       style: TextButton.styleFrom(
-                        backgroundColor: AppTheme.neonCyan.withValues(alpha: 0.08),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        backgroundColor: AppTheme.primaryMuted,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
+                        ),
                       ),
                     ),
                   ),
@@ -258,10 +279,6 @@ class ExerciseBlockCard extends StatelessWidget {
   void _showQuickInfoSheet(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.oledBlack,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (sheetContext) => Consumer(
         builder: (context, ref, _) {
           final exerciseFuture = ref
@@ -307,7 +324,12 @@ class ExerciseBlockCard extends StatelessWidget {
 
               return Padding(
                 key: const ValueKey('block_info_sheet'),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+                padding: const EdgeInsets.fromLTRB(
+                  AppTheme.spaceXl,
+                  AppTheme.spaceXl,
+                  AppTheme.spaceXl,
+                  AppTheme.spaceXxl + AppTheme.spaceXs,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,12 +337,12 @@ class ExerciseBlockCard extends StatelessWidget {
                     Text(
                       sessionExercise.exerciseName ?? 'Exercise',
                       style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.spaceMd + 2),
                     Text(
                       l10nOf(context).quickInfoMuscles,
                       style: AppTheme.num(
@@ -329,7 +351,7 @@ class ExerciseBlockCard extends StatelessWidget {
                         color: AppTheme.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.spaceXs),
                     Text(
                       muscleText,
                       style: const TextStyle(
@@ -337,7 +359,7 @@ class ExerciseBlockCard extends StatelessWidget {
                         fontSize: 13.5,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppTheme.spaceMd + 2),
                     Text(
                       l10nOf(context).quickInfoLastPerformance,
                       style: AppTheme.num(
@@ -346,7 +368,7 @@ class ExerciseBlockCard extends StatelessWidget {
                         color: AppTheme.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppTheme.spaceXs),
                     Text(
                       key: const ValueKey('quick_info_last_performance'),
                       lastPerformance,
@@ -370,10 +392,6 @@ class ExerciseBlockCard extends StatelessWidget {
     final workingWeight = sets.isNotEmpty ? sets.last.weightKg : 80.0;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.oledBlack,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (ctx) => WarmupPyramidSheet(
         workingWeightKg: workingWeight,
         onGenerate: (weight) {

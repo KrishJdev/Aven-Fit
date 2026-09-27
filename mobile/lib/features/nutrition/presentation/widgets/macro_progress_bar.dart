@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Adherence-neutral macro bar (WU-4.5, FEATURES.md §11.1): a flat cyan
-/// fill on a grey track — zero radius, no gradients, **no red/green
-/// judgment colors, no over-target alarm anywhere** (L4). Over-target
-/// consumption simply clamps the fill at full width; the value text keeps
-/// showing the fact.
+/// fill on a grey track — radiusFull track ends, no gradients, **no
+/// red/green judgment colors, no over-target alarm anywhere** (L4).
+/// Over-target consumption simply clamps the fill at full width; the
+/// value text keeps showing the fact.
 class MacroProgressBar extends StatelessWidget {
   const MacroProgressBar({
     super.key,
@@ -67,14 +67,17 @@ class MacroProgressBar extends StatelessWidget {
         ),
         if (hasTarget) ...[
           const SizedBox(height: 6),
-          Container(
-            height: emphasized ? 8 : 5,
-            width: double.infinity,
-            color: AppTheme.glassBorder,
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: (consumed / target!).clamp(0.0, 1.0).toDouble(),
-              child: const ColoredBox(color: AppTheme.neonCyan),
+          ClipRRect(
+            borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusFull)),
+            child: Container(
+              height: emphasized ? 8 : 5,
+              width: double.infinity,
+              color: AppTheme.border,
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: (consumed / target!).clamp(0.0, 1.0).toDouble(),
+                child: const ColoredBox(color: AppTheme.primary),
+              ),
             ),
           ),
         ],

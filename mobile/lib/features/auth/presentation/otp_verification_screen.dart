@@ -53,9 +53,9 @@ class OtpVerificationScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
@@ -73,7 +73,7 @@ class OtpVerificationScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxl, vertical: AppTheme.spaceXxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -85,7 +85,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.spaceXs),
               Text(
                 key: const ValueKey('otp_phone_display'),
                 state.phoneNumber,
@@ -96,12 +96,12 @@ class OtpVerificationScreen extends ConsumerWidget {
                   color: AppTheme.textPrimary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.spaceSm),
               TextButton(
                 key: const ValueKey('change_number'),
                 onPressed: () => context.pop(),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.neonCyan,
+                  foregroundColor: AppTheme.primary,
                 ),
                 child: const Text(
                   'Change number',
@@ -109,7 +109,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppTheme.spaceXxl),
               OtpInputField(
                 otp: state.otp,
                 status: state.status,
@@ -126,7 +126,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                 duration: const Duration(milliseconds: 150),
                 alignment: Alignment.topCenter,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 16),
+                  padding: const EdgeInsets.only(top: AppTheme.spaceLg),
                   child: KeyedSubtree(
                     key: const ValueKey('otp_status_area'),
                     child: switch (state.status) {
@@ -138,7 +138,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                               height: 16,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppTheme.neonCyan,
+                                color: AppTheme.primary,
                               ),
                             ),
                             SizedBox(width: 10),
@@ -155,19 +155,19 @@ class OtpVerificationScreen extends ConsumerWidget {
                         ),
                       OtpStatus.invalid => _OtpNotice(
                           icon: LucideIcons.alertCircle,
-                          color: AppTheme.burntOrange,
+                          color: AppTheme.warning,
                           text: state.errorMessage ?? 'Invalid code. Try again.',
                         ),
                       OtpStatus.expired => _OtpNotice(
                           icon: LucideIcons.timerOff,
-                          color: AppTheme.burntOrange,
+                          color: AppTheme.warning,
                           text: state.errorMessage ??
                               'That code expired. Send a new one.',
                         ),
                       _ => state.errorMessage != null
                           ? _OtpNotice(
                               icon: LucideIcons.alertCircle,
-                              color: AppTheme.burntOrange,
+                              color: AppTheme.warning,
                               text: state.errorMessage!,
                             )
                           : const SizedBox.shrink(),
@@ -176,7 +176,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppTheme.spaceXxl),
 
               // Resend — cooldown-enforced countdown (§6.2 30s timer).
               TextButton(
@@ -185,7 +185,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                     ? () => controller.resend()
                     : null,
                 style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.neonCyan,
+                  foregroundColor: AppTheme.primary,
                 ),
                 child: Text(
                   state.canResend
@@ -196,14 +196,14 @@ class OtpVerificationScreen extends ConsumerWidget {
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.8,
                     color: state.canResend
-                        ? AppTheme.neonCyan
+                        ? AppTheme.primary
                         : AppTheme.textSecondary,
                   ),
                 ),
               ),
 
               // OTP validity window — a neutral fact (L4).
-              const SizedBox(height: 4),
+              const SizedBox(height: AppTheme.spaceXs),
               Text(
                 key: const ValueKey('otp_expiry_display'),
                 state.isExpired
@@ -212,13 +212,13 @@ class OtpVerificationScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: state.isExpired
-                      ? AppTheme.burntOrange
+                      ? AppTheme.warning
                       : AppTheme.textSecondary,
                   fontSize: 12,
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppTheme.spaceXxl),
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
@@ -227,10 +227,10 @@ class OtpVerificationScreen extends ConsumerWidget {
                       ? () => controller.verify()
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.neonCyan,
-                    foregroundColor: AppTheme.oledBlack,
+                    backgroundColor: AppTheme.primary,
+                    foregroundColor: AppTheme.background,
                     disabledBackgroundColor:
-                        AppTheme.neonCyan.withValues(alpha: 0.35),
+                        AppTheme.primary.withValues(alpha: 0.35),
                     shape: const RoundedRectangleBorder(),
                   ),
                   child: const Text(
@@ -243,7 +243,7 @@ class OtpVerificationScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceLg),
               const Text(
                 'No SMS permission needed — the code can also be typed '
                 'in manually.',
@@ -276,7 +276,7 @@ class _OtpNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppTheme.spaceMd),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         border: Border.all(color: color),
@@ -284,7 +284,7 @@ class _OtpNotice extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 16, color: color),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.spaceSm),
           Expanded(
             child: Text(
               text,

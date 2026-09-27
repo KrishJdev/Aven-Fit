@@ -25,10 +25,10 @@ class ExerciseSearchBar extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.border),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
       child: Row(
         children: [
           const Icon(
@@ -61,7 +61,7 @@ class ExerciseSearchBar extends StatelessWidget {
             GestureDetector(
               onTap: onClear,
               child: const Padding(
-                padding: EdgeInsets.all(4),
+                padding: EdgeInsets.all(AppTheme.spaceXs),
                 child: Icon(
                   LucideIcons.x,
                   size: 16,
@@ -100,7 +100,7 @@ class ExerciseFilterChipsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceSm),
       child: Row(
         children: [
           // Favourites Chip
@@ -108,20 +108,20 @@ class ExerciseFilterChipsBar extends StatelessWidget {
             label: '★ Favourites',
             isSelected: favouritesOnly,
             onTap: onToggleFavourites,
-            activeColor: AppTheme.voltGreen,
+            activeColor: AppTheme.secondary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.spaceSm),
 
           // Muscle Groups Chips
           ...muscleGroups.map((mg) {
             final isSelected = selectedMuscleGroupId == mg.id;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppTheme.spaceSm),
               child: _FilterChip(
                 label: mg.name,
                 isSelected: isSelected,
                 onTap: () => onSelectMuscleGroup(mg.id),
-                activeColor: AppTheme.neonCyan,
+                activeColor: AppTheme.primary,
               ),
             );
           }),
@@ -130,12 +130,12 @@ class ExerciseFilterChipsBar extends StatelessWidget {
           ...Equipment.values.where((e) => e != Equipment.none && e != Equipment.other).map((eq) {
             final isSelected = selectedEquipment == eq;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: AppTheme.spaceSm),
               child: _FilterChip(
                 label: _formatEquipment(eq),
                 isSelected: isSelected,
                 onTap: () => onSelectEquipment(eq),
-                activeColor: AppTheme.neonCyan,
+                activeColor: AppTheme.primary,
               ),
             );
           }),
@@ -186,13 +186,13 @@ class _FilterChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
               ? activeColor.withValues(alpha: 0.15)
-              : AppTheme.glassFill,
+              : AppTheme.surface,
           border: Border.all(
-            color: isSelected ? activeColor : AppTheme.glassBorder,
+            color: isSelected ? activeColor : AppTheme.border,
           ),
         ),
         child: Text(
@@ -208,7 +208,7 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-/// Reusable exercise list tile with Sharp Glassmorphism design tokens.
+/// Reusable exercise list tile with v2 design system tokens.
 class ExerciseListTile extends StatelessWidget {
   const ExerciseListTile({
     super.key,
@@ -224,15 +224,14 @@ class ExerciseListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceXs),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
       ),
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppTheme.spaceMd),
           child: Row(
             children: [
               Expanded(
@@ -255,7 +254,7 @@ class ExerciseListTile extends StatelessWidget {
                         if (exercise.primaryMuscle != null)
                           _Badge(
                             label: exercise.primaryMuscle!,
-                            color: AppTheme.neonCyan,
+                            color: AppTheme.primary,
                           ),
                         if (exercise.equipment != Equipment.none)
                           _Badge(
@@ -265,7 +264,7 @@ class ExerciseListTile extends StatelessWidget {
                         if (exercise.isCustom)
                           const _Badge(
                             label: 'CUSTOM',
-                            color: AppTheme.voltGreen,
+                            color: AppTheme.secondary,
                           ),
                       ],
                     ),
@@ -277,7 +276,7 @@ class ExerciseListTile extends StatelessWidget {
                   exercise.isFavourite ? LucideIcons.star : LucideIcons.star,
                   size: 20,
                   color: exercise.isFavourite
-                      ? AppTheme.voltGreen
+                      ? AppTheme.secondary
                       : AppTheme.textSecondary.withValues(alpha: 0.4),
                 ),
                 onPressed: onToggleFavourite,
@@ -302,7 +301,7 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         border: Border.all(color: color.withValues(alpha: 0.3)),

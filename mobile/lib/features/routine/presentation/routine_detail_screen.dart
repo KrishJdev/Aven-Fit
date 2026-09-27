@@ -35,9 +35,9 @@ class RoutineDetailScreen extends ConsumerWidget {
         }
 
         return Scaffold(
-          backgroundColor: AppTheme.oledBlack,
+          backgroundColor: AppTheme.background,
           appBar: AppBar(
-            backgroundColor: AppTheme.oledBlack,
+            backgroundColor: AppTheme.background,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(LucideIcons.arrowLeft,
@@ -56,25 +56,25 @@ class RoutineDetailScreen extends ConsumerWidget {
             actions: [
               IconButton(
                 icon: const Icon(LucideIcons.pencil,
-                    size: 18, color: AppTheme.neonCyan),
+                    size: 18, color: AppTheme.primary),
                 onPressed: () => context.push('/routines/$routineId/edit'),
               ),
               _buildOptionsMenu(context, ref, routine),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppTheme.spaceXs),
             ],
             bottom: const PreferredSize(
               preferredSize: Size.fromHeight(1),
-              child: Divider(color: AppTheme.glassBorder, height: 1),
+              child: Divider(color: AppTheme.border, height: 1),
             ),
           ),
           body: SafeArea(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceLg, 100),
               children: [
                 _buildHeader(routine),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.spaceLg),
                 _buildSummaryBadges(routine),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.spaceXxl),
                 _buildExercisesSection(context, routine),
               ],
             ),
@@ -83,7 +83,7 @@ class RoutineDetailScreen extends ConsumerWidget {
         );
       },
       loading: () => const Scaffold(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         body: Center(
           child: SingleChildScrollView(
             child: LoadingStateWidget(),
@@ -91,7 +91,7 @@ class RoutineDetailScreen extends ConsumerWidget {
         ),
       ),
       error: (err, stack) => Scaffold(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         body: ErrorStateWidget(
           error: err,
           onRetry: () =>
@@ -103,11 +103,10 @@ class RoutineDetailScreen extends ConsumerWidget {
 
   Widget _buildHeader(Routine routine) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +122,7 @@ class RoutineDetailScreen extends ConsumerWidget {
           ),
           if (routine.description != null &&
               routine.description!.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               routine.description!,
               style: const TextStyle(
@@ -145,7 +144,7 @@ class RoutineDetailScreen extends ConsumerWidget {
           child: _buildBadgeCard(
             label: 'EXERCISES',
             value: '${routine.exerciseCount}',
-            color: AppTheme.neonCyan,
+            color: AppTheme.primary,
           ),
         ),
         const SizedBox(width: 10),
@@ -161,7 +160,7 @@ class RoutineDetailScreen extends ConsumerWidget {
           child: _buildBadgeCard(
             label: 'EST. DURATION',
             value: '${routine.estimatedDurationMinutes} MIN',
-            color: AppTheme.voltGreen,
+            color: AppTheme.secondary,
           ),
         ),
       ],
@@ -174,11 +173,10 @@ class RoutineDetailScreen extends ConsumerWidget {
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceMd, horizontal: AppTheme.spaceSm),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: AppTheme.glassBorder),
       ),
       child: Column(
         children: [
@@ -191,7 +189,7 @@ class RoutineDetailScreen extends ConsumerWidget {
               color: AppTheme.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppTheme.spaceXs),
           Text(
             value,
             style: AppTheme.num(
@@ -218,14 +216,13 @@ class RoutineDetailScreen extends ConsumerWidget {
             color: AppTheme.textPrimary,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.spaceMd),
         if (routine.exercises.isEmpty)
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppTheme.spaceXxl),
             decoration: BoxDecoration(
-              color: AppTheme.glassFill,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.glassBorder),
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
             child: const Center(
               child: Text(
@@ -253,11 +250,10 @@ class RoutineDetailScreen extends ConsumerWidget {
         exercise.exerciseName ?? exercise.exercise?.name ?? 'Exercise';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppTheme.spaceMd),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -270,7 +266,7 @@ class RoutineDetailScreen extends ConsumerWidget {
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: AppTheme.neonCyan.withValues(alpha: 0.15),
+                    color: AppTheme.primary.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -279,11 +275,11 @@ class RoutineDetailScreen extends ConsumerWidget {
                     style: AppTheme.num(
                       12,
                       weight: FontWeight.w800,
-                      color: AppTheme.neonCyan,
+                      color: AppTheme.primary,
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppTheme.spaceMd),
                 Expanded(
                   child: Text(
                     exName,
@@ -296,24 +292,24 @@ class RoutineDetailScreen extends ConsumerWidget {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppTheme.glassFill,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: AppTheme.glassBorder),
+                    border: Border.all(color: AppTheme.border),
                   ),
                   child: Text(
                     '${exercise.restSeconds}s rest',
                     style: AppTheme.num(
                       11,
-                      color: AppTheme.voltGreen,
+                      color: AppTheme.secondary,
                       weight: FontWeight.w600,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppTheme.spaceMd),
             // Sets Breakdown Table
             _buildSetsTable(exercise),
             if (exercise.notes != null && exercise.notes!.isNotEmpty) ...[
@@ -321,9 +317,9 @@ class RoutineDetailScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141416),
+                  color: AppTheme.surfaceElevated,
                   borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: AppTheme.glassBorder),
+                  border: Border.all(color: AppTheme.border),
                 ),
                 child: Row(
                   children: [
@@ -358,7 +354,7 @@ class RoutineDetailScreen extends ConsumerWidget {
 
     if (sets.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXs),
         child: Text(
           'Target: ${exercise.targetSummary}',
           style: AppTheme.num(13, color: AppTheme.textSecondary),
@@ -380,7 +376,7 @@ class RoutineDetailScreen extends ConsumerWidget {
             ],
           ),
         ),
-        const Divider(color: AppTheme.glassBorder, height: 1),
+        const Divider(color: AppTheme.border, height: 1),
         const SizedBox(height: 6),
         // Table Rows
         ...sets.map((s) {
@@ -391,7 +387,7 @@ class RoutineDetailScreen extends ConsumerWidget {
           final rpeStr = s.targetRpe != null ? '${s.targetRpe}' : '-';
 
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXs),
             child: Row(
               children: [
                 Expanded(
@@ -412,7 +408,7 @@ class RoutineDetailScreen extends ConsumerWidget {
                     style: AppTheme.num(
                       12,
                       color: s.targetWeightKg != null && s.targetWeightKg! > 0
-                          ? AppTheme.neonCyan
+                          ? AppTheme.primary
                           : AppTheme.textSecondary,
                     ),
                   ),
@@ -431,7 +427,7 @@ class RoutineDetailScreen extends ConsumerWidget {
                     style: AppTheme.num(
                       12,
                       color: s.targetRpe != null
-                          ? AppTheme.voltGreen
+                          ? AppTheme.secondary
                           : AppTheme.textSecondary,
                     ),
                   ),
@@ -470,10 +466,10 @@ class RoutineDetailScreen extends ConsumerWidget {
         color: AppTheme.textSecondary,
         size: 18,
       ),
-      color: const Color(0xFF141416),
+      color: AppTheme.surfaceElevated,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6),
-        side: const BorderSide(color: AppTheme.glassBorder),
+        side: const BorderSide(color: AppTheme.border),
       ),
       onSelected: (action) async {
         if (action == 'duplicate') {
@@ -484,7 +480,7 @@ class RoutineDetailScreen extends ConsumerWidget {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Duplicated "${routine.name}"'),
-                backgroundColor: const Color(0xFF1F1F24),
+                backgroundColor: AppTheme.surfaceElevated,
               ),
             );
             context.push('/routines/${cloned.id}');
@@ -509,10 +505,10 @@ class RoutineDetailScreen extends ConsumerWidget {
           value: 'delete',
           child: Row(
             children: [
-              Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
+              Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
               SizedBox(width: 10),
               Text('Delete Routine',
-                  style: TextStyle(color: AppTheme.burntOrange)),
+                  style: TextStyle(color: AppTheme.warning)),
             ],
           ),
         ),
@@ -528,11 +524,6 @@ class RoutineDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF141416),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: AppTheme.glassBorder),
-        ),
         title: const Text(
           'Delete Routine?',
           style: TextStyle(
@@ -557,7 +548,7 @@ class RoutineDetailScreen extends ConsumerWidget {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.burntOrange,
+              backgroundColor: AppTheme.warning,
               foregroundColor: AppTheme.textPrimary,
             ),
             onPressed: () async {
@@ -582,8 +573,8 @@ class RoutineDetailScreen extends ConsumerWidget {
     Routine routine,
   ) {
     return Container(
-      color: const Color(0xFF101012),
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      color: AppTheme.surfaceElevated,
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceMd, AppTheme.spaceLg, AppTheme.spaceLg),
       child: SafeArea(
         top: false,
         child: SizedBox(
@@ -604,8 +595,8 @@ class RoutineDetailScreen extends ConsumerWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.neonCyan,
-              foregroundColor: AppTheme.oledBlack,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.background,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
@@ -628,10 +619,10 @@ class RoutineDetailScreen extends ConsumerWidget {
 
   Widget _buildNotFoundScreen(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppTheme.spaceXxl),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -640,7 +631,7 @@ class RoutineDetailScreen extends ConsumerWidget {
                 size: 48,
                 color: AppTheme.textSecondary,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppTheme.spaceLg),
               const Text(
                 'Routine Not Found',
                 style: TextStyle(
@@ -649,17 +640,17 @@ class RoutineDetailScreen extends ConsumerWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppTheme.spaceSm),
               const Text(
                 'This routine may have been deleted.',
                 style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppTheme.spaceXxl),
               ElevatedButton(
                 onPressed: () => context.pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.neonCyan,
-                  foregroundColor: AppTheme.oledBlack,
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.background,
                 ),
                 child: const Text('BACK TO ROUTINES'),
               ),

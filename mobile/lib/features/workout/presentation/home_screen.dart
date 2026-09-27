@@ -12,8 +12,8 @@ import 'home_controller.dart';
 import 'home_state.dart';
 import 'widgets/session_conflict_dialog.dart';
 
-/// Root shell hosting the four main tabs (FEATURES.md §7): pitch-black
-/// bar, white active tint, glass border top.
+/// Root shell hosting the four main tabs (FEATURES.md §7): OLED-black
+/// bar, white active tint, divider top.
 class MainShell extends StatelessWidget {
   const MainShell({required this.navigationShell, super.key});
 
@@ -25,8 +25,8 @@ class MainShell extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: DecoratedBox(
         decoration: const BoxDecoration(
-          color: AppTheme.oledBlack,
-          border: Border(top: BorderSide(color: AppTheme.glassBorder)),
+          color: AppTheme.background,
+          border: Border(top: BorderSide(color: AppTheme.divider)),
         ),
         child: NavigationBar(
           selectedIndex: navigationShell.currentIndex,
@@ -59,25 +59,25 @@ class HomePage extends ConsumerWidget {
     final now = DateTime.now();
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXxl),
           children: [
             _HomeHeader(now: now),
             if (state.activeSession != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               _ResumeBanner(session: state.activeSession!),
             ],
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             _StartSessionButton(isFirstRun: state.isFirstRun),
             if (state.suggestedRoutine != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               _SuggestedRoutineCard(routine: state.suggestedRoutine!),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             _GlanceSection(state: state),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             _RecentWorkoutsSection(state: state),
           ],
         ),
@@ -96,7 +96,7 @@ class _HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      padding: const EdgeInsets.only(top: AppTheme.spaceSm, bottom: AppTheme.spaceXs),
       child: Row(
         children: [
           Expanded(
@@ -112,7 +112,7 @@ class _HomeHeader extends StatelessWidget {
                     color: AppTheme.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.spaceXxs),
                 Text(
                   HomeState.dateLabel(now),
                   style: AppTheme.num(
@@ -160,27 +160,27 @@ class _ResumeBanner extends StatelessWidget {
     return InkWell(
       key: const ValueKey('home_resume_banner'),
       onTap: () => context.push('/workout/active'),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceMd),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.neonCyan),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          border: Border.all(color: AppTheme.primary),
         ),
         child: Row(
           children: [
-            const Icon(LucideIcons.play, size: 18, color: AppTheme.neonCyan),
-            const SizedBox(width: 12),
+            const Icon(LucideIcons.play, size: 18, color: AppTheme.primary),
+            const SizedBox(width: AppTheme.spaceMd),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     l10n.homeResumeBannerTitle,
-                    style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.neonCyan),
+                    style: AppTheme.num(12, weight: FontWeight.w700, color: AppTheme.primary),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     l10n.homeResumeBannerSubtitle(session.name, elapsedText, setsDone, setsTotal),
                     overflow: TextOverflow.ellipsis,
@@ -189,7 +189,7 @@ class _ResumeBanner extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(LucideIcons.chevronRight, size: 18, color: AppTheme.neonCyan),
+            const Icon(LucideIcons.chevronRight, size: 18, color: AppTheme.primary),
           ],
         ),
       ),
@@ -225,8 +225,8 @@ class _StartSessionButton extends ConsumerWidget {
         key: const ValueKey('home_start_button'),
         onPressed: () => _start(context, ref),
         style: FilledButton.styleFrom(
-          backgroundColor: AppTheme.neonCyan,
-          foregroundColor: AppTheme.oledBlack,
+          backgroundColor: AppTheme.primary,
+          foregroundColor: AppTheme.background,
           shape: const RoundedRectangleBorder(),
           textStyle: const TextStyle(
             fontSize: 16,
@@ -272,18 +272,17 @@ class _SuggestedRoutineCard extends ConsumerWidget {
     return InkWell(
       key: const ValueKey('home_suggested_routine'),
       onTap: () => _start(context, ref),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: 14),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Row(
           children: [
-            const Icon(LucideIcons.dumbbell, size: 20, color: AppTheme.neonCyan),
-            const SizedBox(width: 12),
+            const Icon(LucideIcons.dumbbell, size: 20, color: AppTheme.primary),
+            const SizedBox(width: AppTheme.spaceMd),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +305,7 @@ class _SuggestedRoutineCard extends ConsumerWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     meta,
                     style: AppTheme.num(
@@ -318,7 +317,7 @@ class _SuggestedRoutineCard extends ConsumerWidget {
                 ],
               ),
             ),
-            const Icon(LucideIcons.play, size: 18, color: AppTheme.voltGreen),
+            const Icon(LucideIcons.play, size: 18, color: AppTheme.secondary),
           ],
         ),
       ),
@@ -345,9 +344,9 @@ class _GlanceSection extends StatelessWidget {
     final delta = state.volumeDeltaPercent;
     if (delta != null) {
       final up = delta >= 0;
-      final color = up ? AppTheme.voltGreen : AppTheme.burntOrange;
+      final color = up ? AppTheme.secondary : AppTheme.warning;
       volumeBadge = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(4),
@@ -359,9 +358,9 @@ class _GlanceSection extends StatelessWidget {
       );
     } else if (state.volumeIsNewThisWeek) {
       volumeBadge = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
         decoration: BoxDecoration(
-          color: AppTheme.voltGreen.withValues(alpha: 0.12),
+          color: AppTheme.secondary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
@@ -369,7 +368,7 @@ class _GlanceSection extends StatelessWidget {
           style: AppTheme.num(
             10,
             weight: FontWeight.w700,
-            color: AppTheme.voltGreen,
+            color: AppTheme.secondary,
           ),
         ),
       );
@@ -386,7 +385,7 @@ class _GlanceSection extends StatelessWidget {
           label: l10n.glanceThisWeek,
           value: streak?.weeklyProgressDisplay ?? '—',
           accent: (streak?.weeklyGoalMet ?? false)
-              ? AppTheme.neonCyan
+              ? AppTheme.primary
               : AppTheme.textSecondary,
         ),
         _GlanceChip(
@@ -402,7 +401,7 @@ class _GlanceSection extends StatelessWidget {
           _GlanceChip(
             label: l10n.glanceStreak,
             value: streak.streakDisplay,
-            accent: AppTheme.neonCyan,
+            accent: AppTheme.primary,
           ),
         if (state.hasCalorieGoal && calories != null)
           _GlanceChip(
@@ -414,7 +413,7 @@ class _GlanceSection extends StatelessWidget {
   }
 }
 
-/// Single glass glance chip — accent-colored label, tabular-numeral
+/// Single surface glance chip — accent-colored label, tabular-numeral
 /// value, optional trailing badge (the ▲/▼ volume delta).
 class _GlanceChip extends StatelessWidget {
   const _GlanceChip({
@@ -432,11 +431,10 @@ class _GlanceChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd, vertical: AppTheme.spaceSm),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,7 +444,7 @@ class _GlanceChip extends StatelessWidget {
             label,
             style: AppTheme.num(10, weight: FontWeight.w700, color: accent),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: AppTheme.spaceXxs),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -499,14 +497,14 @@ class _RecentWorkoutsSection extends StatelessWidget {
                 key: const ValueKey('home_view_all_history'),
                 onPressed: () => context.push('/history'),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 child: Text(
                   l10n.viewAll,
                   style: const TextStyle(
-                    color: AppTheme.neonCyan,
+                    color: AppTheme.primary,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
                   ),
@@ -514,7 +512,7 @@ class _RecentWorkoutsSection extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppTheme.spaceSm),
         if (state.recentWorkouts.isEmpty)
           const _RecentEmptyState()
         else
@@ -537,11 +535,10 @@ class _RecentEmptyState extends StatelessWidget {
     return Container(
       key: const ValueKey('home_recent_empty'),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceXxl),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         children: [
@@ -607,14 +604,13 @@ class _RecentWorkoutCard extends StatelessWidget {
     return InkWell(
       key: ValueKey('home_recent_card_${item.id}'),
       onTap: () => context.push('/history/${item.id}'),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Row(
           children: [
@@ -636,15 +632,15 @@ class _RecentWorkoutCard extends StatelessWidget {
                         ),
                       ),
                       if (item.prCount > 0) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppTheme.spaceSm),
                         Container(
                           key: const ValueKey('home_recent_pr_chip'),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
-                            vertical: 2,
+                            vertical: AppTheme.spaceXxs,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.voltGreen.withValues(alpha: 0.12),
+                            color: AppTheme.secondary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -652,7 +648,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                             style: AppTheme.num(
                               10,
                               weight: FontWeight.w700,
-                              color: AppTheme.voltGreen,
+                              color: AppTheme.secondary,
                             ),
                           ),
                         ),
@@ -680,7 +676,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
             const Icon(
               LucideIcons.chevronRight,
               size: 16,

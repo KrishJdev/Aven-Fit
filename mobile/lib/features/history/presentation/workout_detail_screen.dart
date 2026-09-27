@@ -27,19 +27,19 @@ class WorkoutDetailScreen extends ConsumerWidget {
         ref.read(workoutDetailControllerProvider(sessionId).notifier);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white, size: 22),
+          icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.textPrimary, size: 22),
           onPressed: () => context.pop(),
         ),
         title: sessionAsync.whenOrNull(
               data: (session) => session == null
                   ? Text(
                       'WORKOUT',
-                      style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+                      style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
                     )
                   : GestureDetector(
                       onTap: () => _renameDialog(context, controller, session.name),
@@ -50,7 +50,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
                             child: Text(
                               session.name,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+                              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -67,7 +67,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
                     : PopupMenuButton<String>(
                         icon: const Icon(LucideIcons.ellipsisVertical,
                             color: AppTheme.textSecondary, size: 20),
-                        color: const Color(0xFF1B1F24),
+                        color: AppTheme.surfaceElevated,
                         onSelected: (value) {
                           if (value == 'save_routine') {
                             _saveAsRoutineDialog(context, controller, session.name);
@@ -80,10 +80,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
                             value: 'save_routine',
                             child: Row(
                               children: [
-                                Icon(LucideIcons.bookmark, size: 16, color: AppTheme.neonCyan),
-                                SizedBox(width: 8),
+                                Icon(LucideIcons.bookmark, size: 16, color: AppTheme.primary),
+                                SizedBox(width: AppTheme.spaceSm),
                                 Text('Save as routine',
-                                    style: TextStyle(color: Colors.white, fontSize: 13)),
+                                    style: TextStyle(color: AppTheme.textPrimary, fontSize: 13)),
                               ],
                             ),
                           ),
@@ -91,10 +91,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(LucideIcons.trash2, size: 16, color: AppTheme.burntOrange),
-                                SizedBox(width: 8),
+                                Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
+                                SizedBox(width: AppTheme.spaceSm),
                                 Text('Delete workout',
-                                    style: TextStyle(color: AppTheme.burntOrange, fontSize: 13)),
+                                    style: TextStyle(color: AppTheme.warning, fontSize: 13)),
                               ],
                             ),
                           ),
@@ -135,15 +135,15 @@ class WorkoutDetailScreen extends ConsumerWidget {
     final completedAt = session.completedAt ?? session.startedAt;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXxl),
       children: [
         Text(
           'COMPLETED · ${_formatDate(completedAt)}',
           style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppTheme.spaceMd),
         _StatsGrid(session: session),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppTheme.spaceLg),
         if (session.exercises.isEmpty)
           const _NoExercisesNote()
         else
@@ -160,8 +160,8 @@ class WorkoutDetailScreen extends ConsumerWidget {
     WorkoutDetailController controller,
   ) {
     return Container(
-      color: AppTheme.oledBlack,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      color: AppTheme.background,
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceLg),
       child: SafeArea(
         top: false,
         child: SizedBox(
@@ -173,9 +173,9 @@ class WorkoutDetailScreen extends ConsumerWidget {
             icon: const Icon(LucideIcons.rotateCcw, size: 18),
             label: const Text('REPEAT WORKOUT'),
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.voltGreen,
-              foregroundColor: Colors.black,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              backgroundColor: AppTheme.secondary,
+              foregroundColor: AppTheme.textOnPrimary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
             ),
           ),
         ),
@@ -207,16 +207,15 @@ class WorkoutDetailScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
         title: Text('RENAME WORKOUT',
-            style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
+            style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary)),
         content: TextField(
           controller: textController,
           autofocus: true,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'Workout name...',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
           ),
         ),
         actions: [
@@ -230,8 +229,8 @@ class WorkoutDetailScreen extends ConsumerWidget {
               Navigator.of(ctx).pop();
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.neonCyan,
-              foregroundColor: Colors.black,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.textOnPrimary,
             ),
             child: const Text('SAVE'),
           ),
@@ -249,16 +248,15 @@ class WorkoutDetailScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
         title: Text('SAVE AS ROUTINE',
-            style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
+            style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary)),
         content: TextField(
           controller: textController,
           autofocus: true,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
+          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
           decoration: InputDecoration(
             hintText: 'Routine name...',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
           ),
         ),
         actions: [
@@ -278,14 +276,14 @@ class WorkoutDetailScreen extends ConsumerWidget {
                           ? 'Saved to your routines'
                           : 'Could not save as routine',
                     ),
-                    backgroundColor: const Color(0xFF1F1F24),
+                    backgroundColor: AppTheme.surfaceElevated,
                   ),
                 );
               }
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.neonCyan,
-              foregroundColor: Colors.black,
+              backgroundColor: AppTheme.primary,
+              foregroundColor: AppTheme.textOnPrimary,
             ),
             child: const Text('SAVE'),
           ),
@@ -301,11 +299,9 @@ class WorkoutDetailScreen extends ConsumerWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           'DELETE WORKOUT',
-          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.burntOrange),
+          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.warning),
         ),
         content: const Text(
           'Delete this workout and all of its sets? This can\'t be undone.',
@@ -325,8 +321,8 @@ class WorkoutDetailScreen extends ConsumerWidget {
               }
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.burntOrange,
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.warning,
+              foregroundColor: AppTheme.textPrimary,
             ),
             child: const Text('DELETE'),
           ),
@@ -361,11 +357,10 @@ class _StatsGrid extends StatelessWidget {
         : session.totalVolumeKg.toStringAsFixed(1);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: 14),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         children: [
@@ -376,7 +371,7 @@ class _StatsGrid extends StatelessWidget {
               _StatCell(label: 'WORKING VOLUME', value: '$volume kg', highlight: true),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppTheme.spaceMd),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -423,13 +418,13 @@ class _StatCell extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppTheme.spaceXs),
         Text(
           value,
           style: AppTheme.num(
             16,
             weight: FontWeight.w700,
-            color: highlight ? AppTheme.voltGreen : Colors.white,
+            color: highlight ? AppTheme.secondary : AppTheme.textPrimary,
           ),
         ),
       ],
@@ -438,7 +433,7 @@ class _StatCell extends StatelessWidget {
 }
 
 /// One card per exercise: every set as `weight × reps`, warm-ups W-badged,
-/// PR sets chipped (volt green).
+/// PR sets chipped (secondary).
 class _ExerciseBreakdownCard extends StatelessWidget {
   const _ExerciseBreakdownCard({required this.exercise});
 
@@ -449,21 +444,20 @@ class _ExerciseBreakdownCard extends StatelessWidget {
     final sets = exercise.sets;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(bottom: AppTheme.spaceMd),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             exercise.exerciseName ?? 'Exercise',
-            style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
+            style: AppTheme.num(14, weight: FontWeight.w700, color: AppTheme.textPrimary),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppTheme.spaceSm),
           if (sets.isEmpty)
             const Text(
               'No sets logged',
@@ -512,12 +506,12 @@ class _SetRow extends StatelessWidget {
                     style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                   ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppTheme.spaceSm),
           Expanded(
             child: set.isCompleted
                 ? Text(
                     '$weight kg × ${set.reps}',
-                    style: AppTheme.num(13, weight: FontWeight.w600, color: Colors.white),
+                    style: AppTheme.num(13, weight: FontWeight.w600, color: AppTheme.textPrimary),
                   )
                 : Text(
                     '$weight kg × ${set.reps} (not completed)',
@@ -526,14 +520,14 @@ class _SetRow extends StatelessWidget {
           ),
           if (set.isPr)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
               decoration: BoxDecoration(
-                color: AppTheme.voltGreen.withValues(alpha: 0.15),
+                color: AppTheme.secondary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 'PR',
-                style: AppTheme.num(10, weight: FontWeight.w700, color: AppTheme.voltGreen),
+                style: AppTheme.num(10, weight: FontWeight.w700, color: AppTheme.secondary),
               ),
             ),
         ],
@@ -548,11 +542,10 @@ class _NoExercisesNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppTheme.spaceLg),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: const Text(
         'This workout had no logged exercises.',
@@ -573,23 +566,23 @@ class _ErrorState extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppTheme.spaceXxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.burntOrange),
-            const SizedBox(height: 16),
+            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.warning),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               'COULD NOT LOAD WORKOUT',
-              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               error.toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             OutlinedButton(
               onPressed: () => ref.invalidate(
                 workoutDetailControllerProvider(sessionId),
@@ -611,23 +604,23 @@ class _NotFoundState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(LucideIcons.circleQuestionMark, size: 52, color: AppTheme.textSecondary),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               'WORKOUT NOT FOUND',
-              style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'This workout may have been deleted.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             FilledButton(
               onPressed: () => context.pop(),
               child: const Text('BACK TO HISTORY'),

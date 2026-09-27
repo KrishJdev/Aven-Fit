@@ -21,17 +21,17 @@ class HistoryListScreen extends ConsumerWidget {
     final limit = ref.watch(historyFeedLimitProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.oledBlack,
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, color: Colors.white, size: 22),
+          icon: const Icon(LucideIcons.chevronLeft, color: AppTheme.textPrimary, size: 22),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'WORKOUT HISTORY',
-          style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+          style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
         ),
       ),
       body: feedAsync.when(
@@ -67,12 +67,12 @@ class _HistoryFeed extends ConsumerWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceSm, AppTheme.spaceLg, AppTheme.spaceXxl),
       itemCount: groups.length + (items.length >= limit ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= groups.length) {
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceMd),
             child: OutlinedButton(
               key: const ValueKey('history_load_more'),
               onPressed: () => ref
@@ -80,7 +80,7 @@ class _HistoryFeed extends ConsumerWidget {
                   .loadMore(),
               child: const Text(
                 'LOAD MORE',
-                style: TextStyle(color: AppTheme.neonCyan, fontSize: 13),
+                style: TextStyle(color: AppTheme.primary, fontSize: 13),
               ),
             ),
           );
@@ -91,7 +91,7 @@ class _HistoryFeed extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
+              padding: const EdgeInsets.fromLTRB(AppTheme.spaceXs, AppTheme.spaceLg, AppTheme.spaceXs, AppTheme.spaceSm),
               child: Text(
                 label,
                 style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.textSecondary),
@@ -137,14 +137,13 @@ class _HistoryCard extends StatelessWidget {
     return InkWell(
       key: ValueKey('history_card_${item.id}'),
       onTap: () => context.push('/history/${item.id}'),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Row(
           children: [
@@ -158,26 +157,26 @@ class _HistoryCard extends StatelessWidget {
                         child: Text(
                           item.name,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTheme.num(14, weight: FontWeight.w700, color: Colors.white),
+                          style: AppTheme.num(14, weight: FontWeight.w700, color: AppTheme.textPrimary),
                         ),
                       ),
                       if (item.prCount > 0) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppTheme.spaceSm),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
                           decoration: BoxDecoration(
-                            color: AppTheme.voltGreen.withValues(alpha: 0.15),
+                            color: AppTheme.secondary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             '${item.prCount} PR',
-                            style: AppTheme.num(10, weight: FontWeight.w700, color: AppTheme.voltGreen),
+                            style: AppTheme.num(10, weight: FontWeight.w700, color: AppTheme.secondary),
                           ),
                         ),
                       ],
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppTheme.spaceXs),
                   Text(
                     '$relativeDate · '
                     '${item.exerciseCount} exercise${item.exerciseCount == 1 ? '' : 's'}',
@@ -186,7 +185,7 @@ class _HistoryCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     '${item.totalSetsCount} sets · ${item.volumeDisplay} kg · $duration',
-                    style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.neonCyan),
+                    style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.primary),
                   ),
                 ],
               ),
@@ -231,30 +230,30 @@ class _HistoryEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(LucideIcons.history, size: 56, color: AppTheme.textSecondary),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               'NO WORKOUTS YET',
-              style: AppTheme.num(18, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             const Text(
               'Your history will appear here once you complete your first workout.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             FilledButton.icon(
               onPressed: () => context.push('/workout/active'),
               icon: const Icon(LucideIcons.play, size: 16),
               label: const Text('START WORKOUT'),
               style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.neonCyan,
-                foregroundColor: Colors.black,
+                backgroundColor: AppTheme.primary,
+                foregroundColor: AppTheme.textOnPrimary,
               ),
             ),
           ],
@@ -274,23 +273,23 @@ class _HistoryErrorState extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppTheme.spaceXxl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.burntOrange),
-            const SizedBox(height: 16),
+            const Icon(LucideIcons.triangleAlert, size: 48, color: AppTheme.warning),
+            const SizedBox(height: AppTheme.spaceLg),
             Text(
               'COULD NOT LOAD HISTORY',
-              style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Text(
               error.toString(),
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             OutlinedButton(
               onPressed: () => ref.invalidate(watchWorkoutHistoryProvider),
               child: const Text('RETRY'),

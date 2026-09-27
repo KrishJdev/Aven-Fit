@@ -177,7 +177,7 @@ void main() {
           overrides: [nutritionRepositoryProvider.overrideWithValue(repo)],
           child: MaterialApp(
             theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppTheme.oledBlack,
+              scaffoldBackgroundColor: AppTheme.background,
             ),
             home: const FoodSearchScreen(),
           ),
@@ -222,7 +222,7 @@ void main() {
           overrides: [nutritionRepositoryProvider.overrideWithValue(repo)],
           child: MaterialApp(
             theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppTheme.oledBlack,
+              scaffoldBackgroundColor: AppTheme.background,
             ),
             home: const FoodSearchScreen(),
           ),
@@ -371,7 +371,7 @@ void main() {
           overrides: [nutritionRepositoryProvider.overrideWithValue(repo)],
           child: MaterialApp.router(
             theme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: AppTheme.oledBlack,
+              scaffoldBackgroundColor: AppTheme.background,
             ),
             routerConfig: router,
           ),

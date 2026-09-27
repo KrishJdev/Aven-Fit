@@ -27,7 +27,6 @@ class RoutineExerciseEditorSheet extends StatefulWidget {
     return showModalBottomSheet<RoutineExercise>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (ctx) => RoutineExerciseEditorSheet(
         exercise: exercise,
         onSave: (updated) => Navigator.of(ctx).pop(updated),
@@ -136,19 +135,19 @@ class _RoutineExerciseEditorSheetState
 
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF101012),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        color: AppTheme.surfaceElevated,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusLg)),
         border: Border(
-          top: BorderSide(color: AppTheme.glassBorder, width: 1.5),
-          left: BorderSide(color: AppTheme.glassBorder, width: 1),
-          right: BorderSide(color: AppTheme.glassBorder, width: 1),
+          top: BorderSide(color: AppTheme.border, width: 1.5),
+          left: BorderSide(color: AppTheme.border, width: 1),
+          right: BorderSide(color: AppTheme.border, width: 1),
         ),
       ),
       padding: EdgeInsets.only(
-        top: 20,
-        left: 20,
-        right: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        top: AppTheme.spaceXl,
+        left: AppTheme.spaceXl,
+        right: AppTheme.spaceXl,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppTheme.spaceXxl,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -161,12 +160,12 @@ class _RoutineExerciseEditorSheetState
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppTheme.glassBorder,
+                  color: AppTheme.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,10 +189,10 @@ class _RoutineExerciseEditorSheetState
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
             // Sets Count Selector
             _buildSectionHeader('PLANNED SETS'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Row(
               children: [
                 _buildStepperButton(
@@ -204,24 +203,23 @@ class _RoutineExerciseEditorSheetState
                     }
                   },
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppTheme.spaceLg),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceSm),
                   decoration: BoxDecoration(
-                    color: AppTheme.glassFill,
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppTheme.glassBorder),
                   ),
                   child: Text(
                     '$_setsCount SETS',
                     style: AppTheme.num(
                       16,
                       weight: FontWeight.w700,
-                      color: AppTheme.neonCyan,
+                      color: AppTheme.primary,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppTheme.spaceLg),
                 _buildStepperButton(
                   icon: LucideIcons.plus,
                   onTap: () {
@@ -232,7 +230,7 @@ class _RoutineExerciseEditorSheetState
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             // Target Weight & Reps
             Row(
               children: [
@@ -241,7 +239,7 @@ class _RoutineExerciseEditorSheetState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSectionHeader('TARGET WEIGHT (KG)'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.spaceSm),
                       _buildNumberField(
                         controller: _weightController,
                         hintText: '0.0',
@@ -250,13 +248,13 @@ class _RoutineExerciseEditorSheetState
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppTheme.spaceLg),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSectionHeader('TARGET REPS'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.spaceSm),
                       _buildNumberField(
                         controller: _repsController,
                         hintText: '10',
@@ -267,10 +265,10 @@ class _RoutineExerciseEditorSheetState
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             // Rest Timer
             _buildSectionHeader('REST DURATION'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -279,17 +277,17 @@ class _RoutineExerciseEditorSheetState
                 return ChoiceChip(
                   label: Text('${secs}s'),
                   selected: isSelected,
-                  selectedColor: AppTheme.neonCyan.withValues(alpha: 0.2),
-                  backgroundColor: AppTheme.glassFill,
+                  selectedColor: AppTheme.primary.withValues(alpha: 0.2),
+                  backgroundColor: AppTheme.surface,
                   labelStyle: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: isSelected ? AppTheme.neonCyan : AppTheme.textSecondary,
+                    color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                     side: BorderSide(
-                      color: isSelected ? AppTheme.neonCyan : AppTheme.glassBorder,
+                      color: isSelected ? AppTheme.primary : AppTheme.border,
                     ),
                   ),
                   onSelected: (selected) {
@@ -300,19 +298,19 @@ class _RoutineExerciseEditorSheetState
                 );
               }).toList(),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             // Target RPE (optional)
             _buildSectionHeader('TARGET RPE (OPTIONAL: 6-10)'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             _buildNumberField(
               controller: _rpeController,
               hintText: 'e.g. 8.5',
               isDecimal: true,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppTheme.spaceXl),
             // Notes
             _buildSectionHeader('NOTES & CUES (OPTIONAL)'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppTheme.spaceSm),
             TextField(
               controller: _notesController,
               maxLines: 2,
@@ -323,24 +321,24 @@ class _RoutineExerciseEditorSheetState
                   color: AppTheme.textSecondary.withValues(alpha: 0.4),
                   fontSize: 12,
                 ),
-                fillColor: AppTheme.glassFill,
+                fillColor: AppTheme.surface,
                 filled: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
-                  borderSide: const BorderSide(color: AppTheme.glassBorder),
+                  borderSide: const BorderSide(color: AppTheme.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
-                  borderSide: const BorderSide(color: AppTheme.glassBorder),
+                  borderSide: const BorderSide(color: AppTheme.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
-                  borderSide: const BorderSide(color: AppTheme.neonCyan),
+                  borderSide: const BorderSide(color: AppTheme.primary),
                 ),
-                contentPadding: const EdgeInsets.all(12),
+                contentPadding: const EdgeInsets.all(AppTheme.spaceMd),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppTheme.spaceXxl),
             // Save button
             SizedBox(
               width: double.infinity,
@@ -348,8 +346,8 @@ class _RoutineExerciseEditorSheetState
               child: ElevatedButton(
                 onPressed: _handleSave,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.neonCyan,
-                  foregroundColor: AppTheme.oledBlack,
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.background,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -389,9 +387,9 @@ class _RoutineExerciseEditorSheetState
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
+          color: AppTheme.surface,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: AppTheme.glassBorder),
+          border: Border.all(color: AppTheme.border),
         ),
         child: Icon(icon, size: 18, color: AppTheme.textPrimary),
       ),
@@ -419,21 +417,21 @@ class _RoutineExerciseEditorSheetState
           color: AppTheme.textSecondary.withValues(alpha: 0.4),
           fontSize: 13,
         ),
-        fillColor: AppTheme.glassFill,
+        fillColor: AppTheme.surface,
         filled: true,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppTheme.glassBorder),
+          borderSide: const BorderSide(color: AppTheme.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppTheme.glassBorder),
+          borderSide: const BorderSide(color: AppTheme.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: AppTheme.neonCyan),
+          borderSide: const BorderSide(color: AppTheme.primary),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd, vertical: 10),
       ),
     );
   }

@@ -29,10 +29,10 @@ class ProgressScreen extends ConsumerWidget {
     final recentAsync = ref.watch(recentWorkoutsStreamProvider);
 
     return Scaffold(
-      backgroundColor: AppTheme.oledBlack,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceLg, AppTheme.spaceXxl),
           children: [
             Text(
               l10n.progressTitle,
@@ -42,14 +42,14 @@ class ProgressScreen extends ConsumerWidget {
                 color: AppTheme.textPrimary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
 
             // Streak (§17): current chain + this week's forgiving progress.
             streakAsync.maybeWhen(
               data: (streak) => _StreakCard(streak: streak),
               orElse: () => const SizedBox.shrink(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
 
             // PR Vault preview (§10.2): the newest records, full vault
             // one tap away.
@@ -72,7 +72,7 @@ class ProgressScreen extends ConsumerWidget {
                     ),
               orElse: () => const SizedBox.shrink(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
 
             // Recent workouts (§7.1 parity): top 5, full history one tap
             // away (WU-3.9).
@@ -95,7 +95,7 @@ class ProgressScreen extends ConsumerWidget {
                     ),
               orElse: () => const SizedBox.shrink(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppTheme.spaceLg),
 
             // Body-weight preview (§10.3 [PROPOSED]) — P1 placeholder.
             const _BodyWeightPlaceholder(),
@@ -125,7 +125,7 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppTheme.spaceSm),
       child: Row(
         children: [
           Text(
@@ -142,14 +142,14 @@ class _SectionHeader extends StatelessWidget {
               key: ValueKey(actionKey),
               onPressed: onAction,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: Text(
                 actionLabel,
                 style: const TextStyle(
-                  color: AppTheme.neonCyan,
+                  color: AppTheme.primary,
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                 ),
@@ -177,9 +177,8 @@ class _StreakCard extends StatelessWidget {
       key: const ValueKey('progress_streak_card'),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Row(
         children: [
@@ -192,7 +191,7 @@ class _StreakCard extends StatelessWidget {
                   style: AppTheme.num(
                     10,
                     weight: FontWeight.w700,
-                    color: met ? AppTheme.neonCyan : AppTheme.textSecondary,
+                    color: met ? AppTheme.primary : AppTheme.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 3),
@@ -211,7 +210,7 @@ class _StreakCard extends StatelessWidget {
           Container(
             width: 1,
             height: 34,
-            color: AppTheme.glassBorder,
+            color: AppTheme.border,
           ),
           Expanded(
             child: Column(
@@ -273,14 +272,13 @@ class _PrPreviewRow extends StatelessWidget {
     return InkWell(
       key: ValueKey('progress_pr_entry_${record.id}'),
       onTap: () => context.push('/progress/prs'),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: AppTheme.spaceSm),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Row(
           children: [
@@ -297,7 +295,7 @@ class _PrPreviewRow extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     _relativeDate(context, record.achievedAt, DateTime.now()),
                     style: AppTheme.num(
@@ -314,14 +312,14 @@ class _PrPreviewRow extends StatelessWidget {
               style: AppTheme.num(
                 13,
                 weight: FontWeight.w600,
-                color: AppTheme.voltGreen,
+                color: AppTheme.secondary,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
               decoration: BoxDecoration(
-                color: AppTheme.neonCyan.withValues(alpha: 0.1),
+                color: AppTheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -329,7 +327,7 @@ class _PrPreviewRow extends StatelessWidget {
                 style: AppTheme.num(
                   9.5,
                   weight: FontWeight.w700,
-                  color: AppTheme.neonCyan,
+                  color: AppTheme.primary,
                 ),
               ),
             ),
@@ -351,11 +349,10 @@ class _PrEmptyState extends StatelessWidget {
     return Container(
       key: const ValueKey('progress_pr_empty'),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceXl),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Text(
         l10n.progressPrEmpty,
@@ -398,14 +395,13 @@ class _RecentWorkoutCard extends StatelessWidget {
     return InkWell(
       key: ValueKey('progress_recent_card_${item.id}'),
       onTap: () => context.push('/history/${item.id}'),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: const EdgeInsets.only(bottom: AppTheme.spaceSm),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppTheme.glassFill,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppTheme.glassBorder),
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
         ),
         child: Row(
           children: [
@@ -427,14 +423,14 @@ class _RecentWorkoutCard extends StatelessWidget {
                         ),
                       ),
                       if (item.prCount > 0) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppTheme.spaceSm),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
-                            vertical: 2,
+                            vertical: AppTheme.spaceXxs,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.voltGreen.withValues(alpha: 0.12),
+                            color: AppTheme.secondary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -442,14 +438,14 @@ class _RecentWorkoutCard extends StatelessWidget {
                             style: AppTheme.num(
                               10,
                               weight: FontWeight.w700,
-                              color: AppTheme.voltGreen,
+                              color: AppTheme.secondary,
                             ),
                           ),
                         ),
                       ],
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
                     '${_relativeDate(context, item.date, DateTime.now())} · $meta',
                     style: AppTheme.num(
@@ -461,7 +457,7 @@ class _RecentWorkoutCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
             const Icon(
               LucideIcons.chevronRight,
               size: 16,
@@ -484,11 +480,10 @@ class _RecentEmptyState extends StatelessWidget {
     return Container(
       key: const ValueKey('progress_recent_empty'),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: 18),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Text(
         l10n.homeHistoryEmptyMessageShort,
@@ -510,9 +505,8 @@ class _BodyWeightPlaceholder extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.glassBorder),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Row(
         children: [
@@ -521,7 +515,7 @@ class _BodyWeightPlaceholder extends StatelessWidget {
             size: 18,
             color: AppTheme.textSecondary,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppTheme.spaceMd),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,7 +528,7 @@ class _BodyWeightPlaceholder extends StatelessWidget {
                     color: AppTheme.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppTheme.spaceXxs),
                 Text(
                   l10n.bodyWeightPlaceholder,
                   style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),

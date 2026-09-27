@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/services/workout_foreground_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../data/workout_repository.dart';
 import '../../domain/workout_session.dart';
 import '../rest_timer_controller.dart';
@@ -53,31 +54,13 @@ Future<bool> resolveOneSessionRule(
     case SessionConflictDecision.discard:
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: const Color(0xFF16191D),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(
-            'DISCARD SESSION?',
-            style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.burntOrange),
-          ),
-          content: const Text(
-            'Discard the in-progress workout? This can\'t be undone.',
-            style: TextStyle(color: AppTheme.textSecondary),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('KEEP', style: TextStyle(color: AppTheme.textSecondary)),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.burntOrange,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('DISCARD'),
-            ),
-          ],
+        builder: (ctx) => ConfirmDialog(
+          title: 'DISCARD SESSION?',
+          message: "Discard the in-progress workout? This can't be undone.",
+          confirmLabel: 'Discard',
+          cancelLabel: 'Keep',
+          style: ConfirmStyle.destructive,
+          onConfirm: () {},
         ),
       );
       if (confirmed != true) return false;
@@ -88,8 +71,8 @@ Future<bool> resolveOneSessionRule(
   }
 }
 
-/// Sharp Glassmorphism prompt shown when a session is already active
-/// (FEATURES.md §8.1): Resume / Save current as completed / Discard current.
+/// Prompt shown when a session is already active (FEATURES.md §8.1):
+/// Resume / Save current as completed / Discard current.
 class SessionConflictDialog extends StatelessWidget {
   const SessionConflictDialog({required this.session, super.key});
 
@@ -102,11 +85,9 @@ class SessionConflictDialog extends StatelessWidget {
         '${(elapsed ~/ 60).toString().padLeft(2, '0')}:${(elapsed % 60).toString().padLeft(2, '0')}';
 
     return AlertDialog(
-      backgroundColor: const Color(0xFF16191D),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       title: Text(
         'SESSION IN PROGRESS',
-        style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+        style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
       ),
       content: Text(
         '"${session.name}" is still running · $elapsedText elapsed. One session can be active at a time.',
@@ -118,23 +99,19 @@ class SessionConflictDialog extends StatelessWidget {
           onPressed: () =>
               Navigator.of(context).pop(SessionConflictDecision.discard),
           child: const Text('DISCARD',
-              style: TextStyle(color: AppTheme.burntOrange)),
+              style: TextStyle(color: AppTheme.warning)),
         ),
         TextButton(
           key: const ValueKey('conflict_save_completed'),
           onPressed: () => Navigator.of(context)
               .pop(SessionConflictDecision.saveAsCompleted),
           child: const Text('SAVE AS COMPLETED',
-              style: TextStyle(color: AppTheme.voltGreen)),
+              style: TextStyle(color: AppTheme.secondary)),
         ),
         FilledButton(
           key: const ValueKey('conflict_resume'),
           onPressed: () =>
               Navigator.of(context).pop(SessionConflictDecision.resume),
-          style: FilledButton.styleFrom(
-            backgroundColor: AppTheme.neonCyan,
-            foregroundColor: Colors.black,
-          ),
           child: const Text('RESUME'),
         ),
       ],

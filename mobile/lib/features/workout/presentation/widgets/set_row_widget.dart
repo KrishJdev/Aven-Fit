@@ -36,25 +36,17 @@ class SetRowWidget extends StatelessWidget {
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
-        color: AppTheme.burntOrange.withValues(alpha: 0.2),
-        child: const Icon(LucideIcons.trash2, color: AppTheme.burntOrange, size: 20),
+        color: AppTheme.warning.withValues(alpha: 0.2),
+        child: const Icon(LucideIcons.trash2, color: AppTheme.warning, size: AppTheme.iconAction),
       ),
       confirmDismiss: (direction) async {
         if (!set.isCompleted) return true;
         return await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
-            backgroundColor: const Color(0xFF16191D),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
             title: Text(
               'DELETE COMPLETED SET?',
-              style: AppTheme.num(
-                16,
-                weight: FontWeight.w700,
-                color: AppTheme.burntOrange,
-              ),
+              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.warning),
             ),
             content: const Text(
               'This set is marked as completed. Are you sure you want to delete it?',
@@ -63,16 +55,13 @@ class SetRowWidget extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text(
-                  'CANCEL',
-                  style: TextStyle(color: AppTheme.textSecondary),
-                ),
+                child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.burntOrange,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.warning,
+                  foregroundColor: AppTheme.textOnPrimary,
                 ),
                 child: const Text('DELETE'),
               ),
@@ -83,11 +72,14 @@ class SetRowWidget extends StatelessWidget {
       onDismissed: (_) => onDeleteSet(),
       child: Container(
         color: isDone
-            ? AppTheme.voltGreen.withValues(alpha: 0.08)
+            ? AppTheme.secondary.withValues(alpha: 0.08)
             : isWarmup
-                ? AppTheme.burntOrange.withValues(alpha: 0.05)
+                ? AppTheme.warning.withValues(alpha: 0.05)
                 : Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.spaceLg,
+          vertical: 6,
+        ),
         child: Row(
           children: [
             // Set Number / Type Badge
@@ -119,7 +111,7 @@ class SetRowWidget extends StatelessWidget {
               child: _buildKgField(context),
             ),
 
-            const SizedBox(width: 4),
+            const SizedBox(width: AppTheme.spaceXs),
 
             // REPS Stepper & Display
             Expanded(
@@ -127,7 +119,7 @@ class SetRowWidget extends StatelessWidget {
               child: _buildRepsField(context),
             ),
 
-            const SizedBox(width: 8),
+            const SizedBox(width: AppTheme.spaceSm),
 
             // Complete ✓ Action Button
             SizedBox(
@@ -138,22 +130,22 @@ class SetRowWidget extends StatelessWidget {
                     HapticFeedback.lightImpact();
                     onToggleComplete();
                   },
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
+                    duration: AppTheme.motionFast,
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: isDone ? AppTheme.voltGreen : const Color(0xFF22262B),
-                      borderRadius: BorderRadius.circular(6),
+                      color: isDone ? AppTheme.secondary : AppTheme.surfaceActive,
+                      borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
                       border: Border.all(
-                        color: isDone ? AppTheme.voltGreen : AppTheme.glassBorder,
+                        color: isDone ? AppTheme.secondary : AppTheme.border,
                       ),
                     ),
                     child: Icon(
                       LucideIcons.check,
                       size: 18,
-                      color: isDone ? Colors.black : AppTheme.textSecondary,
+                      color: isDone ? AppTheme.textOnPrimary : AppTheme.textSecondary,
                     ),
                   ),
                 ),
@@ -169,17 +161,17 @@ class SetRowWidget extends StatelessWidget {
     final Widget badge;
     if (isWarmup) {
       badge = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXs, vertical: AppTheme.spaceXxs),
         decoration: BoxDecoration(
-          color: AppTheme.burntOrange.withValues(alpha: 0.2),
-          border: Border.all(color: AppTheme.burntOrange.withValues(alpha: 0.5)),
-          borderRadius: BorderRadius.circular(4),
+          color: AppTheme.warningMuted,
+          border: Border.all(color: AppTheme.warning.withValues(alpha: 0.5)),
+          borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
         ),
         child: const Text(
           'W',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppTheme.burntOrange,
+            color: AppTheme.warning,
             fontSize: 11,
             fontWeight: FontWeight.w700,
           ),
@@ -187,17 +179,17 @@ class SetRowWidget extends StatelessWidget {
       );
     } else if (isDropset) {
       badge = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXs, vertical: AppTheme.spaceXxs),
         decoration: BoxDecoration(
-          color: AppTheme.neonCyan.withValues(alpha: 0.2),
-          border: Border.all(color: AppTheme.neonCyan.withValues(alpha: 0.5)),
-          borderRadius: BorderRadius.circular(4),
+          color: AppTheme.primaryMuted,
+          border: Border.all(color: AppTheme.primary.withValues(alpha: 0.5)),
+          borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
         ),
         child: const Text(
           'D',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppTheme.neonCyan,
+            color: AppTheme.primary,
             fontSize: 11,
             fontWeight: FontWeight.w700,
           ),
@@ -211,14 +203,14 @@ class SetRowWidget extends StatelessWidget {
       );
     }
 
-    // PR badge (§8.1): a tiny volt-green flash when this set beat any
+    // PR badge (§8.1): a tiny secondary flash when this set beat any
     // personal record (weight, e1RM, reps-at-weight, volume).
     if (!set.isPr) return badge;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         badge,
-        const SizedBox(height: 2),
+        const SizedBox(height: AppTheme.spaceXxs),
         const _PrFlashBadge(),
       ],
     );
@@ -232,9 +224,9 @@ class SetRowWidget extends StatelessWidget {
     return Container(
       height: 32,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
-        borderRadius: BorderRadius.circular(4),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.border),
+        borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,7 +254,7 @@ class SetRowWidget extends StatelessWidget {
               child: Text(
                 weightStr,
                 textAlign: TextAlign.center,
-                style: AppTheme.num(13, weight: FontWeight.w700, color: Colors.white),
+                style: AppTheme.num(13, weight: FontWeight.w700, color: AppTheme.textPrimary),
               ),
             ),
           ),
@@ -282,9 +274,9 @@ class SetRowWidget extends StatelessWidget {
     return Container(
       height: 32,
       decoration: BoxDecoration(
-        color: AppTheme.glassFill,
-        border: Border.all(color: AppTheme.glassBorder),
-        borderRadius: BorderRadius.circular(4),
+        color: AppTheme.surface,
+        border: Border.all(color: AppTheme.border),
+        borderRadius: const BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -312,7 +304,7 @@ class SetRowWidget extends StatelessWidget {
               child: Text(
                 set.reps.toString(),
                 textAlign: TextAlign.center,
-                style: AppTheme.num(13, weight: FontWeight.w700, color: Colors.white),
+                style: AppTheme.num(13, weight: FontWeight.w700, color: AppTheme.textPrimary),
               ),
             ),
           ),
@@ -331,49 +323,45 @@ class SetRowWidget extends StatelessWidget {
   void _showSetTypePicker(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppTheme.oledBlack,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (ctx) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceLg),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'SET TYPE',
-                style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white),
+                style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppTheme.spaceMd),
               ListTile(
-                leading: const Icon(LucideIcons.checkCircle2, color: Colors.white),
-                title: const Text('Normal Working Set', style: TextStyle(color: Colors.white)),
+                leading: const Icon(LucideIcons.checkCircle2, color: AppTheme.textPrimary),
+                title: const Text('Normal Working Set', style: TextStyle(color: AppTheme.textPrimary)),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   onUpdateSet(set.copyWith(type: SetType.normal));
                 },
               ),
               ListTile(
-                leading: const Icon(LucideIcons.flame, color: AppTheme.burntOrange),
+                leading: const Icon(LucideIcons.flame, color: AppTheme.warning),
                 title: const Text('Warm-up Set (Excluded from volume)',
-                    style: TextStyle(color: AppTheme.burntOrange)),
+                    style: TextStyle(color: AppTheme.warning)),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   onUpdateSet(set.copyWith(type: SetType.warmup));
                 },
               ),
               ListTile(
-                leading: const Icon(LucideIcons.layers, color: AppTheme.neonCyan),
-                title: const Text('Drop Set', style: TextStyle(color: AppTheme.neonCyan)),
+                leading: const Icon(LucideIcons.layers, color: AppTheme.primary),
+                title: const Text('Drop Set', style: TextStyle(color: AppTheme.primary)),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   onUpdateSet(set.copyWith(type: SetType.dropSet));
                 },
               ),
               ListTile(
-                leading: const Icon(LucideIcons.trash2, color: AppTheme.burntOrange),
-                title: const Text('Delete Set', style: TextStyle(color: AppTheme.burntOrange)),
+                leading: const Icon(LucideIcons.trash2, color: AppTheme.warning),
+                title: const Text('Delete Set', style: TextStyle(color: AppTheme.warning)),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   onDeleteSet();
@@ -396,15 +384,16 @@ class SetRowWidget extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF16191D),
-        title: Text(title, style: AppTheme.num(16, weight: FontWeight.w700, color: Colors.white)),
+        title: Text(title, style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.textPrimary)),
         content: TextField(
           controller: textController,
           autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          style: const TextStyle(color: Colors.white, fontSize: 18),
+          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 18),
           decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(AppTheme.radiusSm)),
+            ),
           ),
         ),
         actions: [
@@ -417,7 +406,6 @@ class SetRowWidget extends StatelessWidget {
               onSubmitted(textController.text);
               Navigator.of(ctx).pop();
             },
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.neonCyan, foregroundColor: Colors.black),
             child: const Text('APPLY'),
           ),
         ],
@@ -426,7 +414,7 @@ class SetRowWidget extends StatelessWidget {
   }
 }
 
-/// Tiny volt-green "PR" chip that pops in (scale + fade) the moment a set is
+/// Tiny secondary "PR" chip that pops in (scale + fade) the moment a set is
 /// confirmed as a new personal record, with a single medium haptic buzz on
 /// appearance — celebration stays haptic + visual only, never confetti-heavy
 /// (FEATURES.md §8.1, L5).
@@ -460,15 +448,15 @@ class _PrFlashBadgeState extends State<_PrFlashBadge> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
         decoration: BoxDecoration(
-          color: AppTheme.voltGreen.withValues(alpha: 0.15),
-          border: Border.all(color: AppTheme.voltGreen),
+          color: AppTheme.secondaryMuted,
+          border: Border.all(color: AppTheme.secondary),
           borderRadius: BorderRadius.circular(3),
         ),
         child: const Text(
           'PR',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: AppTheme.voltGreen,
+            color: AppTheme.secondary,
             fontSize: 8,
             height: 1.1,
             fontWeight: FontWeight.w800,
