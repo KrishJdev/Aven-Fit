@@ -6,6 +6,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/loading_state_widget.dart';
+import '../../../core/widgets/stat_block.dart';
 import '../domain/session_exercise.dart';
 import '../domain/workout_set.dart';
 import 'workout_summary_controller.dart';
@@ -354,25 +355,12 @@ class _StatCell extends StatelessWidget {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spaceXs),
-          Text(
-            value,
-            style: AppTheme.num(18, weight: FontWeight.w700, color: valueColor),
-          ),
-        ],
+      // Stat rendering delegates to the shared [StatBlock] (§10.5):
+      // value-on-top / ALL-CAPS label-below, the canonical dashboard pattern.
+      child: StatBlock(
+        label: label,
+        value: value,
+        valueColor: valueColor,
       ),
     );
   }
