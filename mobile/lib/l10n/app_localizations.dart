@@ -978,6 +978,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'BACK TO HISTORY'**
   String get backToHistory;
+
+  /// No description provided for @exerciseDirectoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EXERCISE DIRECTORY'**
+  String get exerciseDirectoryTitle;
+
+  /// No description provided for @createCustomExerciseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Custom Exercise'**
+  String get createCustomExerciseTooltip;
+
+  /// No description provided for @exerciseLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load exercises: {error}'**
+  String exerciseLoadError(String error);
+
+  /// No description provided for @exerciseEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises match the selected filters.'**
+  String get exerciseEmptyFiltered;
+
+  /// No description provided for @exerciseEmptyLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises found in local library.'**
+  String get exerciseEmptyLibrary;
+
+  /// No description provided for @exerciseEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting your search query or removing active muscle/equipment filters.'**
+  String get exerciseEmptyHint;
+
+  /// No description provided for @clearAllFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'CLEAR ALL FILTERS'**
+  String get clearAllFilters;
+
+  /// No description provided for @exerciseDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EXERCISE DETAIL'**
+  String get exerciseDetailTitle;
+
+  /// No description provided for @exerciseNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise not found'**
+  String get exerciseNotFound;
+
+  /// No description provided for @backToDirectory.
+  ///
+  /// In en, this message translates to:
+  /// **'BACK TO DIRECTORY'**
+  String get backToDirectory;
+
+  /// No description provided for @instructionsCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'INSTRUCTIONS & FORM NOTES'**
+  String get instructionsCardTitle;
+
+  /// No description provided for @noInstructionsRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'No form instructions recorded for this exercise.'**
+  String get noInstructionsRecorded;
+
+  /// No description provided for @targetAnatomyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET ANATOMY'**
+  String get targetAnatomyTitle;
+
+  /// No description provided for @primaryDriverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Driver:'**
+  String get primaryDriverLabel;
+
+  /// No description provided for @secondarySynergistsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary / Synergists:'**
+  String get secondarySynergistsLabel;
+
+  /// No description provided for @performanceHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PERFORMANCE HISTORY & PRs'**
+  String get performanceHistoryTitle;
+
+  /// No description provided for @noLoggedSetsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No logged sets for this exercise yet.'**
+  String get noLoggedSetsYet;
+
+  /// No description provided for @performanceHistoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Past weights, reps, estimated 1RM trends, and ghost suggestions will populate here automatically after logging sets in workout sessions.'**
+  String get performanceHistoryHint;
+
+  /// No description provided for @deleteCustomExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE CUSTOM EXERCISE'**
+  String get deleteCustomExercise;
+
+  /// No description provided for @deleteExerciseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Exercise?'**
+  String get deleteExerciseTitle;
+
+  /// No description provided for @deleteExerciseMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this custom exercise. Previously logged workout sessions and historical records will remain intact.'**
+  String get deleteExerciseMessage;
+
+  /// No description provided for @deleteExerciseConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get deleteExerciseConfirm;
+
+  /// No description provided for @customBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'CUSTOM'**
+  String get customBadge;
+
+  /// No description provided for @createCustomExerciseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATE CUSTOM EXERCISE'**
+  String get createCustomExerciseTitle;
+
+  /// No description provided for @exerciseNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EXERCISE NAME *'**
+  String get exerciseNameLabel;
+
+  /// No description provided for @exerciseNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Landmine Press, Swiss Bar Bench'**
+  String get exerciseNameHint;
+
+  /// No description provided for @exerciseNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an exercise name'**
+  String get exerciseNameRequired;
+
+  /// No description provided for @primaryMuscleDriverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PRIMARY MUSCLE DRIVER *'**
+  String get primaryMuscleDriverLabel;
+
+  /// No description provided for @secondaryMusclesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SECONDARY MUSCLES / STABILIZERS (OPTIONAL)'**
+  String get secondaryMusclesLabel;
+
+  /// No description provided for @equipmentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EQUIPMENT *'**
+  String get equipmentLabel;
+
+  /// No description provided for @categoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CATEGORY *'**
+  String get categoryLabel;
+
+  /// No description provided for @instructionsFormLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'INSTRUCTIONS / FORM NOTES (OPTIONAL)'**
+  String get instructionsFormLabel;
+
+  /// No description provided for @instructionsFormHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Cues, setup notes, bench angle, attachments...'**
+  String get instructionsFormHint;
+
+  /// No description provided for @timeBasedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time-based'**
+  String get timeBasedLabel;
+
+  /// No description provided for @cardioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardio'**
+  String get cardioLabel;
+
+  /// No description provided for @saveCustomExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE CUSTOM EXERCISE'**
+  String get saveCustomExercise;
+
+  /// No description provided for @primaryMuscleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a primary muscle group.'**
+  String get primaryMuscleRequired;
+
+  /// No description provided for @searchExercisesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search exercises (e.g. bench, squat)...'**
+  String get searchExercisesHint;
+
+  /// No description provided for @favouritesChip.
+  ///
+  /// In en, this message translates to:
+  /// **'★ Favourites'**
+  String get favouritesChip;
 }
 
 class _AppLocalizationsDelegate

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../domain/exercise.dart';
 import '../domain/muscle_group.dart';
@@ -12,16 +13,19 @@ class ExerciseSearchBar extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     required this.onClear,
-    this.hintText = 'Search exercises (e.g. bench, squat)...',
+    this.hintText,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
-  final String hintText;
+
+  /// Optional hint override; defaults to the localized search hint.
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
+    final hint = hintText ?? l10nOf(context).searchExercisesHint;
     return Container(
       height: 48,
       decoration: BoxDecoration(
@@ -46,7 +50,7 @@ class ExerciseSearchBar extends StatelessWidget {
                 fontSize: 14,
               ),
               decoration: InputDecoration(
-                hintText: hintText,
+                hintText: hint,
                 hintStyle: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 14,
@@ -98,6 +102,7 @@ class ExerciseFilterChipsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceSm),
@@ -105,7 +110,7 @@ class ExerciseFilterChipsBar extends StatelessWidget {
         children: [
           // Favourites Chip
           _FilterChip(
-            label: '★ Favourites',
+            label: l10n.favouritesChip,
             isSelected: favouritesOnly,
             onTap: onToggleFavourites,
             activeColor: AppTheme.secondary,
@@ -223,6 +228,7 @@ class ExerciseListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceXs),
       decoration: BoxDecoration(
@@ -262,8 +268,8 @@ class ExerciseListTile extends StatelessWidget {
                             color: AppTheme.textSecondary,
                           ),
                         if (exercise.isCustom)
-                          const _Badge(
-                            label: 'CUSTOM',
+                          _Badge(
+                            label: l10n.customBadge,
                             color: AppTheme.secondary,
                           ),
                       ],

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_state_widget.dart';
@@ -46,6 +47,7 @@ class _CreateCustomExerciseScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final musclesAsync =
         ref.watch(createCustomExerciseControllerProvider);
 
@@ -58,9 +60,9 @@ class _CreateCustomExerciseScreenState
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'CREATE CUSTOM EXERCISE',
-          style: TextStyle(
+        title: Text(
+          l10n.createCustomExerciseTitle,
+          style: const TextStyle(
             color: AppTheme.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -115,17 +117,17 @@ class _CreateCustomExerciseScreenState
                   ],
 
                   // Exercise Name
-                  _SectionHeader(title: 'EXERCISE NAME *'),
+                  _SectionHeader(title: l10n.exerciseNameLabel),
                   const SizedBox(height: AppTheme.spaceSm),
                   TextFormField(
                     controller: _nameController,
                     style: const TextStyle(color: AppTheme.textPrimary),
                     decoration: _inputDecoration(
-                      hintText: 'e.g. Landmine Press, Swiss Bar Bench',
+                      hintText: l10n.exerciseNameHint,
                     ),
                     validator: (val) {
                       if (val == null || val.trim().isEmpty) {
-                        return 'Please enter an exercise name';
+                        return l10n.exerciseNameRequired;
                       }
                       return null;
                     },
@@ -134,7 +136,7 @@ class _CreateCustomExerciseScreenState
                   const SizedBox(height: AppTheme.spaceXl),
 
                   // Primary Muscle Group
-                  _SectionHeader(title: 'PRIMARY MUSCLE DRIVER *'),
+                  _SectionHeader(title: l10n.primaryMuscleDriverLabel),
                   const SizedBox(height: AppTheme.spaceSm),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
@@ -175,7 +177,7 @@ class _CreateCustomExerciseScreenState
                   const SizedBox(height: AppTheme.spaceXl),
 
                   // Secondary Muscle Groups (Optional)
-                  _SectionHeader(title: 'SECONDARY MUSCLES / STABILIZERS (OPTIONAL)'),
+                  _SectionHeader(title: l10n.secondaryMusclesLabel),
                   const SizedBox(height: AppTheme.spaceSm),
                   Wrap(
                     spacing: 8,
@@ -226,7 +228,7 @@ class _CreateCustomExerciseScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _SectionHeader(title: 'EQUIPMENT *'),
+                            _SectionHeader(title: l10n.equipmentLabel),
                             const SizedBox(height: AppTheme.spaceSm),
                             _buildDropdownContainer(
                               child: DropdownButton<Equipment>(
@@ -266,7 +268,7 @@ class _CreateCustomExerciseScreenState
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _SectionHeader(title: 'CATEGORY *'),
+                            _SectionHeader(title: l10n.categoryLabel),
                             const SizedBox(height: AppTheme.spaceSm),
                             _buildDropdownContainer(
                               child: DropdownButton<ExerciseCategory>(
@@ -305,14 +307,14 @@ class _CreateCustomExerciseScreenState
                   const SizedBox(height: AppTheme.spaceXl),
 
                   // Instructions / Notes
-                  _SectionHeader(title: 'INSTRUCTIONS / FORM NOTES (OPTIONAL)'),
+                  _SectionHeader(title: l10n.instructionsFormLabel),
                   const SizedBox(height: AppTheme.spaceSm),
                   TextFormField(
                     controller: _instructionsController,
                     maxLines: 3,
                     style: const TextStyle(color: AppTheme.textPrimary),
                     decoration: _inputDecoration(
-                      hintText: 'Cues, setup notes, bench angle, attachments...',
+                      hintText: l10n.instructionsFormHint,
                     ),
                   ),
 
@@ -324,9 +326,9 @@ class _CreateCustomExerciseScreenState
                       Expanded(
                         child: CheckboxListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text(
-                            'Time-based',
-                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+                          title: Text(
+                            l10n.timeBasedLabel,
+                            style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
                           ),
                           value: _isTimeBased,
                           activeColor: AppTheme.primary,
@@ -340,9 +342,9 @@ class _CreateCustomExerciseScreenState
                       Expanded(
                         child: CheckboxListTile(
                           contentPadding: EdgeInsets.zero,
-                          title: const Text(
-                            'Cardio',
-                            style: TextStyle(color: AppTheme.textPrimary, fontSize: 13),
+                          title: Text(
+                            l10n.cardioLabel,
+                            style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
                           ),
                           value: _isCardio,
                           activeColor: AppTheme.primary,
@@ -378,9 +380,9 @@ class _CreateCustomExerciseScreenState
                                 color: AppTheme.background,
                               ),
                             )
-                          : const Text(
-                              'SAVE CUSTOM EXERCISE',
-                              style: TextStyle(
+                          : Text(
+                              l10n.saveCustomExercise,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.8,
                               ),
@@ -456,7 +458,7 @@ class _CreateCustomExerciseScreenState
   Future<void> _saveExercise() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedPrimaryMuscleId == null) {
-      setState(() => _errorMessage = 'Please select a primary muscle group.');
+      setState(() => _errorMessage = l10nOf(context).primaryMuscleRequired);
       return;
     }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -24,6 +25,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     final detailAsync = ref.watch(exerciseDetailControllerProvider(exerciseId));
     final controller =
         ref.read(exerciseDetailControllerProvider(exerciseId).notifier);
@@ -37,9 +39,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'EXERCISE DETAIL',
-          style: TextStyle(
+        title: Text(
+          l10n.exerciseDetailTitle,
+          style: const TextStyle(
             color: AppTheme.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -78,9 +80,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                     color: AppTheme.textSecondary,
                   ),
                   const SizedBox(height: AppTheme.spaceLg),
-                  const Text(
-                    'Exercise not found',
-                    style: TextStyle(
+                  Text(
+                    l10n.exerciseNotFound,
+                    style: const TextStyle(
                       color: AppTheme.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -93,9 +95,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                       side: const BorderSide(color: AppTheme.primary),
                       shape: const RoundedRectangleBorder(),
                     ),
-                    child: const Text(
-                      'BACK TO DIRECTORY',
-                      style: TextStyle(color: AppTheme.primary),
+                    child: Text(
+                      l10n.backToDirectory,
+                      style: const TextStyle(color: AppTheme.primary),
                     ),
                   ),
                 ],
@@ -140,8 +142,8 @@ class ExerciseDetailScreen extends ConsumerWidget {
                       color: AppTheme.textSecondary,
                     ),
                     if (exercise.isCustom)
-                      const _DetailBadge(
-                        label: 'CUSTOM',
+                      _DetailBadge(
+                        label: l10n.customBadge,
                         color: AppTheme.secondary,
                       ),
                   ],
@@ -151,13 +153,13 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
                 // Instructions Card
                 _GlassCard(
-                  title: 'INSTRUCTIONS & FORM NOTES',
+                  title: l10n.instructionsCardTitle,
                   icon: LucideIcons.bookOpen,
                   child: Text(
                     exercise.instructions != null &&
                             exercise.instructions!.isNotEmpty
                         ? exercise.instructions!
-                        : 'No form instructions recorded for this exercise.',
+                        : l10n.noInstructionsRecorded,
                     style: const TextStyle(
                       color: AppTheme.textPrimary,
                       fontSize: 14,
@@ -170,7 +172,7 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
                 // Target Muscles Card
                 _GlassCard(
-                  title: 'TARGET ANATOMY',
+                  title: l10n.targetAnatomyTitle,
                   icon: LucideIcons.layers,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,9 +180,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                       if (exercise.primaryMuscle != null) ...[
                         Row(
                           children: [
-                            const Text(
-                              'Primary Driver:',
-                              style: TextStyle(
+                            Text(
+                              l10n.primaryDriverLabel,
+                              style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 13,
                               ),
@@ -202,9 +204,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Secondary / Synergists:',
-                              style: TextStyle(
+                            Text(
+                              l10n.secondarySynergistsLabel,
+                              style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 13,
                               ),
@@ -231,21 +233,21 @@ class ExerciseDetailScreen extends ConsumerWidget {
 
                 // Performance History Placeholder
                 _GlassCard(
-                  title: 'PERFORMANCE HISTORY & PRs',
+                  title: l10n.performanceHistoryTitle,
                   icon: LucideIcons.trendingUp,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'No logged sets for this exercise yet.',
-                        style: TextStyle(
+                      Text(
+                        l10n.noLoggedSetsYet,
+                        style: const TextStyle(
                           color: AppTheme.textSecondary,
                           fontSize: 13,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Past weights, reps, estimated 1RM trends, and ghost suggestions will populate here automatically after logging sets in workout sessions.',
+                        l10n.performanceHistoryHint,
                         style: TextStyle(
                           color: AppTheme.textSecondary.withValues(alpha: 0.7),
                           fontSize: 12,
@@ -267,9 +269,9 @@ class ExerciseDetailScreen extends ConsumerWidget {
                         size: 16,
                         color: AppTheme.warning,
                       ),
-                      label: const Text(
-                        'DELETE CUSTOM EXERCISE',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.deleteCustomExercise,
+                        style: const TextStyle(
                           color: AppTheme.warning,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
@@ -308,14 +310,14 @@ class ExerciseDetailScreen extends ConsumerWidget {
     BuildContext context,
     ExerciseDetailController controller,
   ) async {
+    final l10n = l10nOf(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => ConfirmDialog(
-        title: 'Delete Exercise?',
-        message:
-            'This will permanently delete this custom exercise. Previously logged workout sessions and historical records will remain intact.',
-        confirmLabel: 'DELETE',
-        cancelLabel: 'CANCEL',
+        title: l10n.deleteExerciseTitle,
+        message: l10n.deleteExerciseMessage,
+        confirmLabel: l10n.deleteExerciseConfirm,
+        cancelLabel: l10n.dialogCancel,
         style: ConfirmStyle.destructive,
         onConfirm: () {},
       ),

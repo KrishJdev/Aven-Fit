@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/exercise.dart';
@@ -43,6 +44,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final stateAsync = ref.watch(exerciseListControllerProvider);
     final controller = ref.read(exerciseListControllerProvider.notifier);
 
@@ -53,9 +55,9 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         elevation: 0,
         title: Row(
           children: [
-            const Text(
-              'EXERCISE DIRECTORY',
-              style: TextStyle(
+            Text(
+              l10n.exerciseDirectoryTitle,
+              style: const TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -87,7 +89,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
         actions: [
           IconButton(
             icon: const Icon(LucideIcons.plus, color: AppTheme.primary),
-            tooltip: 'Create Custom Exercise',
+            tooltip: l10n.createCustomExerciseTooltip,
             onPressed: () => context.push('/exercises/new'),
           ),
         ],
@@ -174,7 +176,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
               ),
               const SizedBox(height: AppTheme.spaceMd),
               Text(
-                'Failed to load exercises: $err',
+                l10n.exerciseLoadError(err.toString()),
                 style: const TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
@@ -185,10 +187,7 @@ class _ExerciseListScreenState extends ConsumerState<ExerciseListScreen> {
                   side: const BorderSide(color: AppTheme.primary),
                   shape: const RoundedRectangleBorder(),
                 ),
-                child: const Text(
-                  'RETRY',
-                  style: TextStyle(color: AppTheme.primary),
-                ),
+                child: Text(l10n.retry),
               ),
             ],
           ),
@@ -209,6 +208,7 @@ class _EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
@@ -223,8 +223,8 @@ class _EmptyStateView extends StatelessWidget {
             const SizedBox(height: AppTheme.spaceLg),
             Text(
               hasFilters
-                  ? 'No exercises match the selected filters.'
-                  : 'No exercises found in local library.',
+                  ? l10n.exerciseEmptyFiltered
+                  : l10n.exerciseEmptyLibrary,
               style: const TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 15,
@@ -233,9 +233,9 @@ class _EmptyStateView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppTheme.spaceSm),
-            const Text(
-              'Try adjusting your search query or removing active muscle/equipment filters.',
-              style: TextStyle(
+            Text(
+              l10n.exerciseEmptyHint,
+              style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
               ),
@@ -250,9 +250,9 @@ class _EmptyStateView extends StatelessWidget {
                   shape: const RoundedRectangleBorder(),
                   padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceMd),
                 ),
-                child: const Text(
-                  'CLEAR ALL FILTERS',
-                  style: TextStyle(
+                child: Text(
+                  l10n.clearAllFilters,
+                  style: const TextStyle(
                     color: AppTheme.primary,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,

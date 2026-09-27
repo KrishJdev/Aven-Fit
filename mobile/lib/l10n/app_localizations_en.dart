@@ -490,4 +490,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToHistory => 'BACK TO HISTORY';
+
+  @override
+  String get exerciseDirectoryTitle => 'EXERCISE DIRECTORY';
+
+  @override
+  String get createCustomExerciseTooltip => 'Create Custom Exercise';
+
+  @override
+  String exerciseLoadError(String error) {
+    return 'Failed to load exercises: $error';
+  }
+
+  @override
+  String get exerciseEmptyFiltered =>
+      'No exercises match the selected filters.';
+
+  @override
+  String get exerciseEmptyLibrary => 'No exercises found in local library.';
+
+  @override
+  String get exerciseEmptyHint =>
+      'Try adjusting your search query or removing active muscle/equipment filters.';
+
+  @override
+  String get clearAllFilters => 'CLEAR ALL FILTERS';
+
+  @override
+  String get exerciseDetailTitle => 'EXERCISE DETAIL';
+
+  @override
+  String get exerciseNotFound => 'Exercise not found';
+
+  @override
+  String get backToDirectory => 'BACK TO DIRECTORY';
+
+  @override
+  String get instructionsCardTitle => 'INSTRUCTIONS & FORM NOTES';
+
+  @override
+  String get noInstructionsRecorded =>
+      'No form instructions recorded for this exercise.';
+
+  @override
+  String get targetAnatomyTitle => 'TARGET ANATOMY';
+
+  @override
+  String get primaryDriverLabel => 'Primary Driver:';
+
+  @override
+  String get secondarySynergistsLabel => 'Secondary / Synergists:';
+
+  @override
+  String get performanceHistoryTitle => 'PERFORMANCE HISTORY & PRs';
+
+  @override
+  String get noLoggedSetsYet => 'No logged sets for this exercise yet.';
+
+  @override
+  String get performanceHistoryHint =>
+      'Past weights, reps, estimated 1RM trends, and ghost suggestions will populate here automatically after logging sets in workout sessions.';
+
+  @override
+  String get deleteCustomExercise => 'DELETE CUSTOM EXERCISE';
+
+  @override
+  String get deleteExerciseTitle => 'Delete Exercise?';
+
+  @override
+  String get deleteExerciseMessage =>
+      'This will permanently delete this custom exercise. Previously logged workout sessions and historical records will remain intact.';
+
+  @override
+  String get deleteExerciseConfirm => 'DELETE';
+
+  @override
+  String get customBadge => 'CUSTOM';
+
+  @override
+  String get createCustomExerciseTitle => 'CREATE CUSTOM EXERCISE';
+
+  @override
+  String get exerciseNameLabel => 'EXERCISE NAME *';
+
+  @override
+  String get exerciseNameHint => 'e.g. Landmine Press, Swiss Bar Bench';
+
+  @override
+  String get exerciseNameRequired => 'Please enter an exercise name';
+
+  @override
+  String get primaryMuscleDriverLabel => 'PRIMARY MUSCLE DRIVER *';
+
+  @override
+  String get secondaryMusclesLabel =>
+      'SECONDARY MUSCLES / STABILIZERS (OPTIONAL)';
+
+  @override
+  String get equipmentLabel => 'EQUIPMENT *';
+
+  @override
+  String get categoryLabel => 'CATEGORY *';
+
+  @override
+  String get instructionsFormLabel => 'INSTRUCTIONS / FORM NOTES (OPTIONAL)';
+
+  @override
+  String get instructionsFormHint =>
+      'Cues, setup notes, bench angle, attachments...';
+
+  @override
+  String get timeBasedLabel => 'Time-based';
+
+  @override
+  String get cardioLabel => 'Cardio';
+
+  @override
+  String get saveCustomExercise => 'SAVE CUSTOM EXERCISE';
+
+  @override
+  String get primaryMuscleRequired => 'Please select a primary muscle group.';
+
+  @override
+  String get searchExercisesHint => 'Search exercises (e.g. bench, squat)...';
+
+  @override
+  String get favouritesChip => '★ Favourites';
 }
