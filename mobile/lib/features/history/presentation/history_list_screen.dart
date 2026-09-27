@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../data/history_repository.dart';
 import '../domain/workout_history_item.dart';
+import 'widgets/workout_history_card.dart';
 
 /// Full workout history list (WU-3.9, FEATURES.md §8.6): every completed
 /// workout, grouped by date bucket, with sets · volume · duration and a PR
@@ -97,7 +98,13 @@ class _HistoryFeed extends ConsumerWidget {
                 style: AppTheme.num(11, weight: FontWeight.w700, color: AppTheme.textSecondary),
               ),
             ),
-            ...bucket.map((item) => _HistoryCard(item: item)),
+            ...bucket.map(
+              (item) => WorkoutHistoryCard(
+                item: item,
+                cardKey: ValueKey('history_card_${item.id}'),
+                variant: HistoryCardVariant.standard,
+              ),
+            ),
           ],
         );
       },
@@ -121,104 +128,6 @@ class _HistoryFeed extends ConsumerWidget {
       'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
     ];
     return '${months[date.month - 1]} ${date.year}';
-  }
-}
-
-class _HistoryCard extends StatelessWidget {
-  const _HistoryCard({required this.item});
-
-  final WorkoutHistoryItem item;
-
-  @override
-  Widget build(BuildContext context) {
-    final duration = _formatDuration(item.durationSeconds);
-    final relativeDate = _relativeDate(item.date, DateTime.now());
-
-    return InkWell(
-      key: ValueKey('history_card_${item.id}'),
-      onTap: () => context.push('/history/${item.id}'),
-      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          item.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTheme.num(14, weight: FontWeight.w700, color: AppTheme.textPrimary),
-                        ),
-                      ),
-                      if (item.prCount > 0) ...[
-                        const SizedBox(width: AppTheme.spaceSm),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: AppTheme.spaceXxs),
-                          decoration: BoxDecoration(
-                            color: AppTheme.secondary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '${item.prCount} PR',
-                            style: AppTheme.num(10, weight: FontWeight.w700, color: AppTheme.secondary),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: AppTheme.spaceXs),
-                  Text(
-                    '$relativeDate · '
-                    '${item.exerciseCount} exercise${item.exerciseCount == 1 ? '' : 's'}',
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '${item.totalSetsCount} sets · ${item.volumeDisplay} kg · $duration',
-                    style: AppTheme.num(12, weight: FontWeight.w600, color: AppTheme.primary),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(LucideIcons.chevronRight, size: 18, color: AppTheme.textSecondary),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _relativeDate(DateTime date, DateTime now) {
-    final today = DateTime(now.year, now.month, now.day);
-    final day = DateTime(date.year, date.month, date.day);
-    final diff = today.difference(day).inDays;
-    if (diff == 0) return 'Today';
-    if (diff == 1) return 'Yesterday';
-    if (diff < 7) return '${diff}d ago';
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    return '${date.day} ${months[date.month - 1]}';
-  }
-
-  String _formatDuration(int totalSeconds) {
-    final hours = totalSeconds ~/ 3600;
-    final minutes = (totalSeconds % 3600) ~/ 60;
-    final seconds = totalSeconds % 60;
-    if (hours > 0) {
-      return '$hours:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-    }
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 }
 

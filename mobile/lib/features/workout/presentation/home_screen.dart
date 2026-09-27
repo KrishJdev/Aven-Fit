@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../../history/domain/workout_history_item.dart';
+import '../../history/presentation/widgets/workout_history_card.dart';
 import '../../routine/domain/routine.dart';
 import '../domain/workout_session.dart';
 import 'home_controller.dart';
@@ -493,7 +493,12 @@ class _RecentWorkoutsSection extends StatelessWidget {
           const _RecentEmptyState()
         else
           ...state.recentWorkouts.map(
-            (item) => _RecentWorkoutCard(item: item),
+            (item) => WorkoutHistoryCard(
+              item: item,
+              cardKey: ValueKey('home_recent_card_${item.id}'),
+              variant: HistoryCardVariant.compact,
+              prChipKey: const ValueKey('home_recent_pr_chip'),
+            ),
           ),
       ],
     );
@@ -532,134 +537,6 @@ class _RecentEmptyState extends StatelessWidget {
             style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12.5),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Compact history card (§7.1 #6): name, relative date, exercise/sets/
-/// volume/duration line, PR-count chip, tap → Past Workout Detail.
-class _RecentWorkoutCard extends StatelessWidget {
-  const _RecentWorkoutCard({required this.item});
-
-  final WorkoutHistoryItem item;
-
-  static String _relativeDate(
-    BuildContext context,
-    DateTime date,
-    DateTime now,
-  ) {
-    final l10n = l10nOf(context);
-    final today = DateTime(now.year, now.month, now.day);
-    final day = DateTime(date.year, date.month, date.day);
-    final diff = today.difference(day).inDays;
-    if (diff <= 0) return l10n.dateToday;
-    if (diff == 1) return l10n.dateYesterday;
-    return l10n.dateDaysAgo(diff);
-  }
-
-  static String _duration(int seconds) {
-    if (seconds >= 3600) {
-      final hours = seconds ~/ 3600;
-      final minutes = (seconds % 3600) ~/ 60;
-      return minutes > 0 ? '${hours}h ${minutes}m' : '${hours}h';
-    }
-    return '${(seconds / 60).round()} min';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = l10nOf(context);
-    final meta = l10n.homeRecentCardMeta(
-      item.exerciseCount,
-      item.totalSetsCount,
-      item.volumeDisplay,
-      _duration(item.durationSeconds),
-    );
-
-    return InkWell(
-      key: ValueKey('home_recent_card_${item.id}'),
-      onTap: () => context.push('/history/${item.id}'),
-      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppTheme.spaceMd),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppTheme.textPrimary,
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      if (item.prCount > 0) ...[
-                        const SizedBox(width: AppTheme.spaceSm),
-                        Container(
-                          key: const ValueKey('home_recent_pr_chip'),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: AppTheme.spaceXxs,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppTheme.secondary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            l10n.prCountChip(item.prCount),
-                            style: AppTheme.num(
-                              10,
-                              weight: FontWeight.w700,
-                              color: AppTheme.secondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    _relativeDate(context, item.date, DateTime.now()),
-                    style: AppTheme.num(
-                      10.5,
-                      weight: FontWeight.w500,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    meta,
-                    style: AppTheme.num(
-                      11.5,
-                      weight: FontWeight.w600,
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppTheme.spaceSm),
-            const Icon(
-              LucideIcons.chevronRight,
-              size: 16,
-              color: AppTheme.textSecondary,
-            ),
-          ],
-        ),
       ),
     );
   }
