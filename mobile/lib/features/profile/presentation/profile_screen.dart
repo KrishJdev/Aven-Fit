@@ -1,6 +1,7 @@
 import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
 import 'package:aven_fit/core/widgets/confirm_dialog.dart';
+import 'package:aven_fit/core/widgets/stat_block.dart';
 import 'package:aven_fit/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -302,6 +303,8 @@ class _LifetimeStatsGrid extends StatelessWidget {
 }
 
 /// Single surface stat cell — tabular numerals so stacked columns align.
+/// The stat rendering delegates to the shared [StatBlock] (§10.5):
+/// value-on-top / ALL-CAPS label-below, the canonical dashboard pattern.
 class _StatCell extends StatelessWidget {
   const _StatCell({
     required this.label,
@@ -321,23 +324,10 @@ class _StatCell extends StatelessWidget {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: AppTheme.num(10, weight: FontWeight.w700,
-                color: AppTheme.textSecondary),
-          ),
-          const SizedBox(height: AppTheme.spaceXs),
-          Text(
-            key: ValueKey(valueKey),
-            value,
-            style: AppTheme.num(18, weight: FontWeight.w600,
-                color: AppTheme.textPrimary),
-          ),
-        ],
+      child: StatBlock(
+        label: label,
+        value: value,
+        valueKey: ValueKey(valueKey),
       ),
     );
   }

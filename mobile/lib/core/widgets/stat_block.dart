@@ -22,6 +22,7 @@ class StatBlock extends StatelessWidget {
     this.variant = StatVariant.standard,
     this.valueColor,
     this.semanticLabel,
+    this.valueKey,
     super.key,
   });
 
@@ -31,15 +32,19 @@ class StatBlock extends StatelessWidget {
   final Color? valueColor;
   final String? semanticLabel;
 
+  /// Optional test key for the value text — lets callers preserve
+  /// `find.byKey` contracts (e.g. the Profile lifetime-stats values).
+  final Key? valueKey;
+
   @override
   Widget build(BuildContext context) {
     switch (variant) {
       case StatVariant.hero:
-        return _Hero(label: label, value: value, valueColor: valueColor, semanticLabel: semanticLabel);
+        return _Hero(label: label, value: value, valueColor: valueColor, semanticLabel: semanticLabel, valueKey: valueKey);
       case StatVariant.standard:
-        return _Standard(label: label, value: value, valueColor: valueColor, semanticLabel: semanticLabel);
+        return _Standard(label: label, value: value, valueColor: valueColor, semanticLabel: semanticLabel, valueKey: valueKey);
       case StatVariant.inline:
-        return _Inline(label: label, value: value, valueColor: valueColor, semanticLabel: semanticLabel);
+        return _Inline(label: label, value: value, valueColor: valueColor, semanticLabel: semanticLabel, valueKey: valueKey);
     }
   }
 }
@@ -47,12 +52,13 @@ class StatBlock extends StatelessWidget {
 enum StatVariant { hero, standard, inline }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.label, required this.value, this.valueColor, this.semanticLabel});
+  const _Hero({required this.label, required this.value, this.valueColor, this.semanticLabel, this.valueKey});
 
   final String label;
   final String value;
   final Color? valueColor;
   final String? semanticLabel;
+  final Key? valueKey;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +71,7 @@ class _Hero extends StatelessWidget {
         children: [
           Text(
             value,
+            key: valueKey,
             style: AppTheme.num(30, weight: FontWeight.w700, color: valueColor ?? AppTheme.textPrimary),
           ),
           const SizedBox(height: AppTheme.spaceXs),
@@ -84,12 +91,13 @@ class _Hero extends StatelessWidget {
 }
 
 class _Standard extends StatelessWidget {
-  const _Standard({required this.label, required this.value, this.valueColor, this.semanticLabel});
+  const _Standard({required this.label, required this.value, this.valueColor, this.semanticLabel, this.valueKey});
 
   final String label;
   final String value;
   final Color? valueColor;
   final String? semanticLabel;
+  final Key? valueKey;
 
   @override
   Widget build(BuildContext context) {
@@ -102,6 +110,7 @@ class _Standard extends StatelessWidget {
         children: [
           Text(
             value,
+            key: valueKey,
             style: AppTheme.num(16, weight: FontWeight.w600, color: valueColor ?? AppTheme.textPrimary),
           ),
           const SizedBox(height: AppTheme.spaceXxs),
@@ -121,12 +130,13 @@ class _Standard extends StatelessWidget {
 }
 
 class _Inline extends StatelessWidget {
-  const _Inline({required this.label, required this.value, this.valueColor, this.semanticLabel});
+  const _Inline({required this.label, required this.value, this.valueColor, this.semanticLabel, this.valueKey});
 
   final String label;
   final String value;
   final Color? valueColor;
   final String? semanticLabel;
+  final Key? valueKey;
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +155,7 @@ class _Inline extends StatelessWidget {
           const SizedBox(width: AppTheme.spaceMd),
           Text(
             value,
+            key: valueKey,
             style: AppTheme.num(14, weight: FontWeight.w500, color: valueColor ?? AppTheme.textPrimary),
           ),
         ],
