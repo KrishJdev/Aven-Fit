@@ -10,12 +10,18 @@ class SectionHeader extends StatelessWidget {
     required this.label,
     this.actionLabel,
     this.onAction,
+    this.actionKey,
     super.key,
   });
 
   final String label;
   final String? actionLabel;
   final VoidCallback? onAction;
+
+  /// Optional test key for the trailing action — lets callers preserve
+  /// `find.byKey` contracts (e.g. Home's VIEW ALL, Progress's VIEW ALL)
+  /// when adopting this widget.
+  final Key? actionKey;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +43,7 @@ class SectionHeader extends StatelessWidget {
           ),
           if (actionLabel != null && onAction != null)
             GestureDetector(
+              key: actionKey,
               onTap: onAction,
               behavior: HitTestBehavior.opaque,
               child: Padding(

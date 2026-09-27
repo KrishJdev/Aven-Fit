@@ -1,5 +1,6 @@
 import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
+import 'package:aven_fit/core/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,16 +50,17 @@ class ProgressScreen extends ConsumerWidget {
               data: (streak) => _StreakCard(streak: streak),
               orElse: () => const SizedBox.shrink(),
             ),
-            const SizedBox(height: AppTheme.spaceLg),
 
             // PR Vault preview (§10.2): the newest records, full vault
             // one tap away.
-            _SectionHeader(
-              title: l10n.prVaultTitle,
-              actionKey: 'progress_pr_view_all',
-              actionLabel: l10n.viewAll,
-              onAction: () => context.push('/progress/prs'),
-              visible: vaultAsync.value?.isNotEmpty ?? false,
+            SectionHeader(
+              label: l10n.prVaultTitle,
+              actionKey: const ValueKey('progress_pr_view_all'),
+              actionLabel:
+                  (vaultAsync.value?.isNotEmpty ?? false) ? l10n.viewAll : null,
+              onAction: (vaultAsync.value?.isNotEmpty ?? false)
+                  ? () => context.push('/progress/prs')
+                  : null,
             ),
             vaultAsync.maybeWhen(
               data: (entries) => entries.isEmpty
@@ -72,16 +74,16 @@ class ProgressScreen extends ConsumerWidget {
                     ),
               orElse: () => const SizedBox.shrink(),
             ),
-            const SizedBox(height: AppTheme.spaceLg),
-
             // Recent workouts (§7.1 parity): top 5, full history one tap
             // away (WU-3.9).
-            _SectionHeader(
-              title: l10n.homeRecentWorkouts,
-              actionKey: 'progress_recent_view_all',
-              actionLabel: l10n.viewAll,
-              onAction: () => context.push('/history'),
-              visible: recentAsync.value?.isNotEmpty ?? false,
+            SectionHeader(
+              label: l10n.homeRecentWorkouts,
+              actionKey: const ValueKey('progress_recent_view_all'),
+              actionLabel:
+                  (recentAsync.value?.isNotEmpty ?? false) ? l10n.viewAll : null,
+              onAction: (recentAsync.value?.isNotEmpty ?? false)
+                  ? () => context.push('/history')
+                  : null,
             ),
             recentAsync.maybeWhen(
               data: (items) => items.isEmpty
@@ -101,61 +103,6 @@ class ProgressScreen extends ConsumerWidget {
             const _BodyWeightPlaceholder(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Section header with an optional VIEW ALL action.
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.actionKey,
-    required this.actionLabel,
-    required this.onAction,
-    required this.visible,
-  });
-
-  final String title;
-  final String actionKey;
-  final String actionLabel;
-  final VoidCallback onAction;
-  final bool visible;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppTheme.spaceSm),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: AppTheme.num(
-              11,
-              weight: FontWeight.w700,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const Spacer(),
-          if (visible)
-            TextButton(
-              key: ValueKey(actionKey),
-              onPressed: onAction,
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm),
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                actionLabel,
-                style: const TextStyle(
-                  color: AppTheme.primary,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-        ],
       ),
     );
   }

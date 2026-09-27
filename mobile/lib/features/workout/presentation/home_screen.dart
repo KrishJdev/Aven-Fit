@@ -1,5 +1,6 @@
 import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
+import 'package:aven_fit/core/widgets/section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -77,7 +78,6 @@ class HomePage extends ConsumerWidget {
             ],
             const SizedBox(height: AppTheme.spaceLg),
             _GlanceSection(state: state),
-            const SizedBox(height: AppTheme.spaceXxl),
             _RecentWorkoutsSection(state: state),
           ],
         ),
@@ -481,38 +481,14 @@ class _RecentWorkoutsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              l10n.homeRecentWorkouts,
-              style: AppTheme.num(
-                11,
-                weight: FontWeight.w700,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-            const Spacer(),
-            if (state.recentWorkouts.isNotEmpty)
-              TextButton(
-                key: const ValueKey('home_view_all_history'),
-                onPressed: () => context.push('/history'),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceSm),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  l10n.viewAll,
-                  style: const TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-          ],
+        SectionHeader(
+          label: l10n.homeRecentWorkouts,
+          actionLabel:
+              state.recentWorkouts.isNotEmpty ? l10n.viewAll : null,
+          onAction:
+              state.recentWorkouts.isNotEmpty ? () => context.push('/history') : null,
+          actionKey: const ValueKey('home_view_all_history'),
         ),
-        const SizedBox(height: AppTheme.spaceSm),
         if (state.recentWorkouts.isEmpty)
           const _RecentEmptyState()
         else
