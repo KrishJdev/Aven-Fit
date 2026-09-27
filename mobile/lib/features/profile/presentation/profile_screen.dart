@@ -1,5 +1,6 @@
 import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
+import 'package:aven_fit/core/widgets/confirm_dialog.dart';
 import 'package:aven_fit/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -477,32 +478,15 @@ class _SignOutTile extends StatelessWidget {
     final l10n = l10nOf(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          l10n.signOutTitle,
-          style: AppTheme.num(16, weight: FontWeight.w700,
-              color: AppTheme.textPrimary),
-        ),
-        content: Text(
-          l10n.signOutMessage,
-          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13.5),
-        ),
-        actions: [
-          TextButton(
-            key: const ValueKey('profile_sign_out_cancel'),
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.dialogCancel),
-          ),
-          TextButton(
-            key: const ValueKey('profile_sign_out_confirm'),
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppTheme.warning),
-            child: Text(
-              l10n.signOutConfirm,
-              style: const TextStyle(fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
+      builder: (dialogContext) => ConfirmDialog(
+        title: l10n.signOutTitle,
+        message: l10n.signOutMessage,
+        cancelLabel: l10n.dialogCancel,
+        confirmLabel: l10n.signOutConfirm,
+        cancelKey: const ValueKey('profile_sign_out_cancel'),
+        confirmKey: const ValueKey('profile_sign_out_confirm'),
+        style: ConfirmStyle.destructive,
+        onConfirm: () {},
       ),
     );
     if (confirmed == true && context.mounted) {

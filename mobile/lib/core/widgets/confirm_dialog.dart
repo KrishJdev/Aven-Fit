@@ -17,6 +17,8 @@ class ConfirmDialog extends StatelessWidget {
     this.cancelLabel,
     this.onCancel,
     this.style = ConfirmStyle.primary,
+    this.cancelKey,
+    this.confirmKey,
     super.key,
   });
 
@@ -27,6 +29,12 @@ class ConfirmDialog extends StatelessWidget {
   final String? cancelLabel;
   final VoidCallback? onCancel;
   final ConfirmStyle style;
+
+  /// Optional test keys for the action buttons — lets callers preserve
+  /// `find.byKey` contracts (e.g. the Profile sign-out confirm/cancel)
+  /// when adopting this widget.
+  final Key? cancelKey;
+  final Key? confirmKey;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +50,7 @@ class ConfirmDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
+          key: cancelKey,
           onPressed: onCancel ?? () => Navigator.of(context).pop(false),
           child: Text(
             (cancelLabel ?? 'Cancel').toUpperCase(),
@@ -54,6 +63,7 @@ class ConfirmDialog extends StatelessWidget {
           ),
         ),
         FilledButton(
+          key: confirmKey,
           onPressed: () {
             onConfirm();
             Navigator.of(context).pop(true);
