@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../domain/routine_exercise.dart';
 import '../domain/routine_set.dart';
@@ -129,9 +130,10 @@ class _RoutineExerciseEditorSheetState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final exName = widget.exercise.exerciseName ??
         widget.exercise.exercise?.name ??
-        'Exercise Targets';
+        l10n.exerciseTargetsTitle;
 
     return Container(
       decoration: const BoxDecoration(
@@ -191,7 +193,7 @@ class _RoutineExerciseEditorSheetState
             ),
             const SizedBox(height: AppTheme.spaceLg),
             // Sets Count Selector
-            _buildSectionHeader('PLANNED SETS'),
+            _buildSectionHeader(l10n.plannedSetsLabel),
             const SizedBox(height: AppTheme.spaceSm),
             Row(
               children: [
@@ -238,7 +240,7 @@ class _RoutineExerciseEditorSheetState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionHeader('TARGET WEIGHT (KG)'),
+                      _buildSectionHeader(l10n.targetWeightKgLabel),
                       const SizedBox(height: AppTheme.spaceSm),
                       _buildNumberField(
                         controller: _weightController,
@@ -253,7 +255,7 @@ class _RoutineExerciseEditorSheetState
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionHeader('TARGET REPS'),
+                      _buildSectionHeader(l10n.targetRepsLabel),
                       const SizedBox(height: AppTheme.spaceSm),
                       _buildNumberField(
                         controller: _repsController,
@@ -267,7 +269,7 @@ class _RoutineExerciseEditorSheetState
             ),
             const SizedBox(height: AppTheme.spaceXl),
             // Rest Timer
-            _buildSectionHeader('REST DURATION'),
+            _buildSectionHeader(l10n.restDurationLabel),
             const SizedBox(height: AppTheme.spaceSm),
             Wrap(
               spacing: 8,
@@ -300,23 +302,23 @@ class _RoutineExerciseEditorSheetState
             ),
             const SizedBox(height: AppTheme.spaceXl),
             // Target RPE (optional)
-            _buildSectionHeader('TARGET RPE (OPTIONAL: 6-10)'),
+            _buildSectionHeader(l10n.targetRpeLabel),
             const SizedBox(height: AppTheme.spaceSm),
             _buildNumberField(
               controller: _rpeController,
-              hintText: 'e.g. 8.5',
+              hintText: l10n.rpeHint,
               isDecimal: true,
             ),
             const SizedBox(height: AppTheme.spaceXl),
             // Notes
-            _buildSectionHeader('NOTES & CUES (OPTIONAL)'),
+            _buildSectionHeader(l10n.notesCuesLabel),
             const SizedBox(height: AppTheme.spaceSm),
             TextField(
               controller: _notesController,
               maxLines: 2,
               style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
               decoration: InputDecoration(
-                hintText: 'e.g. Pause 1s at chest, focus on leg drive',
+                hintText: l10n.notesHint,
                 hintStyle: TextStyle(
                   color: AppTheme.textSecondary.withValues(alpha: 0.4),
                   fontSize: 12,
@@ -352,9 +354,9 @@ class _RoutineExerciseEditorSheetState
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
-                child: const Text(
-                  'CONFIRM TARGETS',
-                  style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                child: Text(
+                  l10n.confirmTargets,
+                  style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.5),
                 ),
               ),
             ),

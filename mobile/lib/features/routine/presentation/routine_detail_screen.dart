@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -27,6 +28,7 @@ class RoutineDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = l10nOf(context);
     final routineAsync = ref.watch(routineDetailControllerProvider(routineId));
 
     return routineAsync.when(
@@ -45,9 +47,9 @@ class RoutineDetailScreen extends ConsumerWidget {
                   color: AppTheme.textPrimary),
               onPressed: () => context.pop(),
             ),
-            title: const Text(
-              'ROUTINE DETAIL',
-              style: TextStyle(
+            title: Text(
+              l10n.routineDetailTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.0,
@@ -74,7 +76,7 @@ class RoutineDetailScreen extends ConsumerWidget {
               children: [
                 _buildHeader(routine),
                 const SizedBox(height: AppTheme.spaceLg),
-                _buildSummaryBadges(routine),
+                _buildSummaryBadges(context, routine),
                 const SizedBox(height: AppTheme.spaceXxl),
                 _buildExercisesSection(context, routine),
               ],
@@ -138,12 +140,13 @@ class RoutineDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryBadges(Routine routine) {
+  Widget _buildSummaryBadges(BuildContext context, Routine routine) {
+    final l10n = l10nOf(context);
     return Row(
       children: [
         Expanded(
           child: _buildBadgeCard(
-            label: 'EXERCISES',
+            label: l10n.statExercises,
             value: '${routine.exerciseCount}',
             color: AppTheme.primary,
           ),
@@ -151,7 +154,7 @@ class RoutineDetailScreen extends ConsumerWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _buildBadgeCard(
-            label: 'TOTAL SETS',
+            label: l10n.totalSetsLabel,
             value: '${routine.totalSets}',
             color: AppTheme.textPrimary,
           ),
@@ -159,7 +162,7 @@ class RoutineDetailScreen extends ConsumerWidget {
         const SizedBox(width: 10),
         Expanded(
           child: _buildBadgeCard(
-            label: 'EST. DURATION',
+            label: l10n.estDurationLabel,
             value: '${routine.estimatedDurationMinutes} MIN',
             color: AppTheme.secondary,
           ),
@@ -205,11 +208,12 @@ class RoutineDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildExercisesSection(BuildContext context, Routine routine) {
+    final l10n = l10nOf(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'PLANNED EXERCISES (${routine.exercises.length})',
+          '${l10n.plannedExercisesLabel} (${routine.exercises.length})',
           style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
@@ -225,10 +229,10 @@ class RoutineDetailScreen extends ConsumerWidget {
               color: AppTheme.surface,
               borderRadius: BorderRadius.circular(AppTheme.radiusSm),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'No exercises added to this routine yet.',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                l10n.noExercisesInRoutine,
+                style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
             ),
           )
@@ -248,7 +252,7 @@ class RoutineDetailScreen extends ConsumerWidget {
     RoutineExercise exercise,
   ) {
     final exName =
-        exercise.exerciseName ?? exercise.exercise?.name ?? 'Exercise';
+        exercise.exerciseName ?? exercise.exercise?.name ?? l10nOf(context).exerciseFallbackName;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppTheme.spaceMd),
@@ -312,7 +316,7 @@ class RoutineDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppTheme.spaceMd),
             // Sets Breakdown Table
-            _buildSetsTable(exercise),
+            _buildSetsTable(context, exercise),
             if (exercise.notes != null && exercise.notes!.isNotEmpty) ...[
               const SizedBox(height: 10),
               Container(
@@ -350,7 +354,8 @@ class RoutineDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSetsTable(RoutineExercise exercise) {
+  Widget _buildSetsTable(BuildContext context, RoutineExercise exercise) {
+    final l10n = l10nOf(context);
     final sets = exercise.sets;
 
     if (sets.isEmpty) {
@@ -370,10 +375,10 @@ class RoutineDetailScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(bottom: 6),
           child: Row(
             children: [
-              _buildTableHeaderCell('SET', flex: 1),
-              _buildTableHeaderCell('TARGET WEIGHT', flex: 2),
-              _buildTableHeaderCell('TARGET REPS', flex: 2),
-              _buildTableHeaderCell('TARGET RPE', flex: 2),
+              _buildTableHeaderCell(l10n.setColumn, flex: 1),
+              _buildTableHeaderCell(l10n.targetWeightColumn, flex: 2),
+              _buildTableHeaderCell(l10n.targetRepsColumn, flex: 2),
+              _buildTableHeaderCell(l10n.targetRpeColumn, flex: 2),
             ],
           ),
         ),
@@ -461,6 +466,7 @@ class RoutineDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     Routine routine,
   ) {
+    final l10n = l10nOf(context);
     return PopupMenuButton<String>(
       icon: const Icon(
         LucideIcons.ellipsisVertical,
@@ -480,7 +486,7 @@ class RoutineDetailScreen extends ConsumerWidget {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Duplicated "${routine.name}"'),
+                content: Text(l10n.routineDuplicated(routine.name)),
                 backgroundColor: AppTheme.surfaceElevated,
               ),
             );
@@ -491,25 +497,25 @@ class RoutineDetailScreen extends ConsumerWidget {
         }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'duplicate',
           child: Row(
             children: [
-              Icon(LucideIcons.copy, size: 16, color: AppTheme.textPrimary),
-              SizedBox(width: 10),
-              Text('Duplicate',
-                  style: TextStyle(color: AppTheme.textPrimary)),
+              const Icon(LucideIcons.copy, size: 16, color: AppTheme.textPrimary),
+              const SizedBox(width: 10),
+              Text(l10n.duplicateMenu,
+                  style: const TextStyle(color: AppTheme.textPrimary)),
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'delete',
           child: Row(
             children: [
-              Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
-              SizedBox(width: 10),
-              Text('Delete Routine',
-                  style: TextStyle(color: AppTheme.warning)),
+              const Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
+              const SizedBox(width: 10),
+              Text(l10n.deleteRoutineMenu,
+                  style: const TextStyle(color: AppTheme.warning)),
             ],
           ),
         ),
@@ -522,14 +528,14 @@ class RoutineDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     Routine routine,
   ) {
+    final l10n = l10nOf(context);
     showDialog(
       context: context,
       builder: (ctx) => ConfirmDialog(
-        title: 'Delete Routine?',
-        message:
-            'Are you sure you want to delete "${routine.name}"? Historical workouts logged from this routine will remain intact.',
-        confirmLabel: 'DELETE',
-        cancelLabel: 'CANCEL',
+        title: l10n.deleteRoutineTitle,
+        message: l10n.deleteRoutineMessage(routine.name),
+        confirmLabel: l10n.deleteWorkoutConfirm,
+        cancelLabel: l10n.dialogCancel,
         style: ConfirmStyle.destructive,
         onConfirm: () async {
           await ref
@@ -548,6 +554,7 @@ class RoutineDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     Routine routine,
   ) {
+    final l10n = l10nOf(context);
     return Container(
       color: AppTheme.surfaceElevated,
       padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceMd, AppTheme.spaceLg, AppTheme.spaceLg),
@@ -579,9 +586,9 @@ class RoutineDetailScreen extends ConsumerWidget {
               ),
             ),
             icon: const Icon(LucideIcons.play, size: 18),
-            label: const Text(
-              'START WORKOUT',
-              style: TextStyle(
+            label: Text(
+              l10n.historyStartWorkout,
+              style: const TextStyle(
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
                 letterSpacing: 0.8,
@@ -594,6 +601,7 @@ class RoutineDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildNotFoundScreen(BuildContext context) {
+    final l10n = l10nOf(context);
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: Center(
@@ -608,18 +616,18 @@ class RoutineDetailScreen extends ConsumerWidget {
                 color: AppTheme.textSecondary,
               ),
               const SizedBox(height: AppTheme.spaceLg),
-              const Text(
-                'Routine Not Found',
-                style: TextStyle(
+              Text(
+                l10n.routineNotFoundTitle,
+                style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: AppTheme.spaceSm),
-              const Text(
-                'This routine may have been deleted.',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+              Text(
+                l10n.routineNotFoundMessage,
+                style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: AppTheme.spaceXxl),
               ElevatedButton(
@@ -628,7 +636,7 @@ class RoutineDetailScreen extends ConsumerWidget {
                   backgroundColor: AppTheme.primary,
                   foregroundColor: AppTheme.background,
                 ),
-                child: const Text('BACK TO ROUTINES'),
+                child: Text(l10n.backToRoutines),
               ),
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -34,6 +35,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final routinesAsync = ref.watch(routineListControllerProvider);
 
     return Scaffold(
@@ -88,9 +90,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
         icon: const Icon(LucideIcons.plus, size: 20),
-        label: const Text(
-          'NEW ROUTINE',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        label: Text(
+          l10n.newRoutine,
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
         onPressed: () => context.push('/routines/new'),
       ),
@@ -98,6 +100,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceLg),
       decoration: const BoxDecoration(
@@ -112,22 +115,22 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'ROUTINES',
-                    style: TextStyle(
+                    l10n.routinesTitle,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.2,
                       color: AppTheme.textPrimary,
                     ),
                   ),
-                  SizedBox(height: AppTheme.spaceXxs),
+                  const SizedBox(height: AppTheme.spaceXxs),
                   Text(
-                    'Workout splits & templates',
-                    style: TextStyle(
+                    l10n.routinesSubtitle,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppTheme.textSecondary,
                     ),
@@ -148,9 +151,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                   ),
                 ),
                 icon: const Icon(LucideIcons.dumbbell, size: 16),
-                label: const Text(
-                  'EXERCISES',
-                  style: TextStyle(
+                label: Text(
+                  l10n.statExercises,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
@@ -172,7 +175,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
               onChanged: (val) => setState(() => _searchQuery = val),
               style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'Search routines by name or muscle...',
+                hintText: l10n.searchRoutinesHint,
                 hintStyle: TextStyle(
                   color: AppTheme.textSecondary.withValues(alpha: 0.5),
                   fontSize: 13,
@@ -221,6 +224,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   Widget _buildRoutineCard(BuildContext context, Routine routine) {
+    final l10n = l10nOf(context);
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -297,7 +301,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 ...routine.exercises.take(3).map((e) {
                   final exName = e.exerciseName ??
                       e.exercise?.name ??
-                      'Exercise';
+                      l10n.exerciseFallbackName;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppTheme.spaceXs),
                     child: Row(
@@ -359,9 +363,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                     ),
                   ),
                   icon: const Icon(LucideIcons.play, size: 16),
-                  label: const Text(
-                    'START WORKOUT',
-                    style: TextStyle(
+                  label: Text(
+                    l10n.historyStartWorkout,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 13,
                       letterSpacing: 0.8,
@@ -409,6 +413,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   Widget _buildRoutineMenu(BuildContext context, Routine routine) {
+    final l10n = l10nOf(context);
     return PopupMenuButton<String>(
       icon: const Icon(
         LucideIcons.ellipsisVertical,
@@ -430,33 +435,33 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
         }
       },
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'edit',
           child: Row(
             children: [
-              Icon(LucideIcons.pencil, size: 16, color: AppTheme.textPrimary),
-              SizedBox(width: 10),
-              Text('Edit Routine', style: TextStyle(color: AppTheme.textPrimary)),
+              const Icon(LucideIcons.pencil, size: 16, color: AppTheme.textPrimary),
+              const SizedBox(width: 10),
+              Text(l10n.editRoutineMenu, style: const TextStyle(color: AppTheme.textPrimary)),
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'duplicate',
           child: Row(
             children: [
-              Icon(LucideIcons.copy, size: 16, color: AppTheme.textPrimary),
-              SizedBox(width: 10),
-              Text('Duplicate', style: TextStyle(color: AppTheme.textPrimary)),
+              const Icon(LucideIcons.copy, size: 16, color: AppTheme.textPrimary),
+              const SizedBox(width: 10),
+              Text(l10n.duplicateMenu, style: const TextStyle(color: AppTheme.textPrimary)),
             ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'delete',
           child: Row(
             children: [
-              Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
-              SizedBox(width: 10),
-              Text('Delete', style: TextStyle(color: AppTheme.warning)),
+              const Icon(LucideIcons.trash2, size: 16, color: AppTheme.warning),
+              const SizedBox(width: 10),
+              Text(l10n.deleteMenu, style: const TextStyle(color: AppTheme.warning)),
             ],
           ),
         ),
@@ -480,9 +485,10 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
     final controller = ref.read(routineListControllerProvider.notifier);
     await controller.duplicateRoutine(routine.id);
     if (mounted) {
+      final l10n = l10nOf(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Duplicated "${routine.name}"'),
+          content: Text(l10n.routineDuplicated(routine.name)),
           backgroundColor: AppTheme.surfaceElevated,
           duration: const Duration(seconds: 2),
         ),
@@ -491,14 +497,14 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   void _confirmDelete(BuildContext context, Routine routine) {
+    final l10n = l10nOf(context);
     showDialog(
       context: context,
       builder: (ctx) => ConfirmDialog(
-        title: 'Delete Routine?',
-        message:
-            'Are you sure you want to delete "${routine.name}"? Historical workouts logged from this routine will remain intact.',
-        confirmLabel: 'DELETE',
-        cancelLabel: 'CANCEL',
+        title: l10n.deleteRoutineTitle,
+        message: l10n.deleteRoutineMessage(routine.name),
+        confirmLabel: l10n.deleteWorkoutConfirm,
+        cancelLabel: l10n.dialogCancel,
         style: ConfirmStyle.destructive,
         onConfirm: () async {
           await ref
@@ -510,6 +516,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final l10n = l10nOf(context);
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl, vertical: AppTheme.spaceXxl),
@@ -534,9 +541,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
               ),
             ),
             const SizedBox(height: AppTheme.spaceXl),
-            const Text(
-              'NO ROUTINES YET',
-              style: TextStyle(
+            Text(
+              l10n.routineEmptyTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.0,
@@ -544,10 +551,10 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
               ),
             ),
             const SizedBox(height: AppTheme.spaceSm),
-            const Text(
-              'Create unlimited custom routines and workout splits to streamline your gym sessions.',
+            Text(
+              l10n.routineEmptyMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
                 height: 1.4,
@@ -567,9 +574,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                   ),
                 ),
                 icon: const Icon(LucideIcons.plus, size: 18),
-                label: const Text(
-                  'CREATE ROUTINE',
-                  style: TextStyle(
+                label: Text(
+                  l10n.createRoutine,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0.5,
                   ),
@@ -583,6 +590,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
   }
 
   Widget _buildNoSearchResults(BuildContext context) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spaceXxxl),
@@ -596,7 +604,7 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
             ),
             const SizedBox(height: 14),
             Text(
-              'No routines matching "$_searchQuery"',
+              l10n.noRoutinesMatching(_searchQuery),
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 15,
@@ -609,9 +617,9 @@ class _RoutineListScreenState extends ConsumerState<RoutineListScreen> {
                 _searchController.clear();
                 setState(() => _searchQuery = '');
               },
-              child: const Text(
-                'CLEAR SEARCH',
-                style: TextStyle(color: AppTheme.primary, fontSize: 13),
+              child: Text(
+                l10n.clearSearch,
+                style: const TextStyle(color: AppTheme.primary, fontSize: 13),
               ),
             ),
           ],

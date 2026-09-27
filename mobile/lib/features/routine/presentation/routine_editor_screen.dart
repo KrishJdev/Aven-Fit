@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/confirm_dialog.dart';
 import '../../../core/widgets/error_state_widget.dart';
@@ -58,6 +59,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     final stateAsync =
         ref.watch(routineEditorControllerProvider(widget.routineId));
     final controller =
@@ -78,7 +80,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               onPressed: () => context.pop(),
             ),
             title: Text(
-              state.isNew ? 'NEW ROUTINE' : 'EDIT ROUTINE',
+              state.isNew ? l10n.newRoutine : l10n.editRoutine,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
@@ -98,9 +100,9 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                           color: AppTheme.primary,
                         ),
                       )
-                    : const Text(
-                        'SAVE',
-                        style: TextStyle(
+                    : Text(
+                        l10n.dialogSave,
+                        style: const TextStyle(
                           color: AppTheme.primary,
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
@@ -195,6 +197,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     RoutineEditorController controller,
     RoutineEditorState state,
   ) {
+    final l10n = l10nOf(context);
     return Container(
       padding: const EdgeInsets.all(AppTheme.spaceLg),
       decoration: BoxDecoration(
@@ -204,9 +207,9 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ROUTINE DETAILS',
-            style: TextStyle(
+          Text(
+            l10n.routineDetailsLabel,
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
@@ -223,12 +226,12 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               fontWeight: FontWeight.w700,
             ),
             decoration: InputDecoration(
-              labelText: 'Routine Name *',
+              labelText: l10n.routineNameLabel,
               labelStyle: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
               ),
-              hintText: 'e.g. Upper Body Hypertrophy',
+              hintText: l10n.routineNameHint,
               hintStyle: TextStyle(
                 color: AppTheme.textSecondary.withValues(alpha: 0.3),
                 fontSize: 14,
@@ -258,12 +261,12 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             maxLines: 2,
             style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),
             decoration: InputDecoration(
-              labelText: 'Description (Optional)',
+              labelText: l10n.descriptionLabel,
               labelStyle: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
               ),
-              hintText: 'e.g. 4-week strength block focusing on bench and OHP',
+              hintText: l10n.descriptionHint,
               hintStyle: TextStyle(
                 color: AppTheme.textSecondary.withValues(alpha: 0.3),
                 fontSize: 13,
@@ -292,11 +295,12 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
   }
 
   Widget _buildSummaryBadges(RoutineEditorState state) {
+    final l10n = l10nOf(context);
     return Row(
       children: [
         Expanded(
           child: _buildBadgeCard(
-            label: 'EXERCISES',
+            label: l10n.statExercises,
             value: '${state.exercises.length}',
             color: AppTheme.primary,
           ),
@@ -304,7 +308,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         const SizedBox(width: 10),
         Expanded(
           child: _buildBadgeCard(
-            label: 'TOTAL SETS',
+            label: l10n.totalSetsLabel,
             value: '${state.totalSets}',
             color: AppTheme.textPrimary,
           ),
@@ -312,7 +316,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         const SizedBox(width: 10),
         Expanded(
           child: _buildBadgeCard(
-            label: 'EST. TIME',
+            label: l10n.estTimeLabel,
             value: '${state.estimatedDurationMinutes} MIN',
             color: AppTheme.secondary,
           ),
@@ -362,12 +366,13 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     RoutineEditorController controller,
     RoutineEditorState state,
   ) {
+    final l10n = l10nOf(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
-          'EXERCISES',
-          style: TextStyle(
+        Text(
+          l10n.statExercises,
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.8,
@@ -376,7 +381,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         ),
         if (state.exercises.isNotEmpty)
           Text(
-            'Drag handle to reorder',
+            l10n.dragToReorder,
             style: TextStyle(
               fontSize: 11,
               color: AppTheme.textSecondary.withValues(alpha: 0.6),
@@ -391,6 +396,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     RoutineEditorController controller,
     RoutineEditorState state,
   ) {
+    final l10n = l10nOf(context);
     if (state.exercises.isEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceXxxl, horizontal: AppTheme.spaceXl),
@@ -406,9 +412,9 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
               color: AppTheme.textSecondary,
             ),
             const SizedBox(height: AppTheme.spaceMd),
-            const Text(
-              'No exercises added yet',
-              style: TextStyle(
+            Text(
+              l10n.noExercisesAdded,
+              style: const TextStyle(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
                 fontSize: 14,
@@ -416,7 +422,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
             ),
             const SizedBox(height: AppTheme.spaceXs),
             Text(
-              'Tap below to browse the catalog and add exercises to your routine.',
+              l10n.noExercisesAddedHint,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppTheme.textSecondary.withValues(alpha: 0.8),
@@ -455,7 +461,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     required RoutineEditorController controller,
   }) {
     final exName =
-        exercise.exerciseName ?? exercise.exercise?.name ?? 'Exercise';
+        exercise.exerciseName ?? exercise.exercise?.name ?? l10nOf(context).exerciseFallbackName;
 
     return Container(
       key: key,
@@ -564,6 +570,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     BuildContext context,
     RoutineEditorController controller,
   ) {
+    final l10n = l10nOf(context);
     return OutlinedButton.icon(
       onPressed: () => _openExercisePicker(context, controller),
       style: OutlinedButton.styleFrom(
@@ -573,9 +580,9 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
         padding: const EdgeInsets.symmetric(vertical: 14),
       ),
       icon: const Icon(LucideIcons.plus, size: 18),
-      label: const Text(
-        'ADD EXERCISE',
-        style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.8),
+      label: Text(
+        l10n.addExercise,
+        style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.8),
       ),
     );
   }
@@ -584,6 +591,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     BuildContext context,
     RoutineEditorState state,
   ) {
+    final l10n = l10nOf(context);
     return Container(
       color: AppTheme.surfaceElevated,
       padding: const EdgeInsets.fromLTRB(AppTheme.spaceLg, AppTheme.spaceMd, AppTheme.spaceLg, AppTheme.spaceLg),
@@ -612,7 +620,7 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
                     ),
                   )
                 : Text(
-                    state.isNew ? 'CREATE ROUTINE' : 'SAVE CHANGES',
+                    state.isNew ? l10n.createRoutine : l10n.saveChanges,
                     style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 14,
@@ -647,13 +655,14 @@ class _RoutineEditorScreenState extends ConsumerState<RoutineEditorScreen> {
     String exerciseName,
     RoutineEditorController controller,
   ) {
+    final l10n = l10nOf(context);
     showDialog(
       context: context,
       builder: (ctx) => ConfirmDialog(
-        title: 'Remove Exercise?',
-        message: 'Remove "$exerciseName" from this routine?',
-        confirmLabel: 'REMOVE',
-        cancelLabel: 'CANCEL',
+        title: l10n.removeExerciseTitle,
+        message: l10n.removeExerciseMessage(exerciseName),
+        confirmLabel: l10n.removeExerciseConfirm,
+        cancelLabel: l10n.dialogCancel,
         style: ConfirmStyle.destructive,
         onConfirm: () => controller.removeExercise(index),
       ),

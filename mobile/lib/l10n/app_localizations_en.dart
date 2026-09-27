@@ -449,7 +449,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveAsRoutineTitle => 'SAVE AS ROUTINE';
 
   @override
-  String get routineNameHint => 'Routine name...';
+  String get routineNameHint => 'e.g. Upper Body Hypertrophy';
 
   @override
   String get savedToRoutines => 'Saved to your routines';
@@ -616,4 +616,168 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favouritesChip => '★ Favourites';
+
+  @override
+  String get routinesTitle => 'ROUTINES';
+
+  @override
+  String get routinesSubtitle => 'Workout splits & templates';
+
+  @override
+  String get searchRoutinesHint => 'Search routines by name or muscle...';
+
+  @override
+  String get newRoutine => 'NEW ROUTINE';
+
+  @override
+  String get editRoutine => 'EDIT ROUTINE';
+
+  @override
+  String get editRoutineMenu => 'Edit Routine';
+
+  @override
+  String get duplicateMenu => 'Duplicate';
+
+  @override
+  String get deleteMenu => 'Delete';
+
+  @override
+  String get deleteRoutineMenu => 'Delete Routine';
+
+  @override
+  String routineDuplicated(String name) {
+    return 'Duplicated \"$name\"';
+  }
+
+  @override
+  String get deleteRoutineTitle => 'Delete Routine?';
+
+  @override
+  String deleteRoutineMessage(String name) {
+    return 'Are you sure you want to delete \"$name\"? Historical workouts logged from this routine will remain intact.';
+  }
+
+  @override
+  String get routineEmptyTitle => 'NO ROUTINES YET';
+
+  @override
+  String get routineEmptyMessage =>
+      'Create unlimited custom routines and workout splits to streamline your gym sessions.';
+
+  @override
+  String get createRoutine => 'CREATE ROUTINE';
+
+  @override
+  String get saveChanges => 'SAVE CHANGES';
+
+  @override
+  String noRoutinesMatching(String query) {
+    return 'No routines matching \"$query\"';
+  }
+
+  @override
+  String get clearSearch => 'CLEAR SEARCH';
+
+  @override
+  String get routineDetailTitle => 'ROUTINE DETAIL';
+
+  @override
+  String get routineDetailsLabel => 'ROUTINE DETAILS';
+
+  @override
+  String get totalSetsLabel => 'TOTAL SETS';
+
+  @override
+  String get estDurationLabel => 'EST. DURATION';
+
+  @override
+  String get estTimeLabel => 'EST. TIME';
+
+  @override
+  String get plannedExercisesLabel => 'PLANNED EXERCISES';
+
+  @override
+  String get noExercisesInRoutine => 'No exercises added to this routine yet.';
+
+  @override
+  String get targetWeightColumn => 'TARGET WEIGHT';
+
+  @override
+  String get targetRepsColumn => 'TARGET REPS';
+
+  @override
+  String get targetRpeColumn => 'TARGET RPE';
+
+  @override
+  String get routineNotFoundTitle => 'Routine Not Found';
+
+  @override
+  String get routineNotFoundMessage => 'This routine may have been deleted.';
+
+  @override
+  String get backToRoutines => 'BACK TO ROUTINES';
+
+  @override
+  String get dragToReorder => 'Drag handle to reorder';
+
+  @override
+  String get noExercisesAdded => 'No exercises added yet';
+
+  @override
+  String get noExercisesAddedHint =>
+      'Tap below to browse the catalog and add exercises to your routine.';
+
+  @override
+  String get routineNameLabel => 'Routine Name *';
+
+  @override
+  String get descriptionLabel => 'Description (Optional)';
+
+  @override
+  String get descriptionHint =>
+      'e.g. 4-week strength block focusing on bench and OHP';
+
+  @override
+  String get routineNameEmpty => 'Routine name cannot be empty';
+
+  @override
+  String get removeExerciseTitle => 'Remove Exercise?';
+
+  @override
+  String removeExerciseMessage(String name) {
+    return 'Remove \"$name\" from this routine?';
+  }
+
+  @override
+  String get removeExerciseConfirm => 'REMOVE';
+
+  @override
+  String get exerciseTargetsTitle => 'Exercise Targets';
+
+  @override
+  String get plannedSetsLabel => 'PLANNED SETS';
+
+  @override
+  String get targetWeightKgLabel => 'TARGET WEIGHT (KG)';
+
+  @override
+  String get targetRepsLabel => 'TARGET REPS';
+
+  @override
+  String get restDurationLabel => 'REST DURATION';
+
+  @override
+  String get targetRpeLabel => 'TARGET RPE (OPTIONAL: 6-10)';
+
+  @override
+  String get notesCuesLabel => 'NOTES & CUES (OPTIONAL)';
+
+  @override
+  String get notesHint => 'e.g. Pause 1s at chest, focus on leg drive';
+
+  @override
+  String get rpeHint => 'e.g. 8.5';
+
+  @override
+  String get confirmTargets => 'CONFIRM TARGETS';
 }

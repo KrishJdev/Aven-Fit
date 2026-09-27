@@ -898,7 +898,7 @@ abstract class AppLocalizations {
   /// No description provided for @routineNameHint.
   ///
   /// In en, this message translates to:
-  /// **'Routine name...'**
+  /// **'e.g. Upper Body Hypertrophy'**
   String get routineNameHint;
 
   /// No description provided for @savedToRoutines.
@@ -1212,6 +1212,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'★ Favourites'**
   String get favouritesChip;
+
+  /// No description provided for @routinesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUTINES'**
+  String get routinesTitle;
+
+  /// No description provided for @routinesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Workout splits & templates'**
+  String get routinesSubtitle;
+
+  /// No description provided for @searchRoutinesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search routines by name or muscle...'**
+  String get searchRoutinesHint;
+
+  /// No description provided for @newRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW ROUTINE'**
+  String get newRoutine;
+
+  /// No description provided for @editRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'EDIT ROUTINE'**
+  String get editRoutine;
+
+  /// No description provided for @editRoutineMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Routine'**
+  String get editRoutineMenu;
+
+  /// No description provided for @duplicateMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get duplicateMenu;
+
+  /// No description provided for @deleteMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteMenu;
+
+  /// No description provided for @deleteRoutineMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Routine'**
+  String get deleteRoutineMenu;
+
+  /// No description provided for @routineDuplicated.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicated \"{name}\"'**
+  String routineDuplicated(String name);
+
+  /// No description provided for @deleteRoutineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Routine?'**
+  String get deleteRoutineTitle;
+
+  /// No description provided for @deleteRoutineMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{name}\"? Historical workouts logged from this routine will remain intact.'**
+  String deleteRoutineMessage(String name);
+
+  /// No description provided for @routineEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NO ROUTINES YET'**
+  String get routineEmptyTitle;
+
+  /// No description provided for @routineEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Create unlimited custom routines and workout splits to streamline your gym sessions.'**
+  String get routineEmptyMessage;
+
+  /// No description provided for @createRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'CREATE ROUTINE'**
+  String get createRoutine;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE CHANGES'**
+  String get saveChanges;
+
+  /// No description provided for @noRoutinesMatching.
+  ///
+  /// In en, this message translates to:
+  /// **'No routines matching \"{query}\"'**
+  String noRoutinesMatching(String query);
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'CLEAR SEARCH'**
+  String get clearSearch;
+
+  /// No description provided for @routineDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUTINE DETAIL'**
+  String get routineDetailTitle;
+
+  /// No description provided for @routineDetailsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUTINE DETAILS'**
+  String get routineDetailsLabel;
+
+  /// No description provided for @totalSetsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL SETS'**
+  String get totalSetsLabel;
+
+  /// No description provided for @estDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EST. DURATION'**
+  String get estDurationLabel;
+
+  /// No description provided for @estTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EST. TIME'**
+  String get estTimeLabel;
+
+  /// No description provided for @plannedExercisesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PLANNED EXERCISES'**
+  String get plannedExercisesLabel;
+
+  /// No description provided for @noExercisesInRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises added to this routine yet.'**
+  String get noExercisesInRoutine;
+
+  /// No description provided for @targetWeightColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET WEIGHT'**
+  String get targetWeightColumn;
+
+  /// No description provided for @targetRepsColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET REPS'**
+  String get targetRepsColumn;
+
+  /// No description provided for @targetRpeColumn.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET RPE'**
+  String get targetRpeColumn;
+
+  /// No description provided for @routineNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine Not Found'**
+  String get routineNotFoundTitle;
+
+  /// No description provided for @routineNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This routine may have been deleted.'**
+  String get routineNotFoundMessage;
+
+  /// No description provided for @backToRoutines.
+  ///
+  /// In en, this message translates to:
+  /// **'BACK TO ROUTINES'**
+  String get backToRoutines;
+
+  /// No description provided for @dragToReorder.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag handle to reorder'**
+  String get dragToReorder;
+
+  /// No description provided for @noExercisesAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No exercises added yet'**
+  String get noExercisesAdded;
+
+  /// No description provided for @noExercisesAddedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap below to browse the catalog and add exercises to your routine.'**
+  String get noExercisesAddedHint;
+
+  /// No description provided for @routineNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine Name *'**
+  String get routineNameLabel;
+
+  /// No description provided for @descriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (Optional)'**
+  String get descriptionLabel;
+
+  /// No description provided for @descriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 4-week strength block focusing on bench and OHP'**
+  String get descriptionHint;
+
+  /// No description provided for @routineNameEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine name cannot be empty'**
+  String get routineNameEmpty;
+
+  /// No description provided for @removeExerciseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Exercise?'**
+  String get removeExerciseTitle;
+
+  /// No description provided for @removeExerciseMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{name}\" from this routine?'**
+  String removeExerciseMessage(String name);
+
+  /// No description provided for @removeExerciseConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'REMOVE'**
+  String get removeExerciseConfirm;
+
+  /// No description provided for @exerciseTargetsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise Targets'**
+  String get exerciseTargetsTitle;
+
+  /// No description provided for @plannedSetsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PLANNED SETS'**
+  String get plannedSetsLabel;
+
+  /// No description provided for @targetWeightKgLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET WEIGHT (KG)'**
+  String get targetWeightKgLabel;
+
+  /// No description provided for @targetRepsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET REPS'**
+  String get targetRepsLabel;
+
+  /// No description provided for @restDurationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'REST DURATION'**
+  String get restDurationLabel;
+
+  /// No description provided for @targetRpeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TARGET RPE (OPTIONAL: 6-10)'**
+  String get targetRpeLabel;
+
+  /// No description provided for @notesCuesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NOTES & CUES (OPTIONAL)'**
+  String get notesCuesLabel;
+
+  /// No description provided for @notesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Pause 1s at chest, focus on leg drive'**
+  String get notesHint;
+
+  /// No description provided for @rpeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 8.5'**
+  String get rpeHint;
+
+  /// No description provided for @confirmTargets.
+  ///
+  /// In en, this message translates to:
+  /// **'CONFIRM TARGETS'**
+  String get confirmTargets;
 }
 
 class _AppLocalizationsDelegate
