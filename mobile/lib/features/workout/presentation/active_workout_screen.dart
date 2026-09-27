@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:aven_fit/core/l10n/l10n.dart';
 import 'package:aven_fit/core/theme/app_theme.dart';
+import 'package:aven_fit/core/widgets/confirm_dialog.dart';
 import 'package:aven_fit/core/widgets/loading_state_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -628,29 +629,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     final l10n = l10nOf(context);
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          l10n.finishWorkoutTitle,
-          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.textPrimary),
-        ),
-        content: Text(
-          l10n.finishWorkoutMessage,
-          style: const TextStyle(color: AppTheme.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.dialogResume, style: const TextStyle(color: AppTheme.textSecondary)),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await _finishAndNavigate(context, controller);
-            },
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.secondary, foregroundColor: AppTheme.textOnPrimary),
-            child: Text(l10n.finishAndSave),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: l10n.finishWorkoutTitle,
+        message: l10n.finishWorkoutMessage,
+        cancelLabel: l10n.dialogResume,
+        confirmLabel: l10n.finishAndSave,
+        style: ConfirmStyle.primary,
+        onConfirm: () => _finishAndNavigate(context, controller),
       ),
     );
   }
@@ -659,29 +644,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     final l10n = l10nOf(context);
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          l10n.discardWorkoutTitle,
-          style: AppTheme.num(18, weight: FontWeight.w700, color: AppTheme.warning),
-        ),
-        content: Text(
-          l10n.discardWorkoutMessage,
-          style: const TextStyle(color: AppTheme.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.dialogResume, style: const TextStyle(color: AppTheme.textSecondary)),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              controller.cancelWorkout();
-            },
-            style: FilledButton.styleFrom(backgroundColor: AppTheme.warning, foregroundColor: AppTheme.textPrimary),
-            child: Text(l10n.discard),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: l10n.discardWorkoutTitle,
+        message: l10n.discardWorkoutMessage,
+        cancelLabel: l10n.dialogResume,
+        confirmLabel: l10n.discard,
+        style: ConfirmStyle.destructive,
+        onConfirm: () => controller.cancelWorkout(),
       ),
     );
   }

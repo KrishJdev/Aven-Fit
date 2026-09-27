@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/confirm_dialog.dart';
 import '../../domain/ghost_set.dart';
 import '../../domain/workout_set.dart';
 
@@ -41,33 +42,19 @@ class SetRowWidget extends StatelessWidget {
       ),
       confirmDismiss: (direction) async {
         if (!set.isCompleted) return true;
-        return await showDialog<bool>(
+        final confirmed = await showDialog<bool>(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(
-              'DELETE COMPLETED SET?',
-              style: AppTheme.num(16, weight: FontWeight.w700, color: AppTheme.warning),
-            ),
-            content: const Text(
-              'This set is marked as completed. Are you sure you want to delete it?',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('CANCEL', style: TextStyle(color: AppTheme.textSecondary)),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.warning,
-                  foregroundColor: AppTheme.textOnPrimary,
-                ),
-                child: const Text('DELETE'),
-              ),
-            ],
+          builder: (ctx) => ConfirmDialog(
+            title: 'DELETE COMPLETED SET?',
+            message:
+                'This set is marked as completed. Are you sure you want to delete it?',
+            confirmLabel: 'DELETE',
+            cancelLabel: 'CANCEL',
+            style: ConfirmStyle.destructive,
+            onConfirm: () {},
           ),
-        ) ?? false;
+        );
+        return confirmed ?? false;
       },
       onDismissed: (_) => onDeleteSet(),
       child: Container(
