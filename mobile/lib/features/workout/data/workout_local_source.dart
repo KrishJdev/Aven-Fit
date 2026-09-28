@@ -224,6 +224,20 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
     return distinctExercises;
   }
 
+  /// Returns all import source-IDs currently in the DB (§12.4 dedup).
+  /// Used to skip workouts that were already imported — re-importing the
+  /// same CSV never double-logs (L7).
+  Future<Set<String>> getExistingImportSourceIds() async {
+    final query = selectOnly(workoutSessions)
+      ..addColumns([workoutSessions.importSourceId])
+      ..where(workoutSessions.importSourceId.isNotNull());
+    final rows = await query.get();
+    return rows
+        .map((r) => r.read(workoutSessions.importSourceId))
+        .whereType<String>()
+        .toSet();
+  }
+
   /// Inserts a new workout session row.
   Future<int> createSession({
     required String id,
@@ -231,6 +245,7 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
     required DateTime startedAt,
     String? routineId,
     String? notes,
+    String? importSourceId,
   }) {
     final now = DateTime.now();
     return into(workoutSessions).insert(
@@ -241,6 +256,7 @@ class WorkoutDao extends DatabaseAccessor<AppDatabase> with _$WorkoutDaoMixin {
         status: const Value('active'),
         routineId: Value(routineId),
         notes: Value(notes),
+        importSourceId: Value(importSourceId),
         createdAt: Value(now),
         updatedAt: Value(now),
       ),

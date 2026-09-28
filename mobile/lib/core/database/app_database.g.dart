@@ -558,6 +558,17 @@ class $WorkoutSessionsTable extends WorkoutSessions
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _importSourceIdMeta = const VerificationMeta(
+    'importSourceId',
+  );
+  @override
+  late final GeneratedColumn<String> importSourceId = GeneratedColumn<String>(
+    'import_source_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -596,6 +607,7 @@ class $WorkoutSessionsTable extends WorkoutSessions
     lastResumedAt,
     pausedDurationSeconds,
     notes,
+    importSourceId,
     createdAt,
     updatedAt,
   ];
@@ -696,6 +708,15 @@ class $WorkoutSessionsTable extends WorkoutSessions
         notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
+    if (data.containsKey('import_source_id')) {
+      context.handle(
+        _importSourceIdMeta,
+        importSourceId.isAcceptableOrUnknown(
+          data['import_source_id']!,
+          _importSourceIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -765,6 +786,10 @@ class $WorkoutSessionsTable extends WorkoutSessions
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
       ),
+      importSourceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}import_source_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -796,6 +821,11 @@ class WorkoutSessionRow extends DataClass
   final DateTime? lastResumedAt;
   final int pausedDurationSeconds;
   final String? notes;
+
+  /// Source identifier for CSV-imported workouts (§12.4 dedup). Format:
+  /// `import_{source}_{date}_{workoutName}`. Null for non-imported sessions.
+  /// Re-importing the same CSV skips workouts whose source-ID already exists.
+  final String? importSourceId;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   const WorkoutSessionRow({
@@ -811,6 +841,7 @@ class WorkoutSessionRow extends DataClass
     this.lastResumedAt,
     required this.pausedDurationSeconds,
     this.notes,
+    this.importSourceId,
     this.createdAt,
     this.updatedAt,
   });
@@ -840,6 +871,9 @@ class WorkoutSessionRow extends DataClass
     map['paused_duration_seconds'] = Variable<int>(pausedDurationSeconds);
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
+    }
+    if (!nullToAbsent || importSourceId != null) {
+      map['import_source_id'] = Variable<String>(importSourceId);
     }
     if (!nullToAbsent || createdAt != null) {
       map['created_at'] = Variable<DateTime>(createdAt);
@@ -876,6 +910,9 @@ class WorkoutSessionRow extends DataClass
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
+      importSourceId: importSourceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(importSourceId),
       createdAt: createdAt == null && nullToAbsent
           ? const Value.absent()
           : Value(createdAt),
@@ -905,6 +942,7 @@ class WorkoutSessionRow extends DataClass
         json['pausedDurationSeconds'],
       ),
       notes: serializer.fromJson<String?>(json['notes']),
+      importSourceId: serializer.fromJson<String?>(json['importSourceId']),
       createdAt: serializer.fromJson<DateTime?>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
@@ -925,6 +963,7 @@ class WorkoutSessionRow extends DataClass
       'lastResumedAt': serializer.toJson<DateTime?>(lastResumedAt),
       'pausedDurationSeconds': serializer.toJson<int>(pausedDurationSeconds),
       'notes': serializer.toJson<String?>(notes),
+      'importSourceId': serializer.toJson<String?>(importSourceId),
       'createdAt': serializer.toJson<DateTime?>(createdAt),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
@@ -943,6 +982,7 @@ class WorkoutSessionRow extends DataClass
     Value<DateTime?> lastResumedAt = const Value.absent(),
     int? pausedDurationSeconds,
     Value<String?> notes = const Value.absent(),
+    Value<String?> importSourceId = const Value.absent(),
     Value<DateTime?> createdAt = const Value.absent(),
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => WorkoutSessionRow(
@@ -962,6 +1002,9 @@ class WorkoutSessionRow extends DataClass
         : this.lastResumedAt,
     pausedDurationSeconds: pausedDurationSeconds ?? this.pausedDurationSeconds,
     notes: notes.present ? notes.value : this.notes,
+    importSourceId: importSourceId.present
+        ? importSourceId.value
+        : this.importSourceId,
     createdAt: createdAt.present ? createdAt.value : this.createdAt,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
@@ -987,6 +1030,9 @@ class WorkoutSessionRow extends DataClass
           ? data.pausedDurationSeconds.value
           : this.pausedDurationSeconds,
       notes: data.notes.present ? data.notes.value : this.notes,
+      importSourceId: data.importSourceId.present
+          ? data.importSourceId.value
+          : this.importSourceId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -1007,6 +1053,7 @@ class WorkoutSessionRow extends DataClass
           ..write('lastResumedAt: $lastResumedAt, ')
           ..write('pausedDurationSeconds: $pausedDurationSeconds, ')
           ..write('notes: $notes, ')
+          ..write('importSourceId: $importSourceId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1027,6 +1074,7 @@ class WorkoutSessionRow extends DataClass
     lastResumedAt,
     pausedDurationSeconds,
     notes,
+    importSourceId,
     createdAt,
     updatedAt,
   );
@@ -1046,6 +1094,7 @@ class WorkoutSessionRow extends DataClass
           other.lastResumedAt == this.lastResumedAt &&
           other.pausedDurationSeconds == this.pausedDurationSeconds &&
           other.notes == this.notes &&
+          other.importSourceId == this.importSourceId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -1063,6 +1112,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
   final Value<DateTime?> lastResumedAt;
   final Value<int> pausedDurationSeconds;
   final Value<String?> notes;
+  final Value<String?> importSourceId;
   final Value<DateTime?> createdAt;
   final Value<DateTime?> updatedAt;
   final Value<int> rowid;
@@ -1079,6 +1129,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     this.lastResumedAt = const Value.absent(),
     this.pausedDurationSeconds = const Value.absent(),
     this.notes = const Value.absent(),
+    this.importSourceId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1096,6 +1147,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     this.lastResumedAt = const Value.absent(),
     this.pausedDurationSeconds = const Value.absent(),
     this.notes = const Value.absent(),
+    this.importSourceId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1114,6 +1166,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     Expression<DateTime>? lastResumedAt,
     Expression<int>? pausedDurationSeconds,
     Expression<String>? notes,
+    Expression<String>? importSourceId,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -1132,6 +1185,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
       if (pausedDurationSeconds != null)
         'paused_duration_seconds': pausedDurationSeconds,
       if (notes != null) 'notes': notes,
+      if (importSourceId != null) 'import_source_id': importSourceId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -1151,6 +1205,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     Value<DateTime?>? lastResumedAt,
     Value<int>? pausedDurationSeconds,
     Value<String?>? notes,
+    Value<String?>? importSourceId,
     Value<DateTime?>? createdAt,
     Value<DateTime?>? updatedAt,
     Value<int>? rowid,
@@ -1169,6 +1224,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
       pausedDurationSeconds:
           pausedDurationSeconds ?? this.pausedDurationSeconds,
       notes: notes ?? this.notes,
+      importSourceId: importSourceId ?? this.importSourceId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -1216,6 +1272,9 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
     }
+    if (importSourceId.present) {
+      map['import_source_id'] = Variable<String>(importSourceId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1243,6 +1302,7 @@ class WorkoutSessionsCompanion extends UpdateCompanion<WorkoutSessionRow> {
           ..write('lastResumedAt: $lastResumedAt, ')
           ..write('pausedDurationSeconds: $pausedDurationSeconds, ')
           ..write('notes: $notes, ')
+          ..write('importSourceId: $importSourceId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -9384,6 +9444,7 @@ typedef $$WorkoutSessionsTableCreateCompanionBuilder =
       Value<DateTime?> lastResumedAt,
       Value<int> pausedDurationSeconds,
       Value<String?> notes,
+      Value<String?> importSourceId,
       Value<DateTime?> createdAt,
       Value<DateTime?> updatedAt,
       Value<int> rowid,
@@ -9402,6 +9463,7 @@ typedef $$WorkoutSessionsTableUpdateCompanionBuilder =
       Value<DateTime?> lastResumedAt,
       Value<int> pausedDurationSeconds,
       Value<String?> notes,
+      Value<String?> importSourceId,
       Value<DateTime?> createdAt,
       Value<DateTime?> updatedAt,
       Value<int> rowid,
@@ -9557,6 +9619,11 @@ class $$WorkoutSessionsTableFilterComposer
 
   ColumnFilters<String> get notes => $composableBuilder(
     column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get importSourceId => $composableBuilder(
+    column: $table.importSourceId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9733,6 +9800,11 @@ class $$WorkoutSessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get importSourceId => $composableBuilder(
+    column: $table.importSourceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -9816,6 +9888,11 @@ class $$WorkoutSessionsTableAnnotationComposer
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<String> get importSourceId => $composableBuilder(
+    column: $table.importSourceId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -9969,6 +10046,7 @@ class $$WorkoutSessionsTableTableManager
                 Value<DateTime?> lastResumedAt = const Value.absent(),
                 Value<int> pausedDurationSeconds = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<String?> importSourceId = const Value.absent(),
                 Value<DateTime?> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -9985,6 +10063,7 @@ class $$WorkoutSessionsTableTableManager
                 lastResumedAt: lastResumedAt,
                 pausedDurationSeconds: pausedDurationSeconds,
                 notes: notes,
+                importSourceId: importSourceId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -10003,6 +10082,7 @@ class $$WorkoutSessionsTableTableManager
                 Value<DateTime?> lastResumedAt = const Value.absent(),
                 Value<int> pausedDurationSeconds = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
+                Value<String?> importSourceId = const Value.absent(),
                 Value<DateTime?> createdAt = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -10019,6 +10099,7 @@ class $$WorkoutSessionsTableTableManager
                 lastResumedAt: lastResumedAt,
                 pausedDurationSeconds: pausedDurationSeconds,
                 notes: notes,
+                importSourceId: importSourceId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

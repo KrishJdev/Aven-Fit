@@ -25,6 +25,10 @@ class WorkoutSessions extends Table {
   IntColumn get pausedDurationSeconds =>
       integer().withDefault(const Constant(0))();
   TextColumn get notes => text().nullable()();
+  /// Source identifier for CSV-imported workouts (§12.4 dedup). Format:
+  /// `import_{source}_{date}_{workoutName}`. Null for non-imported sessions.
+  /// Re-importing the same CSV skips workouts whose source-ID already exists.
+  TextColumn get importSourceId => text().nullable()();
   DateTimeColumn get createdAt =>
       dateTime().nullable().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt =>

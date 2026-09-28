@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -100,6 +100,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(foodItems);
             await m.createTable(loggedMealItems);
             await m.createTable(nutritionGoals);
+          }
+          if (from < 9) {
+            // CSV import dedup (§12.4) — source-ID on imported workouts.
+            await m.addColumn(workoutSessions, workoutSessions.importSourceId);
           }
         },
         beforeOpen: (details) async {
