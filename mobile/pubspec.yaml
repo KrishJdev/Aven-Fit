@@ -57,6 +57,7 @@ dependencies:
 
   # CSV import (§12.4 — Hevy/Strong migration engine)
   csv: ^6.0.0
+  file_picker: ^8.1.0
 
   # Auth (WU-5.1) — encrypted token storage on Android (Keystore-backed)
   flutter_secure_storage: ^9.2.4

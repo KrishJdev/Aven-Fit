@@ -52,7 +52,7 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'e47643a52cc719fe265d1cef674300d7883450ee';
+String _$authRepositoryHash() => r'167071631cd3df582aface157c10fc0591697b3f';
 
 /// KeepAlive reactive auth union (WU-5.3): replays the boot state, then
 /// follows every transition — the Profile screen renders from this and

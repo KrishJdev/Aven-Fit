@@ -335,7 +335,7 @@ final class HomeControllerProvider
   }
 }
 
-String _$homeControllerHash() => r'f2a72b21e1fde2f0ba09ad76a286deaa7404a7e0';
+String _$homeControllerHash() => r'ddf28d74110c7fca6628a9fb51391b5f58dba61d';
 
 /// Riverpod Notifier composing the Home dashboard state (WU-X.1,
 /// FEATURES.md §7.1): the active session, streak, week-over-week glance,
