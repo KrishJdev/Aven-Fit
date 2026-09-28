@@ -55,6 +55,9 @@ dependencies:
   dio: ^5.8.0+1
   workmanager: ^0.10.9
 
+  # CSV import (§12.4 — Hevy/Strong migration engine)
+  csv: ^6.0.0
+
   # Auth (WU-5.1) — encrypted token storage on Android (Keystore-backed)
   flutter_secure_storage: ^9.2.4
 
