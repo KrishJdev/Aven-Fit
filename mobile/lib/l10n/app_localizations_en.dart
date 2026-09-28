@@ -894,4 +894,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addFood => 'ADD FOOD';
+
+  @override
+  String get authWordmark => 'AVEN FIT';
+
+  @override
+  String get authLoginSubtitle => 'Train offline. Track everything.';
+
+  @override
+  String get authPhoneHint => '98765 43210';
+
+  @override
+  String get authSendOtp => 'SEND OTP';
+
+  @override
+  String get authContinueWithGoogle => 'CONTINUE WITH GOOGLE';
+
+  @override
+  String get authContinueAsGuest => 'CONTINUE AS GUEST';
+
+  @override
+  String get authOrDivider => 'OR';
+
+  @override
+  String get authDpdpNotice =>
+      'By continuing you agree to our Terms of Service and Privacy Policy. Your data stays on this device until you sign in.';
+
+  @override
+  String get authVerifyOtpTitle => 'VERIFY OTP';
+
+  @override
+  String get authOtpSentTo => 'We sent a 6-digit code to';
+
+  @override
+  String get authChangeNumber => 'Change number';
+
+  @override
+  String get authVerifying => 'VERIFYING…';
+
+  @override
+  String get authInvalidCodeFallback => 'Invalid code. Try again.';
+
+  @override
+  String get authCodeExpiredFallback => 'That code expired. Send a new one.';
+
+  @override
+  String get authResendCode => 'RESEND CODE';
+
+  @override
+  String authResendCodeIn(int seconds) {
+    return 'RESEND CODE IN ${seconds}s';
+  }
+
+  @override
+  String get authCodeExpiredNotice => 'Code expired — resend to continue.';
+
+  @override
+  String authCodeExpiresIn(String time) {
+    return 'Code expires in $time';
+  }
+
+  @override
+  String get authVerifyAndContinue => 'VERIFY & CONTINUE';
+
+  @override
+  String get authOtpManualEntryNotice =>
+      'No SMS permission needed — the code can also be typed in manually.';
 }

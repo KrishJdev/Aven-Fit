@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import 'login_controller.dart';
 
@@ -54,6 +55,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(loginControllerProvider);
+    final l10n = l10nOf(context);
 
     // One-shot designed notices (currently the Google deferral).
     ref.listen(loginControllerProvider.select((s) => s.infoMessage),
@@ -81,10 +83,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppTheme.spaceXxl),
-              const Text(
-                'AVEN FIT',
+              Text(
+                l10n.authWordmark,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppTheme.textPrimary,
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
@@ -92,10 +94,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
               const SizedBox(height: AppTheme.spaceSm),
-              const Text(
-                'Train offline. Track everything.',
+              Text(
+                l10n.authLoginSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 14,
                 ),
@@ -164,11 +166,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           weight: FontWeight.w600,
                           color: AppTheme.textPrimary,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           counterText: '',
                           border: InputBorder.none,
-                          hintText: '98765 43210',
-                          hintStyle: TextStyle(color: AppTheme.textSecondary),
+                          hintText: l10n.authPhoneHint,
+                          hintStyle: const TextStyle(color: AppTheme.textSecondary),
                         ),
                         onChanged: (value) => ref
                             .read(loginControllerProvider.notifier)
@@ -223,9 +225,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             color: AppTheme.background,
                           ),
                         )
-                      : const Text(
-                          'SEND OTP',
-                          style: TextStyle(
+                      : Text(
+                          l10n.authSendOtp,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.2,
                           ),
@@ -271,9 +273,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   horizontal: AppTheme.spaceSm,
                                 ),
                               ),
-                              child: const Text(
-                                'RETRY',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.retry,
+                                style: const TextStyle(
                                   color: AppTheme.primary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12,
@@ -287,7 +289,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
 
               const SizedBox(height: AppTheme.spaceMd),
-              const _OrDivider(),
+              _OrDivider(),
               const SizedBox(height: AppTheme.spaceMd),
 
               // Google (secondary).
@@ -303,9 +305,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     foregroundColor: AppTheme.textPrimary,
                     shape: const RoundedRectangleBorder(),
                   ),
-                  child: const Text(
-                    'CONTINUE WITH GOOGLE',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.authContinueWithGoogle,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.0,
                       fontSize: 13,
@@ -326,9 +328,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     foregroundColor: AppTheme.secondary,
                     shape: const RoundedRectangleBorder(),
                   ),
-                  child: const Text(
-                    'CONTINUE AS GUEST',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.authContinueAsGuest,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                       fontSize: 14,
@@ -339,12 +341,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
               const SizedBox(height: AppTheme.spaceXxxl),
               // DPDP transparency (§6.1) — placeholder destinations for P0.
-              const Text(
-                'By continuing you agree to our Terms of Service and '
-                'Privacy Policy. Your data stays on this device until '
-                'you sign in.',
+              Text(
+                l10n.authDpdpNotice,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 11.5,
                   height: 1.5,
@@ -363,14 +363,15 @@ class _OrDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    final l10n = l10nOf(context);
+    return Row(
       children: [
-        Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
+        const Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceMd),
           child: Text(
-            'OR',
-            style: TextStyle(
+            l10n.authOrDivider,
+            style: const TextStyle(
               color: AppTheme.textSecondary,
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -378,7 +379,7 @@ class _OrDivider extends StatelessWidget {
             ),
           ),
         ),
-        Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
+        const Expanded(child: Divider(color: AppTheme.border, thickness: 1)),
       ],
     );
   }

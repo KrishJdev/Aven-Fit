@@ -333,5 +333,29 @@
   "@removeItemMessage": {"placeholders": {"name": {"type": "String"}}},
   "removeItemConfirm": "REMOVE",
   "mealNothingLogged": "Nothing logged yet.",
-  "addFood": "ADD FOOD"
+  "addFood": "ADD FOOD",
+
+  "authWordmark": "AVEN FIT",
+  "authLoginSubtitle": "Train offline. Track everything.",
+  "authPhoneHint": "98765 43210",
+  "authSendOtp": "SEND OTP",
+  "authContinueWithGoogle": "CONTINUE WITH GOOGLE",
+  "authContinueAsGuest": "CONTINUE AS GUEST",
+  "authOrDivider": "OR",
+  "authDpdpNotice": "By continuing you agree to our Terms of Service and Privacy Policy. Your data stays on this device until you sign in.",
+
+  "authVerifyOtpTitle": "VERIFY OTP",
+  "authOtpSentTo": "We sent a 6-digit code to",
+  "authChangeNumber": "Change number",
+  "authVerifying": "VERIFYING…",
+  "authInvalidCodeFallback": "Invalid code. Try again.",
+  "authCodeExpiredFallback": "That code expired. Send a new one.",
+  "authResendCode": "RESEND CODE",
+  "authResendCodeIn": "RESEND CODE IN {seconds}s",
+  "@authResendCodeIn": {"placeholders": {"seconds": {"type": "int"}}},
+  "authCodeExpiredNotice": "Code expired — resend to continue.",
+  "authCodeExpiresIn": "Code expires in {time}",
+  "@authCodeExpiresIn": {"placeholders": {"time": {"type": "String"}}},
+  "authVerifyAndContinue": "VERIFY & CONTINUE",
+  "authOtpManualEntryNotice": "No SMS permission needed — the code can also be typed in manually."
 }

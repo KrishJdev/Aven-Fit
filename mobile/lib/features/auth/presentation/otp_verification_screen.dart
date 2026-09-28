@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import 'otp_flow_state.dart';
 import 'otp_verification_controller.dart';
@@ -37,6 +38,7 @@ class OtpVerificationScreen extends ConsumerWidget {
         expiresInSeconds: expiresInSeconds,
       ).notifier,
     );
+    final l10n = l10nOf(context);
 
     // Success → silently land on Home (§6.2). The guest→account data
     // link rides on the surviving guest UUID + the sync contract.
@@ -61,9 +63,9 @@ class OtpVerificationScreen extends ConsumerWidget {
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'VERIFY OTP',
-          style: TextStyle(
+        title: Text(
+          l10n.authVerifyOtpTitle,
+          style: const TextStyle(
             color: AppTheme.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -78,7 +80,7 @@ class OtpVerificationScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'We sent a 6-digit code to',
+                l10n.authOtpSentTo,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppTheme.textSecondary,
@@ -103,9 +105,9 @@ class OtpVerificationScreen extends ConsumerWidget {
                 style: TextButton.styleFrom(
                   foregroundColor: AppTheme.primary,
                 ),
-                child: const Text(
-                  'Change number',
-                  style: TextStyle(fontSize: 13),
+                child: Text(
+                  l10n.authChangeNumber,
+                  style: const TextStyle(fontSize: 13),
                 ),
               ),
 
@@ -130,10 +132,10 @@ class OtpVerificationScreen extends ConsumerWidget {
                   child: KeyedSubtree(
                     key: const ValueKey('otp_status_area'),
                     child: switch (state.status) {
-                      OtpStatus.verifying => const Row(
+                      OtpStatus.verifying => Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 16,
                               height: 16,
                               child: CircularProgressIndicator(
@@ -141,10 +143,10 @@ class OtpVerificationScreen extends ConsumerWidget {
                                 color: AppTheme.primary,
                               ),
                             ),
-                            SizedBox(width: 10),
+                            const SizedBox(width: 10),
                             Text(
-                              'VERIFYING…',
-                              style: TextStyle(
+                              l10n.authVerifying,
+                              style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
@@ -156,13 +158,13 @@ class OtpVerificationScreen extends ConsumerWidget {
                       OtpStatus.invalid => _OtpNotice(
                           icon: LucideIcons.alertCircle,
                           color: AppTheme.warning,
-                          text: state.errorMessage ?? 'Invalid code. Try again.',
+                          text: state.errorMessage ?? l10n.authInvalidCodeFallback,
                         ),
                       OtpStatus.expired => _OtpNotice(
                           icon: LucideIcons.timerOff,
                           color: AppTheme.warning,
                           text: state.errorMessage ??
-                              'That code expired. Send a new one.',
+                              l10n.authCodeExpiredFallback,
                         ),
                       _ => state.errorMessage != null
                           ? _OtpNotice(
@@ -189,8 +191,8 @@ class OtpVerificationScreen extends ConsumerWidget {
                 ),
                 child: Text(
                   state.canResend
-                      ? 'RESEND CODE'
-                      : 'RESEND CODE IN ${state.resendInSeconds}s',
+                      ? l10n.authResendCode
+                      : l10n.authResendCodeIn(state.resendInSeconds),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -207,8 +209,8 @@ class OtpVerificationScreen extends ConsumerWidget {
               Text(
                 key: const ValueKey('otp_expiry_display'),
                 state.isExpired
-                    ? 'Code expired — resend to continue.'
-                    : 'Code expires in ${state.expiresDisplay}',
+                    ? l10n.authCodeExpiredNotice
+                    : l10n.authCodeExpiresIn(state.expiresDisplay),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: state.isExpired
@@ -233,9 +235,9 @@ class OtpVerificationScreen extends ConsumerWidget {
                         AppTheme.primary.withValues(alpha: 0.35),
                     shape: const RoundedRectangleBorder(),
                   ),
-                  child: const Text(
-                    'VERIFY & CONTINUE',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.authVerifyAndContinue,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                     ),
@@ -244,11 +246,10 @@ class OtpVerificationScreen extends ConsumerWidget {
               ),
 
               const SizedBox(height: AppTheme.spaceLg),
-              const Text(
-                'No SMS permission needed — the code can also be typed '
-                'in manually.',
+              Text(
+                l10n.authOtpManualEntryNotice,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 11.5,
                   height: 1.5,

@@ -1728,6 +1728,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ADD FOOD'**
   String get addFood;
+
+  /// No description provided for @authWordmark.
+  ///
+  /// In en, this message translates to:
+  /// **'AVEN FIT'**
+  String get authWordmark;
+
+  /// No description provided for @authLoginSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Train offline. Track everything.'**
+  String get authLoginSubtitle;
+
+  /// No description provided for @authPhoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'98765 43210'**
+  String get authPhoneHint;
+
+  /// No description provided for @authSendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'SEND OTP'**
+  String get authSendOtp;
+
+  /// No description provided for @authContinueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'CONTINUE WITH GOOGLE'**
+  String get authContinueWithGoogle;
+
+  /// No description provided for @authContinueAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'CONTINUE AS GUEST'**
+  String get authContinueAsGuest;
+
+  /// No description provided for @authOrDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get authOrDivider;
+
+  /// No description provided for @authDpdpNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing you agree to our Terms of Service and Privacy Policy. Your data stays on this device until you sign in.'**
+  String get authDpdpNotice;
+
+  /// No description provided for @authVerifyOtpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'VERIFY OTP'**
+  String get authVerifyOtpTitle;
+
+  /// No description provided for @authOtpSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to'**
+  String get authOtpSentTo;
+
+  /// No description provided for @authChangeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Change number'**
+  String get authChangeNumber;
+
+  /// No description provided for @authVerifying.
+  ///
+  /// In en, this message translates to:
+  /// **'VERIFYING…'**
+  String get authVerifying;
+
+  /// No description provided for @authInvalidCodeFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid code. Try again.'**
+  String get authInvalidCodeFallback;
+
+  /// No description provided for @authCodeExpiredFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'That code expired. Send a new one.'**
+  String get authCodeExpiredFallback;
+
+  /// No description provided for @authResendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'RESEND CODE'**
+  String get authResendCode;
+
+  /// No description provided for @authResendCodeIn.
+  ///
+  /// In en, this message translates to:
+  /// **'RESEND CODE IN {seconds}s'**
+  String authResendCodeIn(int seconds);
+
+  /// No description provided for @authCodeExpiredNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Code expired — resend to continue.'**
+  String get authCodeExpiredNotice;
+
+  /// No description provided for @authCodeExpiresIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Code expires in {time}'**
+  String authCodeExpiresIn(String time);
+
+  /// No description provided for @authVerifyAndContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'VERIFY & CONTINUE'**
+  String get authVerifyAndContinue;
+
+  /// No description provided for @authOtpManualEntryNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'No SMS permission needed — the code can also be typed in manually.'**
+  String get authOtpManualEntryNotice;
 }
 
 class _AppLocalizationsDelegate
