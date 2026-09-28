@@ -1518,6 +1518,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CONFIRM TARGETS'**
   String get confirmTargets;
+
+  /// No description provided for @foodDatabaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FOOD DATABASE'**
+  String get foodDatabaseTitle;
+
+  /// No description provided for @foodVegOnlyChip.
+  ///
+  /// In en, this message translates to:
+  /// **'VEG ONLY'**
+  String get foodVegOnlyChip;
+
+  /// No description provided for @foodSatvikChip.
+  ///
+  /// In en, this message translates to:
+  /// **'SATVIK'**
+  String get foodSatvikChip;
+
+  /// No description provided for @searchFoodsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search foods (e.g. dal, paneer, roti)...'**
+  String get searchFoodsHint;
+
+  /// No description provided for @foodEmptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No foods match your search.'**
+  String get foodEmptyFiltered;
+
+  /// No description provided for @foodEmptyCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'The food catalog is empty.'**
+  String get foodEmptyCatalog;
+
+  /// No description provided for @foodEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a shorter query — \"dal\", \"paneer\", \"roti\" — or clear the veg/satvik filters.'**
+  String get foodEmptyHint;
+
+  /// No description provided for @foodClearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'CLEAR FILTERS'**
+  String get foodClearFilters;
+
+  /// No description provided for @foodLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load foods: {error}'**
+  String foodLoadError(String error);
+
+  /// No description provided for @foodDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FOOD DETAIL'**
+  String get foodDetailTitle;
+
+  /// No description provided for @foodNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FOOD NOT FOUND'**
+  String get foodNotFoundTitle;
+
+  /// No description provided for @backToFoodSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'BACK TO SEARCH'**
+  String get backToFoodSearch;
+
+  /// No description provided for @servingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SERVING'**
+  String get servingLabel;
+
+  /// No description provided for @unitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'UNIT'**
+  String get unitLabel;
+
+  /// No description provided for @nutritionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NUTRITION'**
+  String get nutritionLabel;
+
+  /// No description provided for @kcalUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'kcal'**
+  String get kcalUnit;
+
+  /// No description provided for @proteinLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PROTEIN'**
+  String get proteinLabel;
+
+  /// No description provided for @carbsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CARBS'**
+  String get carbsLabel;
+
+  /// No description provided for @fatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'FAT'**
+  String get fatLabel;
+
+  /// No description provided for @fiberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'FIBER'**
+  String get fiberLabel;
+
+  /// No description provided for @addToMealLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ADD TO MEAL'**
+  String get addToMealLabel;
+
+  /// No description provided for @foodLogging.
+  ///
+  /// In en, this message translates to:
+  /// **'LOGGING…'**
+  String get foodLogging;
+
+  /// No description provided for @logToMeal.
+  ///
+  /// In en, this message translates to:
+  /// **'LOG TO {meal}'**
+  String logToMeal(String meal);
+
+  /// No description provided for @customQuantityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom quantity ({unit})'**
+  String customQuantityTitle(String unit);
+
+  /// No description provided for @customQuantityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 1.5'**
+  String get customQuantityHint;
+
+  /// No description provided for @applyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'APPLY'**
+  String get applyAction;
+
+  /// No description provided for @nutritionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NUTRITION'**
+  String get nutritionTitle;
+
+  /// No description provided for @caloriesOverTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'CALORIES OVER TARGET'**
+  String get caloriesOverTarget;
+
+  /// No description provided for @caloriesRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'CALORIES REMAINING'**
+  String get caloriesRemaining;
+
+  /// No description provided for @dailyTotalsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'DAILY TOTALS'**
+  String get dailyTotalsLabel;
+
+  /// No description provided for @removeItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove item?'**
+  String get removeItemTitle;
+
+  /// No description provided for @removeItemMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{name}\" from this meal?'**
+  String removeItemMessage(String name);
+
+  /// No description provided for @removeItemConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'REMOVE'**
+  String get removeItemConfirm;
+
+  /// No description provided for @mealNothingLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing logged yet.'**
+  String get mealNothingLogged;
+
+  /// No description provided for @addFood.
+  ///
+  /// In en, this message translates to:
+  /// **'ADD FOOD'**
+  String get addFood;
 }
 
 class _AppLocalizationsDelegate

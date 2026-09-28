@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/error_state_widget.dart';
 import '../../../core/widgets/loading_state_widget.dart';
@@ -42,6 +43,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
     final detailAsync = ref.watch(foodDetailControllerProvider(widget.foodId));
     final controller =
         ref.read(foodDetailControllerProvider(widget.foodId).notifier);
+    final l10n = l10nOf(context);
 
     // Apply the meal hint once, after the food has loaded (post-frame so
     // the provider state is never mutated during build).
@@ -62,9 +64,9 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
           icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'FOOD DETAIL',
-          style: TextStyle(
+        title: Text(
+          l10n.foodDetailTitle,
+          style: const TextStyle(
             color: AppTheme.textPrimary,
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -85,9 +87,9 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                     color: AppTheme.textSecondary,
                   ),
                   const SizedBox(height: AppTheme.spaceLg),
-                  const Text(
-                    'FOOD NOT FOUND',
-                    style: TextStyle(
+                  Text(
+                    l10n.foodNotFoundTitle,
+                    style: const TextStyle(
                       color: AppTheme.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -100,9 +102,9 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                       side: const BorderSide(color: AppTheme.primary),
                       shape: const RoundedRectangleBorder(),
                     ),
-                    child: const Text(
-                      'BACK TO SEARCH',
-                      style: TextStyle(color: AppTheme.primary),
+                    child: Text(
+                      l10n.backToFoodSearch,
+                      style: const TextStyle(color: AppTheme.primary),
                     ),
                   ),
                 ],
@@ -153,16 +155,16 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
 
                       // Serving selector
                       _GlassCard(
-                        title: 'SERVING',
+                        title: l10n.servingLabel,
                         icon: LucideIcons.salad,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Text(
-                                  'UNIT',
-                                  style: TextStyle(
+                                Text(
+                                  l10n.unitLabel,
+                                  style: const TextStyle(
                                     color: AppTheme.textSecondary,
                                     fontSize: 11,
                                     letterSpacing: 0.8,
@@ -226,7 +228,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                     onTap: () => controller.setQuantity(preset),
                                   ),
                                 _QuantityChip(
-                                  label: 'CUSTOM',
+                                  label: l10n.customBadge,
                                   isSelected: !_isPreset(state.quantity),
                                   onTap: () =>
                                       _showCustomQuantityDialog(controller),
@@ -241,7 +243,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
 
                       // Nutrition panel
                       _GlassCard(
-                        title: 'NUTRITION',
+                        title: l10n.nutritionLabel,
                         icon: LucideIcons.layers,
                         child: Column(
                           children: [
@@ -257,11 +259,11 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 6),
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 5),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
                                   child: Text(
-                                    'kcal',
-                                    style: TextStyle(
+                                    l10n.kcalUnit,
+                                    style: const TextStyle(
                                       color: AppTheme.textSecondary,
                                       fontSize: 13,
                                     ),
@@ -271,11 +273,11 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                             ),
                             const SizedBox(height: AppTheme.spaceMd),
                             _MacroRow(
-                                label: 'PROTEIN', grams: macros.proteinG),
-                            _MacroRow(label: 'CARBS', grams: macros.carbsG),
-                            _MacroRow(label: 'FAT', grams: macros.fatG),
+                                label: l10n.proteinLabel, grams: macros.proteinG),
+                            _MacroRow(label: l10n.carbsLabel, grams: macros.carbsG),
+                            _MacroRow(label: l10n.fatLabel, grams: macros.fatG),
                             _MacroRow(
-                              label: 'FIBER',
+                              label: l10n.fiberLabel,
                               grams: macros.fiberG,
                             ),
                           ],
@@ -286,7 +288,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
 
                       // Meal selector
                       _GlassCard(
-                        title: 'ADD TO MEAL',
+                        title: l10n.addToMealLabel,
                         icon: LucideIcons.bookOpen,
                         child: Wrap(
                           spacing: 8,
@@ -320,9 +322,9 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                   child: SizedBox(
                     width: double.infinity,
                     child: state.isLogging
-                        ? const OutlinedButton(
+                        ? OutlinedButton(
                             onPressed: null,
-                            style: ButtonStyle(
+                            style: const ButtonStyle(
                               side: WidgetStatePropertyAll(
                                 BorderSide(color: AppTheme.border),
                               ),
@@ -334,8 +336,8 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                               ),
                             ),
                             child: Text(
-                              'LOGGING…',
-                              style: TextStyle(
+                              l10n.foodLogging,
+                              style: const TextStyle(
                                 color: AppTheme.textSecondary,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.5,
@@ -353,7 +355,7 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                                   const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
-                              'LOG TO ${state.mealType.label}',
+                              l10n.logToMeal(state.mealType.label),
                               style: const TextStyle(
                                 color: AppTheme.secondary,
                                 fontWeight: FontWeight.w700,
@@ -403,13 +405,14 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
     final current = ref.read(foodDetailControllerProvider(widget.foodId)).value;
     if (current == null) return;
 
+    final l10n = l10nOf(context);
     final fieldController =
         TextEditingController(text: _fmtNum(current.quantity));
     final parsed = await showDialog<double>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(
-          'Custom quantity (${_unitLabel(current.unit)})',
+          l10n.customQuantityTitle(_unitLabel(current.unit)),
           style: const TextStyle(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
@@ -425,17 +428,17 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
             FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
           ],
           style: const TextStyle(color: AppTheme.textPrimary),
-          decoration: const InputDecoration(
-            hintText: 'e.g. 1.5',
-            hintStyle: TextStyle(color: AppTheme.textSecondary),
+          decoration: InputDecoration(
+            hintText: l10n.customQuantityHint,
+            hintStyle: const TextStyle(color: AppTheme.textSecondary),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
-              'CANCEL',
-              style: TextStyle(color: AppTheme.textSecondary),
+            child: Text(
+              l10n.dialogCancel,
+              style: const TextStyle(color: AppTheme.textSecondary),
             ),
           ),
           OutlinedButton(
@@ -448,9 +451,9 @@ class _FoodDetailScreenState extends ConsumerState<FoodDetailScreen> {
                   double.tryParse(fieldController.text.trim().replaceAll(',', '.'));
               Navigator.of(ctx).pop(value);
             },
-            child: const Text(
-              'APPLY',
-              style: TextStyle(
+            child: Text(
+              l10n.applyAction,
+              style: const TextStyle(
                 color: AppTheme.primary,
                 fontWeight: FontWeight.w600,
               ),

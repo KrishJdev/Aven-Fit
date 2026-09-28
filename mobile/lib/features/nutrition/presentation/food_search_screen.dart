@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/loading_state_widget.dart';
 import '../domain/food_item.dart';
@@ -42,6 +43,7 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
   Widget build(BuildContext context) {
     final stateAsync = ref.watch(foodSearchControllerProvider);
     final controller = ref.read(foodSearchControllerProvider.notifier);
+    final l10n = l10nOf(context);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -54,9 +56,9 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
         ),
         title: Row(
           children: [
-            const Text(
-              'FOOD DATABASE',
-              style: TextStyle(
+            Text(
+              l10n.foodDatabaseTitle,
+              style: const TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -111,13 +113,13 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                 child: Row(
                   children: [
                     _FilterChip(
-                      label: 'VEG ONLY',
+                      label: l10n.foodVegOnlyChip,
                       isSelected: state.vegOnly,
                       onTap: controller.toggleVegOnly,
                     ),
                     const SizedBox(width: AppTheme.spaceSm),
                     _FilterChip(
-                      label: 'SATVIK',
+                      label: l10n.foodSatvikChip,
                       isSelected: state.satvikOnly,
                       onTap: controller.toggleSatvikOnly,
                       activeColor: AppTheme.secondary,
@@ -173,7 +175,7 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
               ),
               const SizedBox(height: AppTheme.spaceMd),
               Text(
-                'Failed to load foods: $err',
+                l10n.foodLoadError(err.toString()),
                 style: const TextStyle(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
@@ -184,9 +186,9 @@ class _FoodSearchScreenState extends ConsumerState<FoodSearchScreen> {
                   side: const BorderSide(color: AppTheme.primary),
                   shape: const RoundedRectangleBorder(),
                 ),
-                child: const Text(
-                  'RETRY',
-                  style: TextStyle(color: AppTheme.primary),
+                child: Text(
+                  l10n.retry,
+                  style: const TextStyle(color: AppTheme.primary),
                 ),
               ),
             ],
@@ -211,6 +213,7 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       height: 48,
       decoration: BoxDecoration(
@@ -234,9 +237,9 @@ class _SearchBar extends StatelessWidget {
                 color: AppTheme.textPrimary,
                 fontSize: 14,
               ),
-              decoration: const InputDecoration(
-                hintText: 'Search foods (e.g. dal, paneer, roti)...',
-                hintStyle: TextStyle(
+              decoration: InputDecoration(
+                hintText: l10n.searchFoodsHint,
+                hintStyle: const TextStyle(
                   color: AppTheme.textSecondary,
                   fontSize: 14,
                 ),
@@ -277,6 +280,7 @@ class _FoodTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppTheme.spaceLg, vertical: AppTheme.spaceXs),
       decoration: BoxDecoration(
@@ -317,13 +321,13 @@ class _FoodTile extends StatelessWidget {
                         runSpacing: 4,
                         children: [
                           if (food.isSatvik)
-                            const _Badge(
-                              label: 'SATVIK',
+                            _Badge(
+                              label: l10n.foodSatvikChip,
                               color: AppTheme.secondary,
                             ),
                           if (food.isCustom)
-                            const _Badge(
-                              label: 'CUSTOM',
+                            _Badge(
+                              label: l10n.customBadge,
                               color: AppTheme.textSecondary,
                             ),
                         ],
@@ -493,6 +497,7 @@ class _EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppTheme.spaceXxxl),
@@ -507,8 +512,8 @@ class _EmptyStateView extends StatelessWidget {
             const SizedBox(height: AppTheme.spaceLg),
             Text(
               hasFilters
-                  ? 'No foods match your search.'
-                  : 'The food catalog is empty.',
+                  ? l10n.foodEmptyFiltered
+                  : l10n.foodEmptyCatalog,
               style: const TextStyle(
                 color: AppTheme.textPrimary,
                 fontSize: 15,
@@ -517,9 +522,9 @@ class _EmptyStateView extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppTheme.spaceSm),
-            const Text(
-              'Try a shorter query — "dal", "paneer", "roti" — or clear the veg/satvik filters.',
-              style: TextStyle(
+            Text(
+              l10n.foodEmptyHint,
+              style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
               ),
@@ -535,9 +540,9 @@ class _EmptyStateView extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppTheme.spaceXl, vertical: AppTheme.spaceMd),
                 ),
-                child: const Text(
-                  'CLEAR FILTERS',
-                  style: TextStyle(
+                child: Text(
+                  l10n.foodClearFilters,
+                  style: const TextStyle(
                     color: AppTheme.primary,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,

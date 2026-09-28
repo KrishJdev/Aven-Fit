@@ -780,4 +780,118 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmTargets => 'CONFIRM TARGETS';
+
+  @override
+  String get foodDatabaseTitle => 'FOOD DATABASE';
+
+  @override
+  String get foodVegOnlyChip => 'VEG ONLY';
+
+  @override
+  String get foodSatvikChip => 'SATVIK';
+
+  @override
+  String get searchFoodsHint => 'Search foods (e.g. dal, paneer, roti)...';
+
+  @override
+  String get foodEmptyFiltered => 'No foods match your search.';
+
+  @override
+  String get foodEmptyCatalog => 'The food catalog is empty.';
+
+  @override
+  String get foodEmptyHint =>
+      'Try a shorter query — \"dal\", \"paneer\", \"roti\" — or clear the veg/satvik filters.';
+
+  @override
+  String get foodClearFilters => 'CLEAR FILTERS';
+
+  @override
+  String foodLoadError(String error) {
+    return 'Failed to load foods: $error';
+  }
+
+  @override
+  String get foodDetailTitle => 'FOOD DETAIL';
+
+  @override
+  String get foodNotFoundTitle => 'FOOD NOT FOUND';
+
+  @override
+  String get backToFoodSearch => 'BACK TO SEARCH';
+
+  @override
+  String get servingLabel => 'SERVING';
+
+  @override
+  String get unitLabel => 'UNIT';
+
+  @override
+  String get nutritionLabel => 'NUTRITION';
+
+  @override
+  String get kcalUnit => 'kcal';
+
+  @override
+  String get proteinLabel => 'PROTEIN';
+
+  @override
+  String get carbsLabel => 'CARBS';
+
+  @override
+  String get fatLabel => 'FAT';
+
+  @override
+  String get fiberLabel => 'FIBER';
+
+  @override
+  String get addToMealLabel => 'ADD TO MEAL';
+
+  @override
+  String get foodLogging => 'LOGGING…';
+
+  @override
+  String logToMeal(String meal) {
+    return 'LOG TO $meal';
+  }
+
+  @override
+  String customQuantityTitle(String unit) {
+    return 'Custom quantity ($unit)';
+  }
+
+  @override
+  String get customQuantityHint => 'e.g. 1.5';
+
+  @override
+  String get applyAction => 'APPLY';
+
+  @override
+  String get nutritionTitle => 'NUTRITION';
+
+  @override
+  String get caloriesOverTarget => 'CALORIES OVER TARGET';
+
+  @override
+  String get caloriesRemaining => 'CALORIES REMAINING';
+
+  @override
+  String get dailyTotalsLabel => 'DAILY TOTALS';
+
+  @override
+  String get removeItemTitle => 'Remove item?';
+
+  @override
+  String removeItemMessage(String name) {
+    return 'Remove \"$name\" from this meal?';
+  }
+
+  @override
+  String get removeItemConfirm => 'REMOVE';
+
+  @override
+  String get mealNothingLogged => 'Nothing logged yet.';
+
+  @override
+  String get addFood => 'ADD FOOD';
 }

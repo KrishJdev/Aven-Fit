@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/meal_type.dart';
 import '../../domain/nutrition_log_entry.dart';
@@ -36,6 +37,7 @@ class MealSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return Container(
       key: ValueKey('meal_section_${mealType.name}'),
       width: double.infinity,
@@ -82,7 +84,7 @@ class MealSectionCard extends StatelessWidget {
 
           if (entries.isEmpty)
             Text(
-              'Nothing logged yet.',
+              l10n.mealNothingLogged,
               style: const TextStyle(
                 color: AppTheme.textSecondary,
                 fontSize: 13,
@@ -240,6 +242,7 @@ class _AddFoodButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = l10nOf(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -248,14 +251,14 @@ class _AddFoodButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: AppTheme.border),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.plus, size: 14, color: AppTheme.primary),
-            SizedBox(width: 6),
+            const Icon(LucideIcons.plus, size: 14, color: AppTheme.primary),
+            const SizedBox(width: 6),
             Text(
-              'ADD FOOD',
-              style: TextStyle(
+              l10n.addFood,
+              style: const TextStyle(
                 color: AppTheme.primary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
