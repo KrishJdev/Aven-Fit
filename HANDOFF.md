@@ -660,6 +660,29 @@
     - **Migration test updated:** `migration_test.dart` asserts `schemaVersion == 9` (was 8) and `from 1..8` (was `1..7`).
     - **Gates:** `flutter analyze` → No issues found; `import/` tests → 21/21 pass (16 parser/matcher + 5 repository); `migration_test` → 2/2 pass; full `flutter test` → **408/408 passing** (was 403 + 5 new import repository tests; clean full-suite run, no drift-stream flake).
     - **NEXT STEP (exact):** Chunk 3 of 3 — the import screen & flow (presentation layer): `import_screen.dart` with system file picker (`file_picker` package), parse → preview with mapping review (high-confidence auto-mapped silently, medium batch-reviewed, low → custom-exercise offers), progress states (L6), and success state "Imported N workouts · M sets · K PRs" → land on Progress. Wire entry point from the Profile screen's "DATA EXPORT" placeholder (or a new Settings → Data Import entry). Add `importRepositoryProvider` Riverpod provider. Awaiting user go-ahead.
+- **2026-09-30 (session 68):** **P1 CSV Importer — Chunk 3 of 3: Presentation Layer & Flow Integration** (FEATURES.md §12.4, J4 journey). Completes the Hevy & Strong 1-tap offline CSV migration engine.
+    - **Contract & Services (`features/import/data/file_picker_service.dart`):** `FilePickerService` interface and `PlatformFilePickerService` using `file_picker` package (`filePickerServiceProvider`). Injected into controller for 100% deterministic testability.
+    - **Riverpod Provider (`features/import/data/import_repository.dart`):** Added `@riverpod` `importRepositoryProvider` wiring `db.workoutDao`, `exerciseRepositoryProvider`, and `prRepositoryProvider`.
+    - **Presentation Layer (`features/import/presentation/`):**
+      - `import_state.dart`: Freezed `ImportState` tracking status (`idle`, `parsing`, `preview`, `importing`, `success`, `error`), `fileName`, `summary`, `matchResults`, `result`, `errorMessage`, with getters for confidence tiers (`highConfidenceMatches`, `mediumConfidenceMatches`, `lowConfidenceMatches`) and formatted date range.
+      - `import_controller.dart`: `ImportController` Riverpod notifier handling `pickAndParseFile()`, `parseCsvContent()`, `updateExerciseMatch()`, `startImport()`, and `reset()`.
+      - `import_screen.dart`: Declarative `ConsumerStatefulWidget` strictly following v2 UI/UX design system with all L6 designed states:
+        - *Idle:* hero icon, title, 3-step walkthrough card, "SELECT CSV FILE" button, supported formats disclaimer.
+        - *Parsing:* progress indicator with "Analyzing CSV & matching exercises…".
+        - *Preview:* summary card (source badge, workout count, set count, date range), segmented mapping review tabs ("Auto-mapped", "Needs review", "Custom creation" with custom notice), and sticky action bar ("IMPORT N WORKOUTS", "CANCEL").
+        - *Importing:* progress indicator with PR calculation subtitle.
+        - *Success:* checkmark badge, summary headline ("Imported N workouts · M sets · K PRs" / idempotent "All N workouts from this file were previously imported"), custom count, duplicate count, "VIEW PROGRESS" (navigates to `/progress`), and "DONE" buttons.
+        - *Error:* warning icon, descriptive error message, and "SELECT ANOTHER FILE" retry action.
+    - **Routing & Navigation (`core/router/app_router.dart`):** Registered `/import` route.
+    - **Entry point (`features/profile/presentation/profile_screen.dart`):** Added `_LinkRow` for `profile_link_import` ("DATA IMPORT") with upload icon navigating to `/import`.
+    - **Fuzzy Matcher improvement (`features/import/domain/exercise_matcher.dart`):** Added trailing 's' singular stemming in `_tokenize` to handle common exercise plural variations (e.g. "Triceps Pushdown" vs "Tricep Pushdown", "Squats" vs "Squat").
+    - **Localization (`l10n/app_en.arb`):** Externalized all 28 new import labels and parameters; regenerated with `flutter gen-l10n`.
+    - **Tests (`test/features/import/import_flow_test.dart` + `test/features/profile/profile_test.dart`):**
+      - Created `import_flow_test.dart` (11 comprehensive unit & widget tests): controller lifecycle (idle, cancelled picker, Strong CSV preview with high-confidence matches, Hevy CSV custom exercise identification, match update, single-transaction commit, duplicate idempotent skip, malformed CSV error handling, reset) and screen widget tests (idle render, picker flow, preview state with tabs, commit flow into success state with "VIEW PROGRESS" navigation, error state with retry).
+      - Updated `profile_test.dart` to assert `profile_link_import` presence and ensure snackbar dismissal before tapping.
+    - **Gates:** `flutter analyze` → No issues found (0 issues); `test/features/import/` → 32/32 tests passing (16 parser/matcher + 5 repo + 11 flow); `profile_test.dart` → 14/14 tests passing.
+    - **P1 CSV Importer Status:** ✅ **100% COMPLETE** (Chunk 1 parser + Chunk 2 repository/v9 migration + Chunk 3 presentation/integration).
+    - **NEXT STEP (exact):** Next post-MVP feature slice: **V1.1 Adaptive TDEE Engine** (FEATURES.md §11.11, J5 Cultural & Metabolic Journey) or **Vrat Mode / Satvik Filter** (§11.10). Awaiting user go-ahead.
 
 ---
 
@@ -683,7 +706,8 @@
 | **Slice 3** | Active Workout Engine | ✅ Completed | Live session UI, ghost prefill, rest timer math, SQLite write-through + `/api/v1/workouts` | E2E live-session test with SQLite write-through & lock-screen service test |
 | **Slice 4** | Indian Nutrition Engine | ✅ Completed | Local 948-food bundled catalog search, household units + `/api/v1/nutrition` | 275/275 Flutter tests passing (food search <300ms, katori macro math, J3 journey suite, fiber unknown-semantics) |
 | **Slice 5** | Auth & Cloud Sync | ✅ Completed | Phone OTP/Google login, Profile with lifetime stats, Spring Security + `/api/v1/sync` queue (backend pre-complete) | Spring Security OTP integration test + sync push/pull integration tests (`./gradlew test`) + 340/340 Flutter tests (auth union/lifecycle, screens, profile stats & sign-out) |
-| **Post-MVP** | P1/V1.1/V2 slices | ⬜ Queued | CSV importer, EMA TDEE engine, Vrat Mode, sync hardening, AI surfaces | CSV importer integrity test, EMA TDEE math test, Trainer QR payload test |
+| **Slice 6 (P1)** | CSV Importer (Trojan Horse) | ✅ Completed | Strong/Hevy CSV parser, fuzzy exercise matcher, single-transaction SQLite ingestion, duplicate source-ID detection, PR recompute, full UI flow | 32/32 Flutter tests passing (J4 journey verified) |
+| **Post-MVP** | V1.1/V2 slices | ⬜ Queued | EMA TDEE engine, Vrat Mode, sync hardening, AI surfaces | EMA TDEE math test, Trainer QR payload test |
 
 ---
 

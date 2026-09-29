@@ -357,5 +357,67 @@
   "authCodeExpiresIn": "Code expires in {time}",
   "@authCodeExpiresIn": {"placeholders": {"time": {"type": "String"}}},
   "authVerifyAndContinue": "VERIFY & CONTINUE",
-  "authOtpManualEntryNotice": "No SMS permission needed — the code can also be typed in manually."
+  "authOtpManualEntryNotice": "No SMS permission needed — the code can also be typed in manually.",
+
+  "linkDataImport": "DATA IMPORT",
+  "importTitle": "IMPORT WORKOUTS",
+  "importHeadline": "MIGRATE YOUR WORKOUTS",
+  "importSubtitle": "Switching from Strong or Hevy? Migrate your workout logs and PR history in seconds. 100% on-device and private.",
+  "importStep1": "Select your Strong or Hevy CSV export file",
+  "importStep2": "Review exercise mappings (exact, suggestions, or custom)",
+  "importStep3": "Instant offline import with automatic PR calculation",
+  "importSelectFile": "SELECT CSV FILE",
+  "importSupportedNotice": "Supported: Strong CSV, Hevy CSV · No account needed",
+  "importAnalyzing": "Analyzing CSV & matching exercises…",
+  "importSummaryTitle": "WORKOUT SUMMARY",
+  "importSourceLabel": "SOURCE",
+  "importWorkoutsLabel": "WORKOUTS",
+  "importSetsLabel": "TOTAL SETS",
+  "importDateRangeLabel": "DATE RANGE",
+  "importExerciseMappingTitle": "EXERCISE MATCHING",
+  "importAutoMappedLabel": "Auto-mapped",
+  "importReviewLabel": "Needs review",
+  "importCustomLabel": "Custom creation",
+  "importCustomNotice": "Unmatched exercises will be created as custom exercises so no data is lost.",
+  "importStartButton": "IMPORT {count} WORKOUTS",
+  "@importStartButton": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "importCancelButton": "CANCEL",
+  "importingProgress": "Importing workouts to local database…",
+  "importCalculatingPrs": "Calculating personal records…",
+  "importSuccessTitle": "IMPORT COMPLETE",
+  "importSuccessSummary": "Imported {workouts} workouts · {sets} sets · {prs} PRs",
+  "@importSuccessSummary": {
+    "placeholders": {
+      "workouts": {"type": "int"},
+      "sets": {"type": "int"},
+      "prs": {"type": "int"}
+    }
+  },
+  "importAlreadyImportedTitle": "ALREADY IMPORTED",
+  "importAlreadyImportedMessage": "All {count} workouts from this file were previously imported.",
+  "@importAlreadyImportedMessage": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "importCustomCreatedCount": "{count} custom exercises created",
+  "@importCustomCreatedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "importDuplicatesSkippedCount": "{count} duplicate workouts skipped",
+  "@importDuplicatesSkippedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "importViewProgress": "VIEW PROGRESS",
+  "importDone": "DONE",
+  "importErrorTitle": "IMPORT FAILED",
+  "importSelectAnother": "SELECT ANOTHER FILE"
 }

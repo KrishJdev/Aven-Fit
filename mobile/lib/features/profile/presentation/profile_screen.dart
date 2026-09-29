@@ -394,6 +394,13 @@ class _QuickLinks extends StatelessWidget {
           ),
           const Divider(height: 1, color: AppTheme.border),
           _LinkRow(
+            key: const ValueKey('profile_link_import'),
+            icon: LucideIcons.upload,
+            label: l10n.linkDataImport,
+            onTap: () => context.push('/import'),
+          ),
+          const Divider(height: 1, color: AppTheme.border),
+          _LinkRow(
             key: const ValueKey('profile_link_export'),
             icon: LucideIcons.download,
             label: l10n.linkDataExport,

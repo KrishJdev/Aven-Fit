@@ -1,9 +1,14 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../main.dart';
 import '../../exercise/data/exercise_repository.dart';
 import '../../exercise/domain/muscle_group.dart';
 import '../../progress/data/pr_repository.dart';
 import '../../workout/data/workout_local_source.dart';
 import '../domain/exercise_matcher.dart';
 import '../domain/import_models.dart';
+
+part 'import_repository.g.dart';
 
 /// Repository for importing parsed CSV workouts into local SQLite
 /// (FEATURES.md §12.4, J4 journey).
@@ -234,4 +239,17 @@ class _WorkoutImport {
   final ParsedWorkout workout;
   final String sourceId;
   final int index;
+}
+
+/// Riverpod provider exposing [ImportRepository].
+@riverpod
+ImportRepository importRepository(Ref ref) {
+  final db = ref.watch(appDatabaseProvider);
+  final exerciseRepo = ref.watch(exerciseRepositoryProvider);
+  final prRepo = ref.watch(prRepositoryProvider);
+  return ImportRepository(
+    workoutDao: db.workoutDao,
+    exerciseRepo: exerciseRepo,
+    prRepo: prRepo,
+  );
 }

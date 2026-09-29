@@ -444,6 +444,8 @@ void main() {
 
       expect(find.byKey(const ValueKey('profile_link_settings')),
           findsOneWidget);
+      expect(find.byKey(const ValueKey('profile_link_import')),
+          findsOneWidget);
       expect(find.byKey(const ValueKey('profile_link_export')),
           findsOneWidget);
       expect(find.byKey(const ValueKey('profile_link_about')), findsOneWidget);
@@ -547,6 +549,11 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Data export is coming in a future update.'),
           findsOneWidget);
+
+      ScaffoldMessenger.of(
+              tester.element(find.byKey(const ValueKey('profile_quick_links'))))
+          .hideCurrentSnackBar();
+      await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const ValueKey('profile_link_about')));
       await tester.pumpAndSettle();

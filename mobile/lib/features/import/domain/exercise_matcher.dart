@@ -140,6 +140,9 @@ class ExerciseMatcher {
     return normalized
         .split(' ')
         .where((t) => t.isNotEmpty && !stopWords.contains(t))
+        .map((t) => (t.endsWith('s') && !t.endsWith('ss') && t.length > 3)
+            ? t.substring(0, t.length - 1)
+            : t)
         .toSet();
   }
 

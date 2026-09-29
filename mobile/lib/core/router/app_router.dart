@@ -7,6 +7,7 @@ import 'package:aven_fit/features/exercise/presentation/exercise_list_screen.dar
 import 'package:aven_fit/features/history/presentation/history_list_screen.dart';
 import 'package:aven_fit/features/history/presentation/progress_screen.dart';
 import 'package:aven_fit/features/history/presentation/workout_detail_screen.dart';
+import 'package:aven_fit/features/import/presentation/import_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/food_detail_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/food_search_screen.dart';
 import 'package:aven_fit/features/nutrition/presentation/nutrition_screen.dart';
@@ -130,6 +131,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/progress/prs',
       builder: (context, state) => const PrVaultScreen(),
+    ),
+    GoRoute(
+      path: '/import',
+      builder: (context, state) => const ImportScreen(),
     ),
     GoRoute(
       path: '/auth/login',

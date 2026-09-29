@@ -960,4 +960,121 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authOtpManualEntryNotice =>
       'No SMS permission needed — the code can also be typed in manually.';
+
+  @override
+  String get linkDataImport => 'DATA IMPORT';
+
+  @override
+  String get importTitle => 'IMPORT WORKOUTS';
+
+  @override
+  String get importHeadline => 'MIGRATE YOUR WORKOUTS';
+
+  @override
+  String get importSubtitle =>
+      'Switching from Strong or Hevy? Migrate your workout logs and PR history in seconds. 100% on-device and private.';
+
+  @override
+  String get importStep1 => 'Select your Strong or Hevy CSV export file';
+
+  @override
+  String get importStep2 =>
+      'Review exercise mappings (exact, suggestions, or custom)';
+
+  @override
+  String get importStep3 =>
+      'Instant offline import with automatic PR calculation';
+
+  @override
+  String get importSelectFile => 'SELECT CSV FILE';
+
+  @override
+  String get importSupportedNotice =>
+      'Supported: Strong CSV, Hevy CSV · No account needed';
+
+  @override
+  String get importAnalyzing => 'Analyzing CSV & matching exercises…';
+
+  @override
+  String get importSummaryTitle => 'WORKOUT SUMMARY';
+
+  @override
+  String get importSourceLabel => 'SOURCE';
+
+  @override
+  String get importWorkoutsLabel => 'WORKOUTS';
+
+  @override
+  String get importSetsLabel => 'TOTAL SETS';
+
+  @override
+  String get importDateRangeLabel => 'DATE RANGE';
+
+  @override
+  String get importExerciseMappingTitle => 'EXERCISE MATCHING';
+
+  @override
+  String get importAutoMappedLabel => 'Auto-mapped';
+
+  @override
+  String get importReviewLabel => 'Needs review';
+
+  @override
+  String get importCustomLabel => 'Custom creation';
+
+  @override
+  String get importCustomNotice =>
+      'Unmatched exercises will be created as custom exercises so no data is lost.';
+
+  @override
+  String importStartButton(int count) {
+    return 'IMPORT $count WORKOUTS';
+  }
+
+  @override
+  String get importCancelButton => 'CANCEL';
+
+  @override
+  String get importingProgress => 'Importing workouts to local database…';
+
+  @override
+  String get importCalculatingPrs => 'Calculating personal records…';
+
+  @override
+  String get importSuccessTitle => 'IMPORT COMPLETE';
+
+  @override
+  String importSuccessSummary(int workouts, int sets, int prs) {
+    return 'Imported $workouts workouts · $sets sets · $prs PRs';
+  }
+
+  @override
+  String get importAlreadyImportedTitle => 'ALREADY IMPORTED';
+
+  @override
+  String importAlreadyImportedMessage(int count) {
+    return 'All $count workouts from this file were previously imported.';
+  }
+
+  @override
+  String importCustomCreatedCount(int count) {
+    return '$count custom exercises created';
+  }
+
+  @override
+  String importDuplicatesSkippedCount(int count) {
+    return '$count duplicate workouts skipped';
+  }
+
+  @override
+  String get importViewProgress => 'VIEW PROGRESS';
+
+  @override
+  String get importDone => 'DONE';
+
+  @override
+  String get importErrorTitle => 'IMPORT FAILED';
+
+  @override
+  String get importSelectAnother => 'SELECT ANOTHER FILE';
 }

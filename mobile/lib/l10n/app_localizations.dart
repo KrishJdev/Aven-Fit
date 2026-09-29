@@ -1848,6 +1848,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No SMS permission needed — the code can also be typed in manually.'**
   String get authOtpManualEntryNotice;
+
+  /// No description provided for @linkDataImport.
+  ///
+  /// In en, this message translates to:
+  /// **'DATA IMPORT'**
+  String get linkDataImport;
+
+  /// No description provided for @importTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT WORKOUTS'**
+  String get importTitle;
+
+  /// No description provided for @importHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'MIGRATE YOUR WORKOUTS'**
+  String get importHeadline;
+
+  /// No description provided for @importSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switching from Strong or Hevy? Migrate your workout logs and PR history in seconds. 100% on-device and private.'**
+  String get importSubtitle;
+
+  /// No description provided for @importStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your Strong or Hevy CSV export file'**
+  String get importStep1;
+
+  /// No description provided for @importStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Review exercise mappings (exact, suggestions, or custom)'**
+  String get importStep2;
+
+  /// No description provided for @importStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Instant offline import with automatic PR calculation'**
+  String get importStep3;
+
+  /// No description provided for @importSelectFile.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT CSV FILE'**
+  String get importSelectFile;
+
+  /// No description provided for @importSupportedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Supported: Strong CSV, Hevy CSV · No account needed'**
+  String get importSupportedNotice;
+
+  /// No description provided for @importAnalyzing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing CSV & matching exercises…'**
+  String get importAnalyzing;
+
+  /// No description provided for @importSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WORKOUT SUMMARY'**
+  String get importSummaryTitle;
+
+  /// No description provided for @importSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SOURCE'**
+  String get importSourceLabel;
+
+  /// No description provided for @importWorkoutsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WORKOUTS'**
+  String get importWorkoutsLabel;
+
+  /// No description provided for @importSetsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL SETS'**
+  String get importSetsLabel;
+
+  /// No description provided for @importDateRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'DATE RANGE'**
+  String get importDateRangeLabel;
+
+  /// No description provided for @importExerciseMappingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'EXERCISE MATCHING'**
+  String get importExerciseMappingTitle;
+
+  /// No description provided for @importAutoMappedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-mapped'**
+  String get importAutoMappedLabel;
+
+  /// No description provided for @importReviewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs review'**
+  String get importReviewLabel;
+
+  /// No description provided for @importCustomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom creation'**
+  String get importCustomLabel;
+
+  /// No description provided for @importCustomNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmatched exercises will be created as custom exercises so no data is lost.'**
+  String get importCustomNotice;
+
+  /// No description provided for @importStartButton.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT {count} WORKOUTS'**
+  String importStartButton(int count);
+
+  /// No description provided for @importCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'CANCEL'**
+  String get importCancelButton;
+
+  /// No description provided for @importingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing workouts to local database…'**
+  String get importingProgress;
+
+  /// No description provided for @importCalculatingPrs.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating personal records…'**
+  String get importCalculatingPrs;
+
+  /// No description provided for @importSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT COMPLETE'**
+  String get importSuccessTitle;
+
+  /// No description provided for @importSuccessSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {workouts} workouts · {sets} sets · {prs} PRs'**
+  String importSuccessSummary(int workouts, int sets, int prs);
+
+  /// No description provided for @importAlreadyImportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ALREADY IMPORTED'**
+  String get importAlreadyImportedTitle;
+
+  /// No description provided for @importAlreadyImportedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All {count} workouts from this file were previously imported.'**
+  String importAlreadyImportedMessage(int count);
+
+  /// No description provided for @importCustomCreatedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} custom exercises created'**
+  String importCustomCreatedCount(int count);
+
+  /// No description provided for @importDuplicatesSkippedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} duplicate workouts skipped'**
+  String importDuplicatesSkippedCount(int count);
+
+  /// No description provided for @importViewProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'VIEW PROGRESS'**
+  String get importViewProgress;
+
+  /// No description provided for @importDone.
+  ///
+  /// In en, this message translates to:
+  /// **'DONE'**
+  String get importDone;
+
+  /// No description provided for @importErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'IMPORT FAILED'**
+  String get importErrorTitle;
+
+  /// No description provided for @importSelectAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'SELECT ANOTHER FILE'**
+  String get importSelectAnother;
 }
 
 class _AppLocalizationsDelegate
